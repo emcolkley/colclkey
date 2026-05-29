@@ -170,8 +170,11 @@
     background: var(--dark3); overflow: hidden; position: relative;
   }
   .producto-preview-thumb canvas {
-    width: 200px;
-    height: 190px;
+    width: 100%;
+    height: 100%;
+    max-width: 200px;
+    max-height: 190px;
+    object-fit: contain;
     display: block;
   }
   .producto-info { padding: 1rem 1.1rem 1.2rem; }
@@ -440,6 +443,145 @@
   }
   input:checked + .slider { background-color: rgba(201,168,76,0.12); border-color: var(--gold); }
   input:checked + .slider:before { transform: translateX(22px); background-color: var(--gold); }
+
+  /* ══════════════════════════════════════════
+     OPTIMIZACIONES MÓVILES PREMIUM
+     ══════════════════════════════════════════ */
+
+  /* Para pantallas medianas y pequeñas (máx. 700px) */
+  @media (max-width: 700px) {
+    .personalizar-layout {
+      display: flex;
+      flex-direction: column-reverse; /* El previsualizador del canvas va ARRIBA en mobile */
+      gap: 1.5rem;
+    }
+    .preview-container {
+      padding: 1.2rem;
+    }
+    #frame-preview {
+      max-width: 290px;
+    }
+    .upload-zone {
+      padding: 1.5rem;
+      min-height: 160px;
+    }
+    .upload-icon {
+      font-size: 2rem;
+    }
+    .upload-text {
+      font-size: 0.74rem;
+    }
+    .upload-btn {
+      padding: 8px 18px;
+      font-size: 0.74rem;
+    }
+  }
+
+  /* Para pantallas pequeñas generales (máx. 600px) */
+  @media (max-width: 600px) {
+    /* Navegación y logo */
+    nav { padding: 0.7rem 1rem; }
+    .logo-text { font-size: 1.05rem; letter-spacing: 2px; }
+    .logo-circle { width: 36px; height: 36px; font-size: 1.1rem; }
+    .nav-cart { padding: 8px 14px; font-size: 0.72rem; }
+    .cart-count { width: 18px; height: 18px; font-size: 0.65rem; }
+
+    /* Hero */
+    .hero { padding: 3rem 1rem 2.5rem; }
+    .hero-badge { font-size: 0.6rem; letter-spacing: 2px; padding: 4px 12px; margin-bottom: 1rem; }
+    .hero h1 { font-size: 1.85rem; line-height: 1.2; margin-bottom: 0.75rem; }
+    .hero p { font-size: 0.8rem; line-height: 1.6; margin-bottom: 1.2rem; }
+    .hero-productos { gap: 0.8rem; margin: 1rem 0 1.5rem; }
+    .hero-prod-tag { font-size: 0.7rem; }
+    .hero-cta { padding: 11px 26px; font-size: 0.78rem; }
+
+    /* Steps de compra */
+    .steps { padding: 0.8rem 1rem; gap: 6px; }
+    .step { font-size: 0.68rem; gap: 4px; }
+    .step-num { width: 18px; height: 18px; font-size: 0.6rem; }
+    .step-arrow { margin: 0 3px; font-size: 0.65rem; }
+
+    /* Checkout */
+    .checkout-card { padding: 1.25rem; }
+    .checkout-titulo { font-size: 1.2rem; }
+    .checkout-sub { font-size: 0.74rem; margin-bottom: 1.25rem; }
+    .form-row { grid-template-columns: 1fr; gap: 0; }
+    .form-input { padding: 8px 12px; font-size: 0.8rem; }
+    .resumen-pedido { padding: 1rem; margin: 1.2rem 0; }
+    .resumen-linea { font-size: 0.78rem; }
+
+    /* Panel de administración responsivo */
+    .admin-stats { gap: 10px; margin-bottom: 1.5rem; }
+    .stat-card { padding: 1rem; min-width: 130px; }
+    .stat-num { font-size: 1.6rem; }
+    .stat-label { font-size: 0.6rem; letter-spacing: 0.5px; }
+    .admin-table th, .admin-table td { padding: 0.75rem 0.6rem; font-size: 0.74rem; }
+    .admin-thumb-canvas { width: 50px; height: 47px; }
+    .badge-status { padding: 3px 8px; font-size: 0.6rem; }
+    .switch { width: 38px; height: 20px; }
+    .slider:before { height: 12px; width: 12px; left: 3px; bottom: 3px; }
+    input:checked + .slider:before { transform: translateX(18px); }
+  }
+
+  /* Para pantallas estrechas de teléfonos (máx. 520px) */
+  @media (max-width: 520px) {
+    /* Cuadrícula de catálogo premium de 2 columnas */
+    .productos-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .producto-card {
+      border-radius: 8px;
+    }
+    .producto-preview-thumb {
+      height: 130px;
+    }
+    .producto-preview-thumb canvas {
+      width: 100%;
+      height: 130px;
+      max-width: 100%;
+      object-fit: contain;
+    }
+    .producto-info {
+      padding: 0.75rem;
+    }
+    .producto-nombre {
+      font-size: 0.78rem;
+      line-height: 1.3;
+      margin-bottom: 2px;
+    }
+    .producto-precio {
+      font-size: 0.74rem;
+    }
+    .producto-desc {
+      font-size: 0.68rem;
+      line-height: 1.3;
+      margin-top: 3px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .tag-nuevo {
+      font-size: 0.5rem;
+      padding: 1px 4px;
+      border-radius: 4px;
+      margin-left: 3px;
+    }
+  }
+
+  /* Para pantallas ultra estrechas de teléfonos (máx. 420px) */
+  @media (max-width: 420px) {
+    /* Panel lateral de carrito adaptativo a pantalla completa */
+    #carrito-panel {
+      width: 100%;
+      right: -100%;
+    }
+    .carrito-header { padding: 1.2rem; }
+    .carrito-items { padding: 0.8rem 1.2rem; }
+    .carrito-footer { padding: 1.2rem; }
+  }
 </style>
 </head>
 <body>
