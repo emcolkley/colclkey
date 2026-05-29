@@ -43,6 +43,7 @@ nav {
   padding: 9px 18px; border-radius: 20px;
   font-family: 'Montserrat', sans-serif; font-weight: 500;
   letter-spacing: 0.5px; transition: opacity 0.2s;
+  border: none; outline: none;
 }
 .nav-cart:hover { opacity: 0.88; }
 .cart-count {
@@ -504,4 +505,180 @@ main { max-width: 1100px; margin: 0 auto; padding: 2.5rem 2rem; }
   .carrito-header { padding: 1.2rem; }
   .carrito-items { padding: 0.8rem 1.2rem; }
   .carrito-footer { padding: 1.2rem; }
+}
+
+/* ══════════════════════════════════════════
+   REFACTOR DE BUENAS PRÁCTICAS (NUEVO)
+   ══════════════════════════════════════════ */
+
+/* ── COMPORTAMIENTO DE CARGA Y CANTIDAD ── */
+.upload-zone-hint {
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.cantidad-selector {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.cantidad-selector span {
+  font-weight: 500;
+  min-width: 20px;
+  text-align: center;
+  color: var(--white);
+}
+
+.preview-hint {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+
+/* ── SECCIÓN DE CUPONES PREMIUM ── */
+.coupon-section {
+  background: #141414;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.coupon-section .form-label {
+  display: block;
+  font-size: 0.74rem;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #B8C0CC;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.coupon-input-group {
+  display: flex;
+  gap: 8px;
+}
+
+.coupon-input {
+  flex: 1;
+  padding: 10px;
+  background: var(--dark3);
+  border: 1px solid rgba(201, 168, 76, 0.3);
+  border-radius: 8px;
+  color: white;
+  text-transform: uppercase;
+  outline: none;
+  font-size: 0.8rem;
+  font-family: 'Montserrat', sans-serif;
+  transition: border-color 0.2s;
+}
+
+.coupon-input:focus {
+  border-color: var(--gold);
+}
+
+.coupon-btn {
+  margin: 0;
+  width: auto;
+  padding: 10px 18px;
+  font-size: 0.76rem;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--gold2), var(--gold3));
+  color: var(--black);
+  border: none;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+.coupon-btn:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.coupon-message {
+  font-size: 0.74rem;
+  margin-top: 6px;
+  display: none;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+}
+
+/* ── PIE DE PÁGINA (SITE FOOTER DE LUJO) ── */
+.site-footer {
+  background: var(--dark);
+  border-top: 1px solid var(--border);
+  padding: 3.5rem 2rem 2rem;
+  margin-top: 5rem;
+  text-align: center;
+  position: relative;
+}
+
+.site-footer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center bottom, rgba(201, 168, 76, 0.05) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.footer-content {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.footer-desc {
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  max-width: 500px;
+  font-weight: 300;
+}
+
+.footer-links {
+  display: flex;
+  gap: 2rem;
+  margin: 0.5rem 0;
+}
+
+.footer-links a {
+  color: var(--silver);
+  text-decoration: none;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-family: 'Montserrat', sans-serif;
+  transition: color 0.2s;
+}
+
+.footer-links a:hover {
+  color: var(--gold);
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(201, 168, 76, 0.1);
+  width: 100%;
+  padding-top: 1.5rem;
+  margin-top: 1rem;
+}
+
+.footer-bottom p {
+  color: var(--muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.5px;
 }

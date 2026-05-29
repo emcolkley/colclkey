@@ -1,29 +1,54 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Colkley — Transforma tus recuerdos</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
-<!-- Estilos Modularizados Premium -->
-<link rel="stylesheet" href="/styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Colkley — Transforma tus recuerdos en arte</title>
+  
+  <!-- SEO & Metadatos de Búsqueda -->
+  <meta name="description" content="Colkley — Transforma tus recuerdos en arte. Sube tu foto, elige tu diseño y visualízalo en tiempo real. Tu regalo perfecto con calidad de galería y marcos premium.">
+  <meta name="keywords" content="cuadros personalizados, marcos de fotos, fotos en roca, regalos personalizados, colkley, tazas personalizadas, cuadros de madera, marcos flotantes">
+  <meta name="author" content="Colkley">
+  <link rel="canonical" href="https://empresa-cuadros.vercel.app/">
+  
+  <!-- Open Graph / Facebook / WhatsApp -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://empresa-cuadros.vercel.app/">
+  <meta property="og:title" content="Colkley — Transforma tus recuerdos en arte">
+  <meta property="og:description" content="Sube tu foto, elige tu diseño y visualízalo en tiempo real. Tu regalo perfecto con calidad de galería y terminación artesanal de lujo.">
+  <meta property="og:image" content="/cuadro_nordic_frame.png">
+
+  <!-- Twitter Cards -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://empresa-cuadros.vercel.app/">
+  <meta property="twitter:title" content="Colkley — Transforma tus recuerdos en arte">
+  <meta property="twitter:description" content="Sube tu foto, elige tu diseño y visualízalo en tiempo real. Tu regalo perfecto con calidad de galería y terminación artesanal de lujo.">
+  <meta property="twitter:image" content="/cuadro_nordic_frame.png">
+
+  <!-- Fuentes Premium -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+  
+  <!-- Estilos Modularizados Premium -->
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
 
-<!-- NAV -->
-<nav>
-  <div class="logo-wrap">
-    <div class="logo-circle">C</div>
-    <div class="logo-text">COL<span>K</span>LEY</div>
-  </div>
-  <div class="nav-cart" onclick="abrirCarrito()">
-    🛒 Mi pedido
-    <span class="cart-count" id="cart-count">0</span>
-  </div>
-</nav>
+<!-- ENCABEZADO Y NAVEGACIÓN -->
+<header class="site-header">
+  <nav aria-label="Navegación principal">
+    <div class="logo-wrap">
+      <div class="logo-circle">C</div>
+      <div class="logo-text">COL<span>K</span>LEY</div>
+    </div>
+    <button class="nav-cart" onclick="abrirCarrito()" aria-label="Ver mi pedido y abrir carrito de compras">
+      🛒 Mi pedido
+      <span class="cart-count" id="cart-count">0</span>
+    </button>
+  </nav>
+</header>
 
-<!-- HERO -->
-<div class="hero">
+<!-- HERO / INTRODUCCIÓN -->
+<section class="hero" aria-label="Presentación de Colkley">
   <div class="hero-badge">✦ Calidad garantizada en cada detalle ✦</div>
   <h1>Transforma tus<br><em>recuerdos</em> en arte</h1>
   <div class="hero-productos">
@@ -33,22 +58,22 @@
   </div>
   <p>Subí tu foto, elegí tu diseño y visualizalo en tiempo real. Tu regalo perfecto, hecho con dedicación.</p>
   <button class="hero-cta" onclick="scrollToProductos()">Ver productos →</button>
-</div>
+</section>
 
-<!-- STEPS -->
-<div class="steps">
+<!-- PASOS DE PROGRESO -->
+<section class="steps" aria-label="Progreso del pedido">
   <div class="step active" id="step-1"><span class="step-num" id="sn1">1</span> Elegí tu producto</div>
-  <span class="step-arrow">→</span>
+  <span class="step-arrow" aria-hidden="true">→</span>
   <div class="step" id="step-2"><span class="step-num" id="sn2">2</span> Subí tu foto</div>
-  <span class="step-arrow">→</span>
+  <span class="step-arrow" aria-hidden="true">→</span>
   <div class="step" id="step-3"><span class="step-num" id="sn3">3</span> Confirmá tu pedido</div>
-</div>
+</section>
 
-<!-- MAIN -->
+<!-- CONTENIDO PRINCIPAL -->
 <main>
 
   <!-- SECCIÓN 1: CATÁLOGO -->
-  <section id="seccion-catalogo">
+  <section id="seccion-catalogo" aria-label="Catálogo de productos">
     <h2 class="section-title">Nuestros <span>Productos</span></h2>
     <div class="gold-line"></div>
     <p class="section-sub">Seleccioná el producto que querés personalizar con tu foto</p>
@@ -56,7 +81,7 @@
   </section>
 
   <!-- SECCIÓN 2: PERSONALIZAR -->
-  <section id="seccion-personalizar">
+  <section id="seccion-personalizar" aria-label="Personalización del producto">
     <button class="back-btn" onclick="volverCatalogo()">← Volver al catálogo</button>
     <h2 class="section-title" id="personalizar-titulo">Personalizá tu <span>Cuadro</span></h2>
     <div class="gold-line"></div>
@@ -68,7 +93,7 @@
           <div class="upload-icon">📸</div>
           <div class="upload-text">Arrastrá tu foto acá<br>o hacé clic para seleccionarla</div>
           <button class="upload-btn" onclick="event.stopPropagation(); document.getElementById('file-input').click()">Seleccionar foto</button>
-          <div style="font-size:0.72rem; color:var(--muted);">JPG, PNG — máx. 20MB</div>
+          <div class="upload-zone-hint">JPG, PNG — máx. 20MB</div>
         </div>
         <input type="file" id="file-input" accept="image/*" onchange="cargarFoto(event)">
 
@@ -83,10 +108,10 @@
 
         <div class="opciones-section">
           <div class="opciones-label">Cantidad</div>
-          <div style="display:flex; align-items:center; gap:14px;">
-            <button class="tamano-btn" onclick="cambiarCantidad(-1)">−</button>
-            <span id="cantidad-display" style="font-weight:500; min-width:20px; text-align:center; color:var(--white);">1</span>
-            <button class="tamano-btn" onclick="cambiarCantidad(1)">+</button>
+          <div class="cantidad-selector">
+            <button class="tamano-btn" onclick="cambiarCantidad(-1)" aria-label="Disminuir cantidad">−</button>
+            <span id="cantidad-display">1</span>
+            <button class="tamano-btn" onclick="cambiarCantidad(1)" aria-label="Aumentar cantidad">+</button>
           </div>
         </div>
 
@@ -97,7 +122,7 @@
       <div class="preview-container">
         <div class="preview-title">Vista previa en tiempo real</div>
         <canvas id="frame-preview" width="900" height="900"></canvas>
-        <div style="text-align:center; margin-top:1rem; font-size:0.74rem; color:var(--muted);" id="preview-hint">
+        <div id="preview-hint" class="preview-hint">
           Subí una foto para ver el diseño con tu imagen
         </div>
       </div>
@@ -105,7 +130,7 @@
   </section>
 
   <!-- SECCIÓN 3: CHECKOUT -->
-  <section id="seccion-checkout">
+  <section id="seccion-checkout" aria-label="Confirmación del pedido y checkout">
     <button class="back-btn" onclick="volverPersonalizar()">← Seguir comprando</button>
     <div class="checkout-card">
       <h2 class="checkout-titulo">Confirmar Pedido</h2>
@@ -113,38 +138,38 @@
 
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Nombre *</label>
-          <input class="form-input" type="text" id="input-nombre" placeholder="Tu nombre">
+          <label for="input-nombre" class="form-label">Nombre *</label>
+          <input class="form-input" type="text" id="input-nombre" placeholder="Tu nombre" required>
         </div>
         <div class="form-group">
-          <label class="form-label">Apellido *</label>
-          <input class="form-input" type="text" id="input-apellido" placeholder="Tu apellido">
+          <label for="input-apellido" class="form-label">Apellido *</label>
+          <input class="form-input" type="text" id="input-apellido" placeholder="Tu apellido" required>
         </div>
       </div>
       <div class="form-group">
-        <label class="form-label">Email *</label>
-        <input class="form-input" type="email" id="input-email" placeholder="hola@mail.com">
+        <label for="input-email" class="form-label">Email *</label>
+        <input class="form-input" type="email" id="input-email" placeholder="hola@mail.com" required>
       </div>
       <div class="form-group">
-        <label class="form-label">Teléfono / WhatsApp</label>
+        <label for="input-telefono" class="form-label">Teléfono / WhatsApp</label>
         <input class="form-input" type="tel" id="input-telefono" placeholder="+56 9 ...">
       </div>
       <div class="form-group">
-        <label class="form-label">Mensaje o aclaración (opcional)</label>
+        <label for="input-mensaje" class="form-label">Mensaje o aclaración (opcional)</label>
         <textarea class="form-input" id="input-mensaje" rows="3" placeholder="Ej: quiero que la foto quede centrada, tonos cálidos..."></textarea>
       </div>
 
       <!-- SECCIÓN DE CUPÓN DE DESCUENTO -->
-      <div class="coupon-section" style="background: #141414; padding: 15px; border-radius: 8px; border: 1px solid rgba(201,168,76,0.25); margin-bottom: 1.5rem; text-align: left;">
-        <label class="form-label" style="display: block; font-size: 0.74rem; font-weight: 500; margin-bottom: 6px; color: #B8C0CC; text-transform: uppercase; letter-spacing: 0.5px; font-family: 'Montserrat', sans-serif;">¿Tenés un código de descuento?</label>
-        <div style="display: flex; gap: 8px;">
-          <input class="form-input" type="text" id="input-coupon" placeholder="Ingresá tu cupón" style="flex: 1; padding: 10px; background: #222; border: 1px solid rgba(201,168,76,0.3); border-radius: 8px; color: white; text-transform: uppercase; outline: none; font-size: 0.8rem;">
-          <button class="panel-btn" onclick="aplicarCupon()" style="margin: 0; width: auto; padding: 10px 18px; font-size: 0.76rem; border-radius: 8px; background: linear-gradient(135deg, #E8C96A, #A07830); color: black;">Aplicar</button>
+      <div class="coupon-section">
+        <label for="input-coupon" class="form-label">¿Tenés un código de descuento?</label>
+        <div class="coupon-input-group">
+          <input class="coupon-input" type="text" id="input-coupon" placeholder="Ingresá tu cupón">
+          <button type="button" class="coupon-btn" onclick="aplicarCupon()">Aplicar</button>
         </div>
-        <div id="coupon-message" style="font-size: 0.74rem; margin-top: 6px; display: none; font-family: 'Montserrat', sans-serif; font-weight: 500;"></div>
+        <div id="coupon-message" class="coupon-message"></div>
       </div>
 
-      <div class="resumen-pedido">
+      <div class="resumen-pedido" aria-label="Resumen de tu compra">
         <div class="resumen-titulo">Resumen del pedido</div>
         <div id="resumen-items"></div>
         <div class="resumen-linea resumen-total">
@@ -159,12 +184,12 @@
 
 </main>
 
-<!-- CARRITO -->
-<div id="overlay" onclick="cerrarCarrito()"></div>
-<div id="carrito-panel">
+<!-- CARRITO LATERAL (DRAWER) -->
+<div id="overlay" onclick="cerrarCarrito()" aria-hidden="true"></div>
+<aside id="carrito-panel" aria-label="Carrito de compras" role="dialog" aria-modal="true">
   <div class="carrito-header">
-    <span class="carrito-titulo">Tu Pedido</span>
-    <button class="carrito-close" onclick="cerrarCarrito()">✕</button>
+    <h2 class="carrito-titulo">Tu Pedido</h2>
+    <button class="carrito-close" onclick="cerrarCarrito()" aria-label="Cerrar carrito">✕</button>
   </div>
   <div class="carrito-items" id="carrito-items-lista"></div>
   <div class="carrito-footer" id="carrito-footer" style="display:none;">
@@ -174,20 +199,40 @@
     </div>
     <button class="panel-btn" onclick="irCheckout()">Completar pedido →</button>
   </div>
-</div>
+</aside>
 
-<!-- MODAL CONFIRMACION -->
-<div id="modal-confirmacion">
+<!-- MODAL CONFIRMACION DE COMPRA -->
+<div id="modal-confirmacion" role="dialog" aria-modal="true" aria-labelledby="modal-confirmacion-titulo">
   <div class="modal-content">
-    <div class="modal-icon">✨</div>
-    <h3 class="modal-titulo">¡Pedido recibido!</h3>
+    <div class="modal-icon" aria-hidden="true">✨</div>
+    <h3 class="modal-titulo" id="modal-confirmacion-titulo">¡Pedido recibido!</h3>
     <p class="modal-texto" id="modal-texto">Tu pedido fue registrado correctamente. Recibirás confirmación por email y nos comunicaremos contigo para coordinar la entrega. ¡Gracias por elegir Colkley!</p>
     <button class="modal-btn" id="btn-whatsapp-confirm" onclick="abrirWhatsApp()">
       💬 Confirmar por WhatsApp
     </button>
-    <span class="modal-close-link" onclick="cerrarModal()">Cerrar</span>
+    <button class="modal-close-link" onclick="cerrarModal()" style="background:none; border:none; width:100%; font-family:inherit;">Cerrar</button>
   </div>
 </div>
+
+<!-- PIE DE PÁGINA (FOOTER DE LUJO) -->
+<footer class="site-footer">
+  <div class="footer-content">
+    <div class="footer-brand">
+      <div class="logo-circle">C</div>
+      <div class="logo-text">COL<span>K</span>LEY</div>
+    </div>
+    <p class="footer-desc">
+      Terminaciones de galería de arte y atención 100% personalizada. Convertimos tus mejores momentos en piezas de diseño hechas para perdurar.
+    </p>
+    <div class="footer-links">
+      <a href="#seccion-catalogo" onclick="scrollToProductos(); return false;">Productos</a>
+      <a href="/admin">Administración</a>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Colkley. Todos los derechos reservados. Diseñado con dedicación.</p>
+    </div>
+  </div>
+</footer>
 
 <!-- Scripts Modularizados Centrales -->
 <script src="/productos.js" defer></script>
