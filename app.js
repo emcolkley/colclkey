@@ -31,9 +31,9 @@ function getDeactivatedIDs() {
   }
 }
 
-// Retorna si un producto está activo
-function isProductActive(id) {
-  const deactivated = getDeactivatedIDs();
+// Retorna si un producto está activo (Optimizado)
+function isProductActive(id, deactivatedList) {
+  const deactivated = deactivatedList || getDeactivatedIDs();
   return !deactivated.includes(id);
 }
 
@@ -44,7 +44,8 @@ function renderCatalogo() {
   const grid = document.getElementById('productos-grid');
   if (!grid) return;
   
-  const productosActivos = getProductos().filter(p => isProductActive(p.id));
+  const deactivatedList = getDeactivatedIDs(); // Read once from localStorage!
+  const productosActivos = getProductos().filter(p => isProductActive(p.id, deactivatedList));
   grid.innerHTML = productosActivos.map(p => `
     <div class="producto-card" onclick="seleccionarProducto(${p.id})" id="card-${p.id}">
       <div class="producto-preview-thumb">
@@ -149,9 +150,15 @@ function scrollToProductos() {
 // ══════════════════════════════════════════
 // GESTIÓN DE FOTOGRAFÍA
 // ══════════════════════════════════════════
+let isUploadingFoto = false;
+
 function cargarFoto(event) {
   const file = event.target.files[0];
   if (!file) return;
+  
+  isUploadingFoto = true;
+  document.getElementById('preview-hint').innerHTML = `<span style="color: var(--gold); font-weight: 500;">📤 Subiendo foto original a la nube para garantizar alta resolución...</span>`;
+  
   const reader = new FileReader();
   reader.onload = (e) => {
     fotoBase64 = e.target.result;
@@ -159,7 +166,6 @@ function cargarFoto(event) {
     img.onload = () => {
       fotoURL = img;
       document.getElementById('upload-zone').classList.add('has-image');
-      document.getElementById('preview-hint').textContent = '✅ Foto cargada — la calidad original se conserva para impresión';
       actualizarCanvas();
       subirCloudinary(file);
     };
@@ -171,6 +177,8 @@ function cargarFoto(event) {
 async function subirCloudinary(file) {
   if (CLOUDINARY_CLOUD === "TU_CLOUD_NAME") {
     fotoCloudinaryURL = "[Configurar Cloudinary para activar links de alta calidad]";
+    isUploadingFoto = false;
+    document.getElementById('preview-hint').textContent = '✅ Foto cargada localmente (alta resolución lista al enviar)';
     return;
   }
   try {
@@ -180,7 +188,13 @@ async function subirCloudinary(file) {
     const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, { method:'POST', body:fd });
     const data = await res.json();
     fotoCloudinaryURL = data.secure_url;
-  } catch(e) { fotoCloudinaryURL = "[Error al subir foto]"; }
+    document.getElementById('preview-hint').textContent = '✅ Foto cargada y enlazada con éxito en alta resolución';
+  } catch(e) { 
+    fotoCloudinaryURL = "[Error al subir foto]"; 
+    document.getElementById('preview-hint').textContent = '⚠️ Error en subida de alta calidad, pero tu foto se enviará igualmente';
+  } finally {
+    isUploadingFoto = false;
+  }
 }
 
 function actualizarCanvas() {
@@ -195,6 +209,10 @@ function actualizarCanvas() {
 // ══════════════════════════════════════════
 function agregarAlCarrito() {
   if (!fotoURL) { alert('📸 Por favor subí una foto primero'); return; }
+  if (isUploadingFoto) {
+    alert('📤 Espere un momento por favor. Estamos subiendo su foto en alta resolución para asegurar la mejor calidad de impresión.');
+    return;
+  }
   carrito.push({
     id: Date.now(),
     producto: productoSeleccionado,

@@ -73,21 +73,21 @@ const imgSpotifyNegro = new Image();
 imgSpotifyNegro.src = '/cuadro_spotify_negro.png';
 imgSpotifyNegro.onload = () => {
   if (typeof actualizarCanvas === 'function') actualizarCanvas();
-  productos.forEach(p => dibujarThumb(p));
+  getProductos().forEach(p => dibujarThumb(p));
 };
 
 const imgNordicFrame = new Image();
 imgNordicFrame.src = '/cuadro_nordic_frame.png';
 imgNordicFrame.onload = () => {
   if (typeof actualizarCanvas === 'function') actualizarCanvas();
-  productos.forEach(p => dibujarThumb(p));
+  getProductos().forEach(p => dibujarThumb(p));
 };
 
 const imgNordicRoom = new Image();
 imgNordicRoom.src = '/cuadro_nordic_room.png';
 imgNordicRoom.onload = () => {
   if (typeof actualizarCanvas === 'function') actualizarCanvas();
-  productos.forEach(p => dibujarThumb(p));
+  getProductos().forEach(p => dibujarThumb(p));
 };
 
 // ══════════════════════════════════════════
@@ -455,19 +455,27 @@ function getProductos() {
   }
 }
 
+const cacheImagenesBase64 = new Map();
+
 function dibujarThumb(p) {
   const canvas = document.getElementById(`thumb-${p.id}`);
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   
   if (p.imagenBase64) {
-    // Cargar y dibujar la imagen de muestra cargada de forma personalizada
-    const img = new Image();
-    img.onload = () => {
+    if (cacheImagenesBase64.has(p.id)) {
+      const img = cacheImagenesBase64.get(p.id);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    };
-    img.src = p.imagenBase64;
+    } else {
+      const img = new Image();
+      img.onload = () => {
+        cacheImagenesBase64.set(p.id, img);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      };
+      img.src = p.imagenBase64;
+    }
   } else {
     dibujarDiseño(ctx, p.diseño, canvas.width, canvas.height, null);
   }
