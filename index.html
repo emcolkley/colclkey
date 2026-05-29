@@ -1377,6 +1377,7 @@ function volverPersonalizar() {
   document.getElementById('seccion-personalizar').style.display = 'block';
   document.getElementById('seccion-checkout').style.display = 'none';
   actualizarStep(2);
+  document.getElementById('seccion-personalizar').scrollIntoView({ behavior: 'smooth' });
 }
 
 function actualizarStep(n) {
@@ -1510,7 +1511,7 @@ function irCheckout() {
   document.getElementById('seccion-checkout').style.display = 'block';
   actualizarStep(3);
   renderResumen();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  document.getElementById('seccion-checkout').scrollIntoView({ behavior: 'smooth' });
 }
 
 function renderResumen() {
