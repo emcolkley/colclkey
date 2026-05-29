@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Colkley — Transforma tus recuerdos</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black:   #0A0A0A;
+    --dark:    #111111;
+    --dark2:   #1A1A1A;
+    --dark3:   #222222;
+    --gold:    #C9A84C;
+    --gold2:   #E8C96A;
+    --gold3:   #A07830;
+    --silver:  #B8C0CC;
+    --silver2: #D8DDE6;
+    --white:   #F5F5F5;
+    --muted:   #6A6A6A;
+    --border:  rgba(201,168,76,0.25);
+    --border2: rgba(201,168,76,0.5);
+    --success: #4A9B6F;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Montserrat', sans-serif; background: var(--black); color: var(--white); min-height: 100vh; }
+
+  /* ── NAV ── */
+  nav {
+    background: var(--dark);
+    border-bottom: 1px solid var(--border);
+    padding: 0.85rem 2rem;
+    display: flex; justify-content: space-between; align-items: center;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo-wrap { display: flex; align-items: center; gap: 12px; }
+  .logo-circle {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--black);
+    border: 2px solid var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cinzel', serif; font-size: 1.3rem; color: var(--gold);
+    font-weight: 700; line-height: 1;
+  }
+  .logo-text { font-family: 'Cinzel', serif; font-size: 1.2rem; color: var(--white); letter-spacing: 3px; }
+  .logo-text span { color: var(--gold); }
+  .nav-cart {
+    color: var(--black); cursor: pointer; font-size: 0.78rem;
+    display: flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, var(--gold2), var(--gold3));
+    padding: 9px 18px; border-radius: 20px;
+    font-family: 'Montserrat', sans-serif; font-weight: 500;
+    letter-spacing: 0.5px; transition: opacity 0.2s;
+  }
+  .nav-cart:hover { opacity: 0.88; }
+  .cart-count {
+    background: var(--black); color: var(--gold);
+    border-radius: 50%; width: 20px; height: 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.72rem; font-weight: 600;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--dark);
+    padding: 5rem 2rem 4rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border);
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center top, rgba(201,168,76,0.08) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-block;
+    border: 1px solid var(--border2);
+    color: var(--gold);
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    padding: 6px 18px;
+    border-radius: 20px;
+    margin-bottom: 1.5rem;
+    font-family: 'Montserrat', sans-serif;
+    text-transform: uppercase;
+  }
+  .hero h1 {
+    font-family: 'Cinzel', serif;
+    color: var(--white);
+    font-size: clamp(2rem, 5vw, 3.8rem);
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+  .hero h1 em { color: var(--gold); font-style: italic; font-family: 'Cormorant Garamond', serif; font-size: 1.15em; }
+  .hero p { color: #888; font-size: 0.9rem; max-width: 500px; margin: 0 auto 1rem; line-height: 1.8; font-weight: 300; }
+  .hero-productos {
+    display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap;
+    margin: 1.5rem 0 2rem;
+  }
+  .hero-prod-tag {
+    display: flex; align-items: center; gap: 6px;
+    color: var(--silver); font-size: 0.78rem; font-weight: 300;
+  }
+  .hero-prod-tag::before { content: '✦'; color: var(--gold); font-size: 0.6rem; }
+  .hero-cta {
+    background: linear-gradient(135deg, var(--gold2), var(--gold3));
+    color: var(--black); border: none;
+    padding: 14px 36px; border-radius: 30px;
+    font-family: 'Cinzel', serif; font-size: 0.85rem;
+    cursor: pointer; letter-spacing: 1px; font-weight: 600;
+    transition: transform 0.2s, opacity 0.2s;
+  }
+  .hero-cta:hover { transform: translateY(-2px); opacity: 0.9; }
+
+  /* ── STEPS ── */
+  .steps {
+    display: flex; justify-content: center; gap: 0;
+    padding: 1.25rem 2rem;
+    background: var(--dark2);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+  }
+  .step { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; color: var(--muted); white-space: nowrap; letter-spacing: 0.5px; }
+  .step.active { color: var(--gold); font-weight: 500; }
+  .step.done { color: var(--success); }
+  .step-num {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--dark3); border: 1px solid var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.65rem; font-weight: 600;
+  }
+  .step.active .step-num { background: var(--gold); color: var(--black); border-color: var(--gold); }
+  .step.done .step-num { background: var(--success); color: white; border-color: var(--success); }
+  .step-arrow { margin: 0 14px; color: var(--border2); font-size: 0.8rem; }
+
+  /* ── MAIN ── */
+  main { max-width: 1100px; margin: 0 auto; padding: 2.5rem 2rem; }
+
+  /* ── CATÁLOGO ── */
+  .section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.6rem; font-weight: 600;
+    color: var(--white); margin-bottom: 0.4rem;
+  }
+  .section-title span { color: var(--gold); }
+  .section-sub { color: var(--muted); font-size: 0.82rem; margin-bottom: 2rem; font-weight: 300; }
+  .gold-line { width: 48px; height: 2px; background: linear-gradient(90deg, var(--gold), transparent); margin-bottom: 1.5rem; }
+
+  .productos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.5rem; }
+  .producto-card {
+    background: var(--dark2);
+    border-radius: 10px; overflow: hidden;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: transform 0.22s, border-color 0.22s, box-shadow 0.22s;
+  }
+  .producto-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--border2);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.5), 0 0 20px rgba(201,168,76,0.08);
+  }
+  .producto-card.selected { border: 1.5px solid var(--gold); }
+  .producto-preview-thumb {
+    width: 100%; height: 190px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--dark3); overflow: hidden; position: relative;
+  }
+  .producto-preview-thumb canvas {
+    width: 200px;
+    height: 190px;
+    display: block;
+  }
+  .producto-info { padding: 1rem 1.1rem 1.2rem; }
+  .producto-nombre { font-size: 0.9rem; font-weight: 500; color: var(--white); margin-bottom: 4px; letter-spacing: 0.3px; }
+  .producto-precio { color: var(--gold); font-size: 0.82rem; font-weight: 500; font-family: 'Cinzel', serif; }
+  .producto-desc { color: var(--muted); font-size: 0.76rem; margin-top: 5px; line-height: 1.5; font-weight: 300; }
+  .tag-nuevo {
+    background: linear-gradient(135deg, var(--gold2), var(--gold3));
+    color: var(--black); font-size: 0.6rem; padding: 2px 8px;
+    border-radius: 8px; margin-left: 6px; vertical-align: middle;
+    font-weight: 600; letter-spacing: 0.5px;
+  }
+
+  /* ── PERSONALIZAR ── */
+  #seccion-personalizar { display: none; }
+  .personalizar-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+  @media(max-width: 700px) { .personalizar-layout { grid-template-columns: 1fr; } }
+
+  .upload-zone {
+    border: 2px dashed var(--border2);
+    border-radius: 10px; padding: 2rem;
+    text-align: center; cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    min-height: 200px; background: var(--dark2);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 12px;
+  }
+  .upload-zone:hover { border-color: var(--gold); background: rgba(201,168,76,0.04); }
+  .upload-zone.has-image { border-style: solid; border-color: var(--success); }
+  .upload-icon { font-size: 2.5rem; }
+  .upload-text { font-size: 0.82rem; color: var(--muted); line-height: 1.6; font-weight: 300; }
+  .upload-btn {
+    background: linear-gradient(135deg, var(--gold2), var(--gold3));
+    color: var(--black); padding: 9px 22px;
+    border-radius: 20px; font-size: 0.8rem;
+    border: none; cursor: pointer;
+    font-family: 'Montserrat', sans-serif; font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  #file-input { display: none; }
+
+  .preview-container {
+    background: var(--dark2); border-radius: 10px;
+    border: 1px solid var(--border); padding: 1.5rem;
+  }
+  .preview-title {
+    font-size: 0.7rem; color: var(--gold);
+    margin-bottom: 1rem; text-transform: uppercase;
+    letter-spacing: 2px; font-family: 'Montserrat', sans-serif;
+  }
+  #frame-preview { width: 100%; max-width: 300px; margin: 0 auto; display: block; border-radius: 4px; }
+
+  .opciones-section { margin-top: 1.5rem; }
+  .opciones-label { font-size: 0.78rem; font-weight: 500; margin-bottom: 0.75rem; color: var(--silver); letter-spacing: 1px; text-transform: uppercase; }
+  .tamanos-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tamano-btn {
+    padding: 7px 15px;
+    border: 1px solid var(--border2);
+    border-radius: 18px; font-size: 0.76rem;
+    cursor: pointer; background: transparent;
+    transition: all 0.15s;
+    font-family: 'Montserrat', sans-serif;
+    color: var(--silver);
+  }
+  .tamano-btn.active, .tamano-btn:hover {
+    border-color: var(--gold);
+    background: var(--gold); color: var(--black); font-weight: 600;
+  }
+
+  .panel-btn {
+    width: 100%; margin-top: 1.5rem;
+    background: linear-gradient(135deg, var(--gold2), var(--gold3));
+    color: var(--black); border: none;
+    padding: 13px; border-radius: 30px;
+    font-size: 0.88rem; font-family: 'Cinzel', serif;
+    cursor: pointer; transition: opacity 0.2s, transform 0.2s;
+    font-weight: 600; letter-spacing: 1px;
+  }
+  .panel-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .panel-btn.secondary {
+    background: transparent;
+    border: 1.5px solid var(--border2);
+    color: var(--gold); margin-top: 10px;
+  }
+
+  .nota-calidad {
+    background: rgba(74,155,111,0.1);
+    border: 1px solid rgba(74,155,111,0.3);
+    border-radius: 8px; padding: 10px 14px;
+    font-size: 0.76rem; color: #7BC99A;
+    margin-top: 1rem; line-height: 1.6; font-weight: 300;
+  }
+
+  /* ── CARRITO ── */
+  #carrito-panel {
+    position: fixed; right: -390px; top: 0;
+    width: 370px; height: 100vh;
+    background: var(--dark); z-index: 200;
+    transition: right 0.3s; overflow-y: auto;
+    display: flex; flex-direction: column;
+    border-left: 1px solid var(--border);
+  }
+  #carrito-panel.open { right: 0; }
+  .carrito-header {
+    padding: 1.5rem; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .carrito-titulo { font-family: 'Cinzel', serif; font-size: 1.1rem; color: var(--white); }
+  .carrito-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1.3rem; }
+  .carrito-close:hover { color: var(--white); }
+  .carrito-items { flex: 1; padding: 1rem 1.5rem; }
+  .carrito-item {
+    display: flex; gap: 12px;
+    padding: 1rem 0; border-bottom: 1px solid var(--border);
+  }
+  .carrito-item-img {
+    width: 58px; height: 58px;
+    background: var(--dark3); border-radius: 6px;
+    overflow: hidden; flex-shrink: 0;
+    border: 1px solid var(--border);
+  }
+  .carrito-item-img img { width: 100%; height: 100%; object-fit: cover; }
+  .carrito-item-info { flex: 1; }
+  .carrito-item-nombre { font-size: 0.85rem; font-weight: 500; color: var(--white); }
+  .carrito-item-detalle { font-size: 0.74rem; color: var(--muted); margin-top: 2px; }
+  .carrito-item-precio { font-size: 0.85rem; color: var(--gold); font-weight: 500; font-family: 'Cinzel', serif; }
+  .carrito-item-remove { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 0.9rem; padding: 4px; }
+  .carrito-item-remove:hover { color: #E25555; }
+  .carrito-footer { padding: 1.5rem; border-top: 1px solid var(--border); }
+  .carrito-total { display: flex; justify-content: space-between; margin-bottom: 1rem; }
+  .carrito-total span:first-child { color: var(--muted); font-size: 0.82rem; }
+  .carrito-total span:last-child { color: var(--gold); font-family: 'Cinzel', serif; font-size: 1rem; font-weight: 600; }
+  .carrito-empty { text-align: center; color: var(--muted); padding: 2.5rem 1rem; font-size: 0.85rem; line-height: 2; }
+
+  /* ── CHECKOUT ── */
+  #seccion-checkout { display: none; }
+  .checkout-card {
+    background: var(--dark2); border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 2rem; max-width: 580px; margin: 0 auto;
+  }
+  .checkout-titulo { font-family: 'Cinzel', serif; font-size: 1.4rem; margin-bottom: 0.3rem; color: var(--white); }
+  .checkout-sub { color: var(--muted); font-size: 0.8rem; margin-bottom: 1.75rem; font-weight: 300; }
+  .form-group { margin-bottom: 1rem; }
+  .form-label { display: block; font-size: 0.74rem; font-weight: 500; margin-bottom: 6px; color: var(--silver); letter-spacing: 0.5px; text-transform: uppercase; }
+  .form-input {
+    width: 100%; padding: 10px 14px;
+    background: var(--dark3);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem; color: var(--white);
+    transition: border-color 0.2s;
+  }
+  .form-input::placeholder { color: var(--muted); }
+  .form-input:focus { outline: none; border-color: var(--gold); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .resumen-pedido {
+    background: var(--dark3); border-radius: 8px;
+    border: 1px solid var(--border);
+    padding: 1.25rem; margin: 1.5rem 0;
+  }
+  .resumen-titulo { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gold); margin-bottom: 0.75rem; }
+  .resumen-linea { display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 6px; color: var(--silver); }
+  .resumen-total {
+    border-top: 1px solid var(--border); padding-top: 8px; margin-top: 8px;
+    font-weight: 600; font-size: 0.95rem; color: var(--white);
+  }
+  .resumen-total span:last-child { color: var(--gold); font-family: 'Cinzel', serif; }
+
+  /* ── MODAL ── */
+  #modal-confirmacion {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75); z-index: 300;
+    align-items: center; justify-content: center;
+  }
+  #modal-confirmacion.show { display: flex; }
+  .modal-content {
+    background: var(--dark2); border-radius: 14px;
+    border: 1px solid var(--border2);
+    padding: 2.5rem; max-width: 400px; width: 90%; text-align: center;
+  }
+  .modal-icon { font-size: 3rem; margin-bottom: 1rem; }
+  .modal-titulo { font-family: 'Cinzel', serif; font-size: 1.3rem; margin-bottom: 0.75rem; color: var(--white); }
+  .modal-texto { font-size: 0.84rem; color: var(--muted); line-height: 1.7; margin-bottom: 1.75rem; font-weight: 300; }
+  .modal-btn {
+    background: #25D366; color: white; border: none;
+    padding: 13px 28px; border-radius: 30px;
+    font-size: 0.9rem; cursor: pointer;
+    font-family: 'Montserrat', sans-serif; font-weight: 600;
+    display: inline-flex; align-items: center; gap: 8px;
+    letter-spacing: 0.5px;
+  }
+  .modal-btn:hover { opacity: 0.9; }
+  .modal-close-link { margin-top: 1rem; display: block; color: var(--muted); cursor: pointer; font-size: 0.8rem; }
+  .modal-close-link:hover { color: var(--white); }
+
+  /* ── OVERLAY ── */
+  #overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 150; }
+  #overlay.show { display: block; }
+
+  /* ── UTILS ── */
+  .back-btn {
+    background: none; border: none; color: var(--muted);
+    cursor: pointer; font-size: 0.78rem;
+    font-family: 'Montserrat', sans-serif;
+    display: flex; align-items: center; gap: 6px;
+    margin-bottom: 1.75rem; padding: 0; letter-spacing: 0.5px;
+  }
+  .back-btn:hover { color: var(--gold); }
+  .divider-gold { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo-wrap">
+    <div class="logo-circle">C</div>
+    <div class="logo-text">COL<span>K</span>LEY</div>
+  </div>
+  <div class="nav-cart" onclick="abrirCarrito()">
+    🛒 Mi pedido
+    <span class="cart-count" id="cart-count">0</span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">✦ Calidad garantizada en cada detalle ✦</div>
+  <h1>Transforma tus<br><em>recuerdos</em> en arte</h1>
+  <div class="hero-productos">
+    <span class="hero-prod-tag">Cuadros en Roca</span>
+    <span class="hero-prod-tag">Restauración Profesional</span>
+    <span class="hero-prod-tag">Tazas & Llaveros</span>
+  </div>
+  <p>Subí tu foto, elegí tu diseño y visualizalo en tiempo real. Tu regalo perfecto, hecho con dedicación.</p>
+  <button class="hero-cta" onclick="scrollToProductos()">Ver productos →</button>
+</div>
+
+<!-- STEPS -->
+<div class="steps">
+  <div class="step active" id="step-1"><span class="step-num" id="sn1">1</span> Elegí tu producto</div>
+  <span class="step-arrow">→</span>
+  <div class="step" id="step-2"><span class="step-num" id="sn2">2</span> Subí tu foto</div>
+  <span class="step-arrow">→</span>
+  <div class="step" id="step-3"><span class="step-num" id="sn3">3</span> Confirmá tu pedido</div>
+</div>
+
+<!-- MAIN -->
+<main>
+
+  <!-- SECCIÓN 1: CATÁLOGO -->
+  <section id="seccion-catalogo">
+    <h2 class="section-title">Nuestros <span>Productos</span></h2>
+    <div class="gold-line"></div>
+    <p class="section-sub">Seleccioná el producto que querés personalizar con tu foto</p>
+    <div class="productos-grid" id="productos-grid"></div>
+  </section>
+
+  <!-- SECCIÓN 2: PERSONALIZAR -->
+  <section id="seccion-personalizar">
+    <button class="back-btn" onclick="volverCatalogo()">← Volver al catálogo</button>
+    <h2 class="section-title" id="personalizar-titulo">Personalizá tu <span>Cuadro</span></h2>
+    <div class="gold-line"></div>
+    <p class="section-sub">Subí tu foto y mirá cómo queda antes de agregar al carrito</p>
+
+    <div class="personalizar-layout">
+      <div>
+        <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+          <div class="upload-icon">📸</div>
+          <div class="upload-text">Arrastrá tu foto acá<br>o hacé clic para seleccionarla</div>
+          <button class="upload-btn" onclick="event.stopPropagation(); document.getElementById('file-input').click()">Seleccionar foto</button>
+          <div style="font-size:0.72rem; color:var(--muted);">JPG, PNG — máx. 20MB</div>
+        </div>
+        <input type="file" id="file-input" accept="image/*" onchange="cargarFoto(event)">
+
+        <div class="nota-calidad">
+          📤 Tu foto se guarda en alta resolución. Al confirmar, recibimos el link de descarga directamente para garantizar la mejor calidad de impresión.
+        </div>
+
+        <div class="opciones-section">
+          <div class="opciones-label">Tamaño</div>
+          <div class="tamanos-grid" id="tamanos-grid"></div>
+        </div>
+
+        <div class="opciones-section">
+          <div class="opciones-label">Cantidad</div>
+          <div style="display:flex; align-items:center; gap:14px;">
+            <button class="tamano-btn" onclick="cambiarCantidad(-1)">−</button>
+            <span id="cantidad-display" style="font-weight:500; min-width:20px; text-align:center; color:var(--white);">1</span>
+            <button class="tamano-btn" onclick="cambiarCantidad(1)">+</button>
+          </div>
+        </div>
+
+        <button class="panel-btn" onclick="agregarAlCarrito()">Agregar al carrito</button>
+        <button class="panel-btn secondary" onclick="abrirCarrito()">Ver carrito →</button>
+      </div>
+
+      <div class="preview-container">
+        <div class="preview-title">Vista previa en tiempo real</div>
+        <canvas id="frame-preview" width="900" height="900"></canvas>
+        <div style="text-align:center; margin-top:1rem; font-size:0.74rem; color:var(--muted);" id="preview-hint">
+          Subí una foto para ver el diseño con tu imagen
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECCIÓN 3: CHECKOUT -->
+  <section id="seccion-checkout">
+    <button class="back-btn" onclick="volverPersonalizar()">← Seguir comprando</button>
+    <div class="checkout-card">
+      <h2 class="checkout-titulo">Confirmar Pedido</h2>
+      <p class="checkout-sub">Completá tus datos y te contactamos para coordinar la entrega</p>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nombre *</label>
+          <input class="form-input" type="text" id="input-nombre" placeholder="Tu nombre">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Apellido *</label>
+          <input class="form-input" type="text" id="input-apellido" placeholder="Tu apellido">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email *</label>
+        <input class="form-input" type="email" id="input-email" placeholder="hola@mail.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Teléfono / WhatsApp</label>
+        <input class="form-input" type="tel" id="input-telefono" placeholder="+56 9 ...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Mensaje o aclaración (opcional)</label>
+        <textarea class="form-input" id="input-mensaje" rows="3" placeholder="Ej: quiero que la foto quede centrada, tonos cálidos..."></textarea>
+      </div>
+
+      <div class="resumen-pedido">
+        <div class="resumen-titulo">Resumen del pedido</div>
+        <div id="resumen-items"></div>
+        <div class="resumen-linea resumen-total">
+          <span>Total estimado</span>
+          <span id="resumen-total-precio">$0</span>
+        </div>
+      </div>
+
+      <button class="panel-btn" onclick="confirmarPedido()">✅ Enviar pedido</button>
+    </div>
+  </section>
+
+</main>
+
+<!-- CARRITO -->
+<div id="overlay" onclick="cerrarCarrito()"></div>
+<div id="carrito-panel">
+  <div class="carrito-header">
+    <span class="carrito-titulo">Tu Pedido</span>
+    <button class="carrito-close" onclick="cerrarCarrito()">✕</button>
+  </div>
+  <div class="carrito-items" id="carrito-items-lista"></div>
+  <div class="carrito-footer" id="carrito-footer" style="display:none;">
+    <div class="carrito-total">
+      <span>Total estimado</span>
+      <span id="carrito-total-precio">$0</span>
+    </div>
+    <button class="panel-btn" onclick="irCheckout()">Completar pedido →</button>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="modal-confirmacion">
+  <div class="modal-content">
+    <div class="modal-icon">✨</div>
+    <h3 class="modal-titulo">¡Pedido recibido!</h3>
+    <p class="modal-texto" id="modal-texto">Tu pedido fue registrado correctamente. Recibirás confirmación por email y nos comunicaremos contigo para coordinar la entrega. ¡Gracias por elegir Colkley!</p>
+    <button class="modal-btn" id="btn-whatsapp-confirm" onclick="abrirWhatsApp()">
+      💬 Confirmar por WhatsApp
+    </button>
+    <span class="modal-close-link" onclick="cerrarModal()">Cerrar</span>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// CONFIGURACIÓN — editá estos valores
+// ══════════════════════════════════════════
+const WHATSAPP_NUMERO  = "5491100000000"; // Tu número: código país + número sin +
+const CLOUDINARY_CLOUD = "TU_CLOUD_NAME";
+const CLOUDINARY_PRESET = "TU_UPLOAD_PRESET";
+
+// ══════════════════════════════════════════
+// PRODUCTOS COLKLEY
+// ══════════════════════════════════════════
+const productos = [
+  {
+    id: 1, nombre: "Cuadro en Roca", tipo: "roca",
+    precio: 4500,
+    desc: "Elegancia y durabilidad extrema. Impresión sobre roca natural.",
+    tamanos: ["20x25", "30x35", "40x50"],
+    diseño: "roca", nuevo: true
+  },
+  {
+    id: 2, nombre: "Cuadro Collage Romántico", tipo: "marco",
+    precio: 3800,
+    desc: "Diseño estilo pizarra con texto personalizado y múltiples fotos.",
+    tamanos: ["30x40", "40x60"],
+    diseño: "collage"
+  },
+  {
+    id: 3, nombre: "Marco Clásico Dorado", tipo: "marco",
+    precio: 2900,
+    desc: "Marco elegante con terminación dorada. Atemporal y sofisticado.",
+    tamanos: ["20x20", "30x30", "40x40", "30x40"],
+    diseño: "dorado"
+  },
+  {
+    id: 4, nombre: "Taza Personalizada", tipo: "taza",
+    precio: 1600,
+    desc: "Taza de cerámica premium con tu foto en alta calidad.",
+    tamanos: ["Tamaño único"],
+    diseño: "taza", nuevo: true
+  },
+  {
+    id: 5, nombre: "Llavero con Foto", tipo: "llavero",
+    precio: 900,
+    desc: "El detalle perfecto. Tu foto en un llavero compacto y resistente.",
+    tamanos: ["Redondo", "Rectangular"],
+    diseño: "llavero"
+  },
+  {
+    id: 6, nombre: "Restauración Profesional", tipo: "restauracion",
+    precio: 3200,
+    desc: "Devolvemos el color y la vida a tus fotos antiguas o dañadas.",
+    tamanos: ["Tamaño original"],
+    diseño: "restauracion", nuevo: true
+  },
+  {
+    id: 7, nombre: "Cuadro Spotify Minimalista Negro", tipo: "marco",
+    precio: 3800,
+    desc: "Hermosa plantilla Spotify con tu canción favorita y tu foto, con elegante marco negro.",
+    tamanos: ["20x25", "30x40", "40x60"],
+    diseño: "spotify_negro", nuevo: true
+  },
+  {
+    id: 8, nombre: "Cuadro Nordic Frame Premium", tipo: "marco",
+    precio: 4200,
+    desc: "Elegante maqueta de sala de estar moderna con marco nórdico vertical negro.",
+    tamanos: ["30x40", "40x50", "40x60"],
+    diseño: "nordic_frame", nuevo: true
+  },
+  {
+    id: 9, nombre: "Cuadro Nordic Room Premium", tipo: "marco",
+    precio: 4500,
+    desc: "Imponente cuadro vertical con marco de madera negra en un estudio de diseño nórdico.",
+    tamanos: ["30x40", "40x50", "40x60"],
+    diseño: "nordic_room", nuevo: true
+  }
+];
+
+// ══════════════════════════════════════════
+// IMÁGENES DE PLANTILLAS PREMIUM
+// ══════════════════════════════════════════
+const imgSpotifyNegro = new Image();
+imgSpotifyNegro.src = 'cuadro_spotify_negro.png';
+imgSpotifyNegro.onload = () => {
+  actualizarCanvas();
+  if (typeof productos !== 'undefined') {
+    productos.forEach(p => dibujarThumb(p));
+  }
+};
+
+const imgNordicFrame = new Image();
+imgNordicFrame.src = 'cuadro_nordic_frame.png';
+imgNordicFrame.onload = () => {
+  actualizarCanvas();
+  if (typeof productos !== 'undefined') {
+    productos.forEach(p => dibujarThumb(p));
+  }
+};
+
+const imgNordicRoom = new Image();
+imgNordicRoom.src = 'cuadro_nordic_room.png';
+imgNordicRoom.onload = () => {
+  actualizarCanvas();
+  if (typeof productos !== 'undefined') {
+    productos.forEach(p => dibujarThumb(p));
+  }
+};
+
+// ══════════════════════════════════════════
+// ESTADO
+// ══════════════════════════════════════════
+let carrito = [];
+let productoSeleccionado = null;
+let tamanoSeleccionado = null;
+let cantidad = 1;
+let fotoURL = null;
+let fotoBase64 = null;
+let fotoCloudinaryURL = null;
+
+// ══════════════════════════════════════════
+// RENDER CATÁLOGO
+// ══════════════════════════════════════════
+function renderCatalogo() {
+  const grid = document.getElementById('productos-grid');
+  grid.innerHTML = productos.map(p => `
+    <div class="producto-card" onclick="seleccionarProducto(${p.id})" id="card-${p.id}">
+      <div class="producto-preview-thumb">
+        <canvas id="thumb-${p.id}" width="400" height="380"></canvas>
+      </div>
+      <div class="producto-info">
+        <div class="producto-nombre">
+          ${p.nombre}
+          ${p.nuevo ? '<span class="tag-nuevo">NUEVO</span>' : ''}
+        </div>
+        <div class="producto-precio">Desde $${p.precio.toLocaleString()}</div>
+        <div class="producto-desc">${p.desc}</div>
+      </div>
+    </div>
+  `).join('');
+  productos.forEach(p => dibujarThumb(p));
+}
+
+// ══════════════════════════════════════════
+// CANVAS — Diseños Colkley
+// ══════════════════════════════════════════
+const GOLD  = '#C9A84C';
+const GOLD2 = '#E8C96A';
+const SILVER = '#B8C0CC';
+const DARK = '#0A0A0A';
+
+function dibujarDiseño(ctx, diseño, w, h, img) {
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = '#141414';
+  ctx.fillRect(0, 0, w, h);
+
+  if (diseño === 'spotify_negro') {
+    const win_x = w * (311 / 1044.0);
+    const win_y = h * (198 / 1024.0);
+    const win_w = w * (437 / 1044.0);
+    const win_h = h * (435 / 1024.0);
+
+    if (img) {
+      ctx.save();
+      // Clip rendering to the photo window coordinates
+      ctx.beginPath();
+      ctx.rect(win_x, win_y, win_w, win_h);
+      ctx.clip();
+      
+      // Aspect fill the client's photo inside the window
+      const ar = img.width / img.height;
+      let sw = win_w, sh = sw / ar;
+      if (sh < win_h) { sh = win_h; sw = sh * ar; }
+      const sx = win_x + (win_w - sw) / 2;
+      const sy = win_y + (win_h - sh) / 2;
+      ctx.drawImage(img, sx, sy, sw, sh);
+      ctx.restore();
+    } else {
+      // Draw placeholder inside the window area
+      ctx.fillStyle = '#1E1E1E';
+      ctx.fillRect(win_x, win_y, win_w, win_h);
+      ctx.fillStyle = '#666';
+      ctx.font = `${w*0.045}px Montserrat`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('Tu foto aquí', win_x + win_w/2, win_y + win_h/2 - 8);
+      ctx.font = `${w*0.06}px sans-serif`;
+      ctx.fillText('📷', win_x + win_w/2, win_y + win_h/2 + 15);
+    }
+
+    // Superimpose the premium template image on top
+    if (imgSpotifyNegro.complete && imgSpotifyNegro.naturalWidth !== 0) {
+      ctx.drawImage(imgSpotifyNegro, 0, 0, w, h);
+    } else {
+      // Draw loading state fallback
+      ctx.strokeStyle = 'rgba(201,168,76,0.3)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(win_x, win_y, win_w, win_h);
+      ctx.fillStyle = '#C9A84C';
+      ctx.font = `${w*0.035}px Cinzel, serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText('Cargando plantilla...', w/2, h/2);
+    }
+    return;
+  }
+
+  if (diseño === 'nordic_frame') {
+    // 1. Calculate aspect-cover coordinates for the 4500x3000 (1.5 ratio) mockup image
+    const img_ar = 4500.0 / 3000.0;
+    const canvas_ar = w / h;
+    let dw = w, dh = h;
+    let dx = 0, dy = 0;
+    
+    if (img_ar > canvas_ar) {
+      dw = h * img_ar;
+      dx = (w - dw) / 2;
+    } else {
+      dh = w / img_ar;
+      dy = (h - dh) / 2;
+    }
+
+    // 2. Calculate the exact window coordinates inside the scaled mockup
+    const win_x = dx + dw * (2106 / 4500.0);
+    const win_y = dy + dh * (868 / 3000.0);
+    const win_w = dw * (737 / 4500.0);
+    const win_h = dh * (927 / 3000.0);
+
+    if (img) {
+      ctx.save();
+      // Clip rendering to the photo window coordinates
+      ctx.beginPath();
+      ctx.rect(win_x, win_y, win_w, win_h);
+      ctx.clip();
+      
+      // Aspect fill the client's photo inside the window
+      const ar = img.width / img.height;
+      let sw = win_w, sh = sw / ar;
+      if (sh < win_h) { sh = win_h; sw = sh * ar; }
+      const sx = win_x + (win_w - sw) / 2;
+      const sy = win_y + (win_h - sh) / 2;
+      ctx.drawImage(img, sx, sy, sw, sh);
+      ctx.restore();
+    } else {
+      // Draw placeholder inside the window area
+      ctx.fillStyle = '#1E1E1E';
+      ctx.fillRect(win_x, win_y, win_w, win_h);
+      ctx.fillStyle = '#666';
+      ctx.font = `${w*0.032}px Montserrat`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('Tu foto aquí', win_x + win_w/2, win_y + win_h/2 - 8);
+      ctx.font = `${w*0.045}px sans-serif`;
+      ctx.fillText('📷', win_x + win_w/2, win_y + win_h/2 + 12);
+    }
+
+    // Superimpose the premium template image on top
+    if (imgNordicFrame.complete && imgNordicFrame.naturalWidth !== 0) {
+      ctx.drawImage(imgNordicFrame, dx, dy, dw, dh);
+    } else {
+      // Draw loading state fallback
+      ctx.strokeStyle = 'rgba(201,168,76,0.3)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(win_x, win_y, win_w, win_h);
+      ctx.fillStyle = '#C9A84C';
+      ctx.font = `${w*0.035}px Cinzel, serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText('Cargando maqueta...', w/2, h/2);
+    }
+    return;
+  }
+
+  if (diseño === 'nordic_room') {
+    // 1. Calculate aspect-cover coordinates for the 4000x2660 (1.50376 ratio) mockup image
+    const img_ar = 4000.0 / 2660.0;
+    const canvas_ar = w / h;
+    let dw = w, dh = h;
+    let dx = 0, dy = 0;
+    
+    if (img_ar > canvas_ar) {
+      dw = h * img_ar;
+      dx = (w - dw) / 2;
+    } else {
+      dh = w / img_ar;
+      dy = (h - dh) / 2;
+    }
+
+    // 2. Calculate the exact window coordinates inside the scaled mockup
+    const win_x = dx + dw * (1356 / 4000.0);
+    const win_y = dy + dh * (420 / 2660.0);
+    const win_w = dw * (1357 / 4000.0);
+    const win_h = dh * (1831 / 2660.0);
+
+    if (img) {
+      ctx.save();
+      // Clip rendering to the photo window coordinates
+      ctx.beginPath();
+      ctx.rect(win_x, win_y, win_w, win_h);
+      ctx.clip();
+      
+      // Aspect fill the client's photo inside the window
+      const ar = img.width / img.height;
+      let sw = win_w, sh = sw / ar;
+      if (sh < win_h) { sh = win_h; sw = sh * ar; }
+      const sx = win_x + (win_w - sw) / 2;
+      const sy = win_y + (win_h - sh) / 2;
+      ctx.drawImage(img, sx, sy, sw, sh);
+      ctx.restore();
+    } else {
+      // Draw placeholder inside the window area
+      ctx.fillStyle = '#1E1E1E';
+      ctx.fillRect(win_x, win_y, win_w, win_h);
+      ctx.fillStyle = '#666';
+      ctx.font = `${w*0.032}px Montserrat`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('Tu foto aquí', win_x + win_w/2, win_y + win_h/2 - 8);
+      ctx.font = `${w*0.045}px sans-serif`;
+      ctx.fillText('📷', win_x + win_w/2, win_y + win_h/2 + 12);
+    }
+
+    // Superimpose the premium template image on top
+    if (imgNordicRoom.complete && imgNordicRoom.naturalWidth !== 0) {
+      ctx.drawImage(imgNordicRoom, dx, dy, dw, dh);
+    } else {
+      // Draw loading state fallback
+      ctx.strokeStyle = 'rgba(201,168,76,0.3)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(win_x, win_y, win_w, win_h);
+      ctx.fillStyle = '#C9A84C';
+      ctx.font = `${w*0.035}px Cinzel, serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText('Cargando maqueta...', w/2, h/2);
+    }
+    return;
+  }
+
+  if (img) {
+    ctx.save();
+    dibujarAreaFoto(ctx, diseño, w, h);
+    ctx.clip();
+    const ar = img.width / img.height;
+    let sw = w * 0.78, sh = sw / ar;
+    if (sh > h * 0.78) { sh = h * 0.78; sw = sh * ar; }
+    const sx = (w - sw) / 2, sy = (h - sh) / 2;
+    ctx.drawImage(img, sx, sy, sw, sh);
+    ctx.restore();
+  } else {
+    ctx.save();
+    dibujarAreaFoto(ctx, diseño, w, h);
+    ctx.clip();
+    ctx.fillStyle = '#1E1E1E';
+    ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = '#333';
+    ctx.font = `${w*0.07}px Montserrat`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('Tu foto aquí', w/2, h/2 - 10);
+    ctx.font = `${w*0.09}px sans-serif`;
+    ctx.fillText('📷', w/2, h/2 + 22);
+    ctx.restore();
+  }
+
+  // Superponer el marco/diseño encima
+  superponeMarco(ctx, diseño, w, h);
+}
+
+function dibujarAreaFoto(ctx, diseño, w, h) {
+  const pad = w * 0.1;
+  switch(diseño) {
+    case 'roca':
+      ctx.beginPath();
+      ctx.moveTo(pad * 1.2, pad);
+      ctx.lineTo(w - pad * 0.8, pad * 0.8);
+      ctx.lineTo(w - pad * 0.6, h - pad);
+      ctx.lineTo(pad * 0.9, h - pad * 1.1);
+      ctx.closePath();
+      break;
+    case 'taza':
+      const tw = w * 0.6, th = h * 0.42;
+      const tx = (w - tw) / 2, ty = (h - th) / 2 - h * 0.05;
+      ctx.beginPath();
+      ctx.rect(tx, ty, tw, th);
+      break;
+    case 'llavero':
+      ctx.beginPath();
+      ctx.arc(w/2, h/2 + 10, w * 0.28, 0, Math.PI * 2);
+      break;
+    default:
+      ctx.beginPath();
+      ctx.rect(pad, pad, w - pad*2, h - pad*2);
+  }
+}
+
+function superponeMarco(ctx, diseño, w, h) {
+  ctx.save();
+  switch(diseño) {
+    case 'dorado':
+      // Marco dorado clásico
+      ctx.strokeStyle = GOLD;
+      ctx.lineWidth = w * 0.055;
+      ctx.strokeRect(6, 6, w-12, h-12);
+      ctx.strokeStyle = GOLD2;
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(w*0.09, w*0.09, w-w*0.18, h-w*0.18);
+      ctx.strokeStyle = GOLD;
+      ctx.lineWidth = 0.8;
+      ctx.strokeRect(w*0.12, w*0.12, w-w*0.24, h-w*0.24);
+      // Esquinas decorativas
+      const cs = w * 0.07;
+      [[w*0.09,w*0.09],[w-w*0.09,w*0.09],[w*0.09,h-w*0.09],[w-w*0.09,h-w*0.09]].forEach(([cx,cy]) => {
+        ctx.beginPath(); ctx.arc(cx,cy,3,0,Math.PI*2);
+        ctx.fillStyle = GOLD2; ctx.fill();
+      });
+      break;
+
+    case 'collage':
+      // Borde grueso negro + línea dorada interior
+      ctx.strokeStyle = '#0A0A0A';
+      ctx.lineWidth = w * 0.08;
+      ctx.strokeRect(4, 4, w-8, h-8);
+      ctx.strokeStyle = GOLD;
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(w*0.09, w*0.09, w-w*0.18, h-w*0.18);
+      // Texto estilo pizarra
+      ctx.fillStyle = 'rgba(0,0,0,0.55)';
+      ctx.fillRect(w*0.12, h*0.72, w*0.76, h*0.18);
+      ctx.fillStyle = GOLD2;
+      ctx.font = `italic ${w*0.065}px Cormorant Garamond, serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('✦ Colkley ✦', w/2, h*0.81);
+      break;
+
+    case 'roca':
+      // Borde orgánico dorado
+      ctx.strokeStyle = GOLD;
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      const pad = w*0.1;
+      ctx.moveTo(pad*1.2, pad);
+      ctx.lineTo(w-pad*0.8, pad*0.8);
+      ctx.lineTo(w-pad*0.6, h-pad);
+      ctx.lineTo(pad*0.9, h-pad*1.1);
+      ctx.closePath();
+      ctx.stroke();
+      ctx.fillStyle = GOLD;
+      ctx.font = `${w*0.06}px Cinzel, serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText('COLKLEY', w/2, h - 8);
+      break;
+
+    case 'taza':
+      // Silueta taza
+      ctx.strokeStyle = GOLD;
+      ctx.lineWidth = 2.5;
+      const TW = w*0.68, TH = h*0.52;
+      const TX = (w-TW)/2, TY = (h-TH)/2 - h*0.05;
+      ctx.beginPath();
+      ctx.moveTo(TX, TY);
+      ctx.lineTo(TX + TW*0.04, TY + TH);
+      ctx.lineTo(TX + TW*0.96, TY + TH);
+      ctx.lineTo(TX + TW, TY);
+      ctx.arc(TX + TW/2, TY, TW/2, 0, Math.PI, true);
+      ctx.stroke();
+      // asa
+      ctx.beginPath();
+      ctx.arc(TX + TW + 10, TY + TH*0.4, 16, -Math.PI*0.45, Math.PI*0.45);
+      ctx.stroke();
+      ctx.fillStyle = GOLD;
+      ctx.font = `${w*0.056}px Cinzel, serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('COLKLEY', w/2, TY + TH + 22);
+      break;
+
+    case 'llavero':
+      ctx.strokeStyle = GOLD;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(w/2, h/2+10, w*0.28, 0, Math.PI*2);
+      ctx.stroke();
+      ctx.strokeStyle = GOLD2;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(w/2, h/2+10, w*0.31, 0, Math.PI*2);
+      ctx.stroke();
+      // Argolla
+      ctx.strokeStyle = SILVER;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(w/2, h/2 - w*0.25, 12, 0, Math.PI*2);
+      ctx.stroke();
+      break;
+
+    case 'restauracion':
+      // Efecto "antes y después" — línea diagonal
+      ctx.strokeStyle = GOLD;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(w*0.08, w*0.08, w-w*0.16, h-w*0.16);
+      ctx.strokeStyle = 'rgba(201,168,76,0.4)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(w*0.08, h*0.5);
+      ctx.lineTo(w-w*0.08, h*0.5);
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(10,10,10,0.6)';
+      ctx.fillRect(w*0.08, h*0.08, w-w*0.16, h*0.16);
+      ctx.fillStyle = GOLD2;
+      ctx.font = `${w*0.058}px Cinzel, serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('RESTAURACIÓN', w/2, h*0.16);
+      break;
+  }
+  ctx.restore();
+}
+
+function dibujarThumb(p) {
+  const canvas = document.getElementById(`thumb-${p.id}`);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  dibujarDiseño(ctx, p.diseño, canvas.width, canvas.height, null);
+}
+
+// ══════════════════════════════════════════
+// NAVEGACIÓN
+// ══════════════════════════════════════════
+function seleccionarProducto(id) {
+  productoSeleccionado = productos.find(p => p.id === id);
+  tamanoSeleccionado = productoSeleccionado.tamanos[0];
+  cantidad = 1;
+  fotoURL = null; fotoBase64 = null; fotoCloudinaryURL = null;
+
+  document.getElementById('personalizar-titulo').innerHTML =
+    `Personalizá tu <span>${productoSeleccionado.nombre}</span>`;
+  document.getElementById('seccion-catalogo').style.display = 'none';
+  document.getElementById('seccion-personalizar').style.display = 'block';
+  document.getElementById('seccion-checkout').style.display = 'none';
+  document.getElementById('upload-zone').classList.remove('has-image');
+  document.getElementById('preview-hint').textContent = 'Subí una foto para ver el diseño con tu imagen';
+  document.getElementById('cantidad-display').textContent = '1';
+
+  renderTamanos();
+  actualizarStep(2);
+  actualizarCanvas();
+  // Scroll smoothly to the customization section instead of the top of the page
+  document.getElementById('seccion-personalizar').scrollIntoView({ behavior: 'smooth' });
+}
+
+function renderTamanos() {
+  document.getElementById('tamanos-grid').innerHTML =
+    productoSeleccionado.tamanos.map(t =>
+      `<button class="tamano-btn ${t===tamanoSeleccionado?'active':''}" onclick="seleccionarTamano('${t}')">${t}</button>`
+    ).join('');
+}
+
+function seleccionarTamano(t) {
+  tamanoSeleccionado = t;
+  renderTamanos();
+}
+
+function cambiarCantidad(d) {
+  cantidad = Math.max(1, cantidad + d);
+  document.getElementById('cantidad-display').textContent = cantidad;
+}
+
+function volverCatalogo() {
+  document.getElementById('seccion-catalogo').style.display = 'block';
+  document.getElementById('seccion-personalizar').style.display = 'none';
+  document.getElementById('seccion-checkout').style.display = 'none';
+  actualizarStep(1);
+  // Scroll smoothly directly to the catalogue section
+  document.getElementById('seccion-catalogo').scrollIntoView({ behavior: 'smooth' });
+}
+
+function volverPersonalizar() {
+  document.getElementById('seccion-catalogo').style.display = 'none';
+  document.getElementById('seccion-personalizar').style.display = 'block';
+  document.getElementById('seccion-checkout').style.display = 'none';
+  actualizarStep(2);
+}
+
+function actualizarStep(n) {
+  [1,2,3].forEach(i => {
+    const el = document.getElementById(`step-${i}`);
+    el.classList.remove('active','done');
+    if (i < n) el.classList.add('done');
+    else if (i === n) el.classList.add('active');
+  });
+}
+
+function scrollToProductos() {
+  document.getElementById('seccion-catalogo').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ══════════════════════════════════════════
+// FOTO
+// ══════════════════════════════════════════
+function cargarFoto(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    fotoBase64 = e.target.result;
+    const img = new Image();
+    img.onload = () => {
+      fotoURL = img;
+      document.getElementById('upload-zone').classList.add('has-image');
+      document.getElementById('preview-hint').textContent = '✅ Foto cargada — la calidad original se conserva para impresión';
+      actualizarCanvas();
+      subirCloudinary(file);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function subirCloudinary(file) {
+  if (CLOUDINARY_CLOUD === "TU_CLOUD_NAME") {
+    fotoCloudinaryURL = "[Configurar Cloudinary para activar links de alta calidad]";
+    return;
+  }
+  try {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('upload_preset', CLOUDINARY_PRESET);
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, { method:'POST', body:fd });
+    const data = await res.json();
+    fotoCloudinaryURL = data.secure_url;
+  } catch(e) { fotoCloudinaryURL = "[Error al subir foto]"; }
+}
+
+function actualizarCanvas() {
+  const canvas = document.getElementById('frame-preview');
+  const ctx = canvas.getContext('2d');
+  if (productoSeleccionado) dibujarDiseño(ctx, productoSeleccionado.diseño, canvas.width, canvas.height, fotoURL);
+}
+
+// ══════════════════════════════════════════
+// CARRITO
+// ══════════════════════════════════════════
+function agregarAlCarrito() {
+  if (!fotoURL) { alert('📸 Por favor subí una foto primero'); return; }
+  carrito.push({
+    id: Date.now(),
+    producto: productoSeleccionado,
+    tamano: tamanoSeleccionado,
+    cantidad,
+    precio: productoSeleccionado.precio * cantidad,
+    foto: fotoBase64,
+    fotoURL: fotoCloudinaryURL
+  });
+  actualizarCartCount();
+  renderCarrito();
+  abrirCarrito();
+}
+
+function eliminarDelCarrito(id) {
+  carrito = carrito.filter(i => i.id !== id);
+  actualizarCartCount();
+  renderCarrito();
+}
+
+function actualizarCartCount() {
+  document.getElementById('cart-count').textContent = carrito.reduce((s,i) => s+i.cantidad, 0);
+}
+
+function renderCarrito() {
+  const lista = document.getElementById('carrito-items-lista');
+  const footer = document.getElementById('carrito-footer');
+  if (!carrito.length) {
+    lista.innerHTML = '<div class="carrito-empty">✦<br>Tu carrito está vacío<br><small style="font-size:0.76rem">Elegí un producto para empezar</small></div>';
+    footer.style.display = 'none'; return;
+  }
+  footer.style.display = 'block';
+  lista.innerHTML = carrito.map(item => `
+    <div class="carrito-item">
+      <div class="carrito-item-img">
+        ${item.foto ? `<img src="${item.foto}" alt="foto">` : ''}
+      </div>
+      <div class="carrito-item-info">
+        <div class="carrito-item-nombre">${item.producto.nombre}</div>
+        <div class="carrito-item-detalle">${item.tamano} · Cant: ${item.cantidad}</div>
+        <div class="carrito-item-precio">$${item.precio.toLocaleString()}</div>
+      </div>
+      <button class="carrito-item-remove" onclick="eliminarDelCarrito(${item.id})">✕</button>
+    </div>
+  `).join('');
+  document.getElementById('carrito-total-precio').textContent =
+    `$${carrito.reduce((s,i)=>s+i.precio,0).toLocaleString()}`;
+}
+
+function abrirCarrito() {
+  renderCarrito();
+  document.getElementById('carrito-panel').classList.add('open');
+  document.getElementById('overlay').classList.add('show');
+}
+function cerrarCarrito() {
+  document.getElementById('carrito-panel').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
+
+// ══════════════════════════════════════════
+// CHECKOUT
+// ══════════════════════════════════════════
+function irCheckout() {
+  if (!carrito.length) return;
+  cerrarCarrito();
+  document.getElementById('seccion-catalogo').style.display = 'none';
+  document.getElementById('seccion-personalizar').style.display = 'none';
+  document.getElementById('seccion-checkout').style.display = 'block';
+  actualizarStep(3);
+  renderResumen();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderResumen() {
+  document.getElementById('resumen-items').innerHTML = carrito.map(i =>
+    `<div class="resumen-linea"><span>${i.producto.nombre} (${i.tamano}) ×${i.cantidad}</span><span>$${i.precio.toLocaleString()}</span></div>`
+  ).join('');
+  document.getElementById('resumen-total-precio').textContent =
+    `$${carrito.reduce((s,i)=>s+i.precio,0).toLocaleString()}`;
+}
+
+function confirmarPedido() {
+  const nombre = document.getElementById('input-nombre').value.trim();
+  const apellido = document.getElementById('input-apellido').value.trim();
+  const email = document.getElementById('input-email').value.trim();
+  const tel = document.getElementById('input-telefono').value.trim();
+  const msg = document.getElementById('input-mensaje').value.trim();
+  if (!nombre || !email) { alert('Por favor completá nombre y email'); return; }
+
+  const total = carrito.reduce((s,i)=>s+i.precio,0);
+  let txt = `👑 *NUEVO PEDIDO — COLKLEY*\n\n`;
+  txt += `👤 *Cliente:* ${nombre} ${apellido}\n`;
+  txt += `📧 *Email:* ${email}\n`;
+  if (tel) txt += `📱 *Teléfono:* ${tel}\n`;
+  txt += `\n📦 *Productos:*\n`;
+  carrito.forEach((item,i) => {
+    txt += `\n${i+1}. ${item.producto.nombre}\n`;
+    txt += `   Tamaño: ${item.tamano} | Cantidad: ${item.cantidad}\n`;
+    txt += `   Precio: $${item.precio.toLocaleString()}\n`;
+    txt += `   📷 Foto alta calidad: ${item.fotoURL || 'adjunta por email'}\n`;
+  });
+  txt += `\n💰 *Total: $${total.toLocaleString()}*`;
+  if (msg) txt += `\n\n💬 *Nota:* ${msg}`;
+
+  window.waMensaje = `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(txt)}`;
+  document.getElementById('modal-confirmacion').classList.add('show');
+}
+
+function abrirWhatsApp() {
+  window.open(window.waMensaje, '_blank');
+  cerrarModal();
+  carrito = [];
+  actualizarCartCount();
+  volverCatalogo();
+}
+
+function cerrarModal() {
+  document.getElementById('modal-confirmacion').classList.remove('show');
+}
+
+// ══════════════════════════════════════════
+// DRAG & DROP
+// ══════════════════════════════════════════
+const zone = document.getElementById('upload-zone');
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.style.borderColor = '#C9A84C'; });
+zone.addEventListener('dragleave', () => { zone.style.borderColor = ''; });
+zone.addEventListener('drop', e => {
+  e.preventDefault(); zone.style.borderColor = '';
+  const f = e.dataTransfer.files[0];
+  if (f && f.type.startsWith('image/')) cargarFoto({ target: { files: [f] } });
+});
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+renderCatalogo();
+</script>
+</body>
+</html>
