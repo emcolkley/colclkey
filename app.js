@@ -269,12 +269,100 @@ function irCheckout() {
   document.getElementById('seccion-checkout').scrollIntoView({ behavior: 'smooth' });
 }
 
+let activeCoupon = null;
+
 function renderResumen() {
-  document.getElementById('resumen-items').innerHTML = carrito.map(i =>
+  const subtotal = carrito.reduce((s, i) => s + i.precio, 0);
+  let discountAmount = 0;
+
+  if (activeCoupon) {
+    if (activeCoupon.tipo === 'porcentaje') {
+      discountAmount = Math.round(subtotal * (activeCoupon.valor / 100));
+    } else if (activeCoupon.tipo === 'fijo') {
+      discountAmount = activeCoupon.valor;
+    }
+  }
+
+  const total = Math.max(0, subtotal - discountAmount);
+
+  let itemsHTML = carrito.map(i =>
     `<div class="resumen-linea"><span>${i.producto.nombre} (${i.tamano}) ×${i.cantidad}</span><span>$${i.precio.toLocaleString()}</span></div>`
   ).join('');
-  document.getElementById('resumen-total-precio').textContent =
-    `$${carrito.reduce((s,i)=>s+i.precio,0).toLocaleString()}`;
+
+  if (activeCoupon && discountAmount > 0) {
+    itemsHTML += `
+      <div class="resumen-linea" style="color: #4A9B6F; font-weight: 500; font-size: 0.8rem; margin-top: 8px; border-top: 1px dashed rgba(201,168,76,0.2); padding-top: 8px;">
+        <span>Descuento (Cupón: ${activeCoupon.codigo})</span>
+        <span>-$${discountAmount.toLocaleString()}</span>
+      </div>
+    `;
+  }
+
+  document.getElementById('resumen-items').innerHTML = itemsHTML;
+  document.getElementById('resumen-total-precio').textContent = `$${total.toLocaleString()}`;
+}
+
+function aplicarCupon() {
+  const input = document.getElementById('input-coupon');
+  const msgEl = document.getElementById('coupon-message');
+  if (!input || !msgEl) return;
+
+  const code = input.value.trim().toUpperCase();
+  if (!code) {
+    msgEl.textContent = "⚠️ Ingresá un código primero.";
+    msgEl.style.color = "#E74C3C";
+    msgEl.style.display = "block";
+    return;
+  }
+
+  // Cargar lista de cupones de localStorage (o default si no existe)
+  let cupones = [];
+  try {
+    const list = localStorage.getItem('colkley_cupones');
+    cupones = list ? JSON.parse(list) : [
+      { codigo: "BIENVENIDA", tipo: "porcentaje", valor: 10, minCompra: 0, activo: true }
+    ];
+  } catch (e) {
+    console.error("Error al leer cupones", e);
+  }
+
+  const coupon = cupones.find(c => c.codigo === code);
+
+  if (!coupon) {
+    msgEl.textContent = "❌ El cupón no es válido.";
+    msgEl.style.color = "#E74C3C";
+    msgEl.style.display = "block";
+    activeCoupon = null;
+    renderResumen();
+    return;
+  }
+
+  if (!coupon.activo) {
+    msgEl.textContent = "❌ Este cupón ya no está activo.";
+    msgEl.style.color = "#E74C3C";
+    msgEl.style.display = "block";
+    activeCoupon = null;
+    renderResumen();
+    return;
+  }
+
+  const subtotal = carrito.reduce((s, i) => s + i.precio, 0);
+  if (coupon.minCompra && subtotal < coupon.minCompra) {
+    msgEl.textContent = `❌ Este cupón requiere una compra mínima de $${coupon.minCompra.toLocaleString()}.`;
+    msgEl.style.color = "#E74C3C";
+    msgEl.style.display = "block";
+    activeCoupon = null;
+    renderResumen();
+    return;
+  }
+
+  activeCoupon = coupon;
+  const discountText = coupon.tipo === 'porcentaje' ? `${coupon.valor}%` : `$${coupon.valor.toLocaleString()}`;
+  msgEl.textContent = `✅ ¡Cupón ${coupon.codigo} aplicado! Descuento de ${discountText}`;
+  msgEl.style.color = "#4A9B6F";
+  msgEl.style.display = "block";
+
+  renderResumen();
 }
 
 function confirmarPedido() {
@@ -285,18 +373,36 @@ function confirmarPedido() {
   const msg = document.getElementById('input-mensaje').value.trim();
   if (!nombre || !email) { alert('Por favor completá nombre y email'); return; }
 
-  const total = carrito.reduce((s,i)=>s+i.precio,0);
+  const subtotal = carrito.reduce((s, i) => s + i.precio, 0);
+  let discountAmount = 0;
+
+  if (activeCoupon) {
+    if (activeCoupon.tipo === 'porcentaje') {
+      discountAmount = Math.round(subtotal * (activeCoupon.valor / 100));
+    } else if (activeCoupon.tipo === 'fijo') {
+      discountAmount = activeCoupon.valor;
+    }
+  }
+
+  const total = Math.max(0, subtotal - discountAmount);
+
   let txt = `👑 *NUEVO PEDIDO — COLKLEY*\n\n`;
   txt += `👤 *Cliente:* ${nombre} ${apellido}\n`;
   txt += `📧 *Email:* ${email}\n`;
   if (tel) txt += `📱 *Teléfono:* ${tel}\n`;
   txt += `\n📦 *Productos:*\n`;
-  carrito.forEach((item,i) => {
-    txt += `\n${i+1}. ${item.producto.nombre}\n`;
+  carrito.forEach((item, i) => {
+    txt += `\n${i + 1}. ${item.producto.nombre}\n`;
     txt += `   Tamaño: ${item.tamano} | Cantidad: ${item.cantidad}\n`;
     txt += `   Precio: $${item.precio.toLocaleString()}\n`;
     txt += `   📷 Foto alta calidad: ${item.fotoURL || 'adjunta por email'}\n`;
   });
+
+  if (activeCoupon && discountAmount > 0) {
+    txt += `\n🏷️ *Cupón aplicado:* ${activeCoupon.codigo} (-$${discountAmount.toLocaleString()})`;
+    txt += `\n💵 *Subtotal:* $${subtotal.toLocaleString()}`;
+  }
+
   txt += `\n💰 *Total: $${total.toLocaleString()}*`;
   if (msg) txt += `\n\n💬 *Nota:* ${msg}`;
 

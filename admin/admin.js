@@ -481,9 +481,204 @@ function eliminarProducto(id) {
 }
 
 // ══════════════════════════════════════════
+// NAVEGACIÓN ENTRE PESTAÑAS (TABS)
+// ══════════════════════════════════════════
+
+function switchAdminTab(tabName) {
+  const btnProds = document.getElementById('btn-tab-productos');
+  const btnCupones = document.getElementById('btn-tab-cupones');
+  const contentProds = document.getElementById('content-tab-productos');
+  const contentCupones = document.getElementById('content-tab-cupones');
+
+  if (tabName === 'productos') {
+    btnProds.classList.add('active');
+    btnProds.style.borderBottom = '3px solid #C9A84C';
+    btnProds.style.color = '#C9A84C';
+    
+    btnCupones.classList.remove('active');
+    btnCupones.style.borderBottom = 'none';
+    btnCupones.style.color = '#777';
+    
+    contentProds.style.display = 'block';
+    contentCupones.style.display = 'none';
+    
+    renderAdminDashboard();
+  } else if (tabName === 'cupones') {
+    btnCupones.classList.add('active');
+    btnCupones.style.borderBottom = '3px solid #C9A84C';
+    btnCupones.style.color = '#C9A84C';
+    
+    btnProds.classList.remove('active');
+    btnProds.style.borderBottom = 'none';
+    btnProds.style.color = '#777';
+    
+    contentCupones.style.display = 'block';
+    contentProds.style.display = 'none';
+    
+    renderCuponesDashboard();
+  }
+}
+
+// ══════════════════════════════════════════
+// PANEL DE ADMINISTRACIÓN DE CUPONES
+// ══════════════════════════════════════════
+
+// Obtiene la lista de cupones de localStorage (o default)
+function getCupones() {
+  try {
+    const list = localStorage.getItem('colkley_cupones');
+    if (!list) {
+      const defaultCupones = [
+        { codigo: "BIENVENIDA", tipo: "porcentaje", valor: 10, minCompra: 0, activo: true }
+      ];
+      localStorage.setItem('colkley_cupones', JSON.stringify(defaultCupones));
+      return defaultCupones;
+    }
+    return JSON.parse(list);
+  } catch (e) {
+    console.error("Error al leer cupones", e);
+    return [];
+  }
+}
+
+// Dibuja el panel administrativo de cupones
+function renderCuponesDashboard() {
+  const tbody = document.getElementById('admin-cupones-rows');
+  if (!tbody) return;
+
+  const cupones = getCupones();
+
+  tbody.innerHTML = cupones.map(c => {
+    const typeLabel = c.tipo === 'porcentaje' ? 'Porcentaje (%)' : 'Monto Fijo ($)';
+    const valueLabel = c.tipo === 'porcentaje' ? `${c.valor}%` : `$${c.valor.toLocaleString()}`;
+    const minCompraLabel = c.minCompra && c.minCompra > 0 ? `$${c.minCompra.toLocaleString()}` : 'Sin mínimo';
+
+    return `
+      <tr>
+        <td style="font-weight: 600; font-size: 0.92rem; color: #E8C96A; letter-spacing: 1px; padding: 12px 1rem;">
+          ${c.codigo}
+        </td>
+        <td style="font-size: 0.8rem; color: #B8C0CC;">
+          ${typeLabel}
+        </td>
+        <td style="font-weight: 500; color: #C9A84C;">
+          ${valueLabel}
+        </td>
+        <td style="font-size: 0.8rem; color: #888;">
+          ${minCompraLabel}
+        </td>
+        <td>
+          <span class="badge-status ${c.activo ? 'active' : 'inactive'}">
+            ${c.activo ? 'Activo' : 'Inactivo'}
+          </span>
+        </td>
+        <td style="text-align: right; padding-right: 2rem;">
+          <div style="display: flex; align-items: center; justify-content: flex-end; gap: 12px; min-height: 34px;">
+            <label class="switch" style="margin: 0;">
+              <input type="checkbox" ${c.activo ? 'checked' : ''} onchange="toggleCuponStatus('${c.codigo}')">
+              <span class="slider"></span>
+            </label>
+            <button class="delete-btn" onclick="eliminarCupon('${c.codigo}')" style="background: transparent; border: none; color: #C9A84C; font-size: 1.1rem; cursor: pointer; transition: color 0.2s, transform 0.2s; padding: 4px;" title="Eliminar Cupón" onmouseover="this.style.color='#E8C96A'; this.style.transform='scale(1.15)';" onmouseout="this.style.color='#C9A84C'; this.style.transform='scale(1)';">🗑️</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// Alterna el estado activo/inactivo de un cupón
+function toggleCuponStatus(codigo) {
+  try {
+    let cupones = getCupones();
+    cupones = cupones.map(c => {
+      if (c.codigo === codigo) {
+        c.activo = !c.activo;
+      }
+      return c;
+    });
+    localStorage.setItem('colkley_cupones', JSON.stringify(cupones));
+    renderCuponesDashboard();
+  } catch (e) {
+    console.error("Error al alternar estado del cupón", e);
+  }
+}
+
+// Abre el modal de creación de cupón
+function abrirModalCupon() {
+  document.getElementById('form-add-cupon').reset();
+  document.getElementById('modal-add-cupon').style.display = 'flex';
+}
+
+// Cierra el modal de creación de cupón
+function cerrarModalCupon() {
+  document.getElementById('modal-add-cupon').style.display = 'none';
+}
+
+// Guarda un nuevo cupón en localStorage
+function guardarNuevoCupon(event) {
+  event.preventDefault();
+
+  const code = document.getElementById('cupon-codigo').value.trim().toUpperCase();
+  const type = document.getElementById('cupon-tipo').value;
+  const value = parseFloat(document.getElementById('cupon-valor').value);
+  const minCompra = parseFloat(document.getElementById('cupon-min-compra').value) || 0;
+
+  if (!code) {
+    alert("⚠️ Por favor ingresa un código de cupón válido.");
+    return;
+  }
+
+  const newCoupon = {
+    codigo: code,
+    tipo: type,
+    valor: value,
+    minCompra: minCompra,
+    activo: true
+  };
+
+  try {
+    const cupones = getCupones();
+    
+    // Verificar si ya existe un cupón con el mismo código
+    if (cupones.some(c => c.codigo === code)) {
+      alert("⚠️ Ya existe un cupón con este código.");
+      return;
+    }
+
+    cupones.push(newCoupon);
+    localStorage.setItem('colkley_cupones', JSON.stringify(cupones));
+
+    cerrarModalCupon();
+    renderCuponesDashboard();
+  } catch (e) {
+    console.error("Error al guardar cupón", e);
+    alert("❌ Error al guardar cupón.");
+  }
+}
+
+// Elimina un cupón permanentemente
+function eliminarCupon(codigo) {
+  if (!confirm(`⚠️ ¿Estás seguro de que querés eliminar el cupón "${codigo}"? Esta acción no se puede deshacer.`)) return;
+
+  try {
+    let cupones = getCupones();
+    cupones = cupones.filter(c => c.codigo !== codigo);
+    localStorage.setItem('colkley_cupones', JSON.stringify(cupones));
+    renderCuponesDashboard();
+  } catch (e) {
+    console.error("Error al eliminar cupón", e);
+  }
+}
+
+// ══════════════════════════════════════════
 // INITIALIZATION
 // ══════════════════════════════════════════
-window.addEventListener('load', renderAdminDashboard);
+window.addEventListener('load', () => {
+  renderAdminDashboard();
+  // Inicializar pestañas para asegurar que todo cargue bien
+  switchAdminTab('productos');
+});
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
   renderAdminDashboard();
+  switchAdminTab('productos');
 }

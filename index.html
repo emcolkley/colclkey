@@ -134,6 +134,16 @@
         <textarea class="form-input" id="input-mensaje" rows="3" placeholder="Ej: quiero que la foto quede centrada, tonos cálidos..."></textarea>
       </div>
 
+      <!-- SECCIÓN DE CUPÓN DE DESCUENTO -->
+      <div class="coupon-section" style="background: #141414; padding: 15px; border-radius: 8px; border: 1px solid rgba(201,168,76,0.25); margin-bottom: 1.5rem; text-align: left;">
+        <label class="form-label" style="display: block; font-size: 0.74rem; font-weight: 500; margin-bottom: 6px; color: #B8C0CC; text-transform: uppercase; letter-spacing: 0.5px; font-family: 'Montserrat', sans-serif;">¿Tenés un código de descuento?</label>
+        <div style="display: flex; gap: 8px;">
+          <input class="form-input" type="text" id="input-coupon" placeholder="Ingresá tu cupón" style="flex: 1; padding: 10px; background: #222; border: 1px solid rgba(201,168,76,0.3); border-radius: 8px; color: white; text-transform: uppercase; outline: none; font-size: 0.8rem;">
+          <button class="panel-btn" onclick="aplicarCupon()" style="margin: 0; width: auto; padding: 10px 18px; font-size: 0.76rem; border-radius: 8px; background: linear-gradient(135deg, #E8C96A, #A07830); color: black;">Aplicar</button>
+        </div>
+        <div id="coupon-message" style="font-size: 0.74rem; margin-top: 6px; display: none; font-family: 'Montserrat', sans-serif; font-weight: 500;"></div>
+      </div>
+
       <div class="resumen-pedido">
         <div class="resumen-titulo">Resumen del pedido</div>
         <div id="resumen-items"></div>

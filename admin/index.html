@@ -27,80 +27,119 @@
   <section id="seccion-admin">
     <a href="/" class="back-btn">← Volver a la tienda</a>
     
-    <div class="admin-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
-      <div>
-        <h2 class="section-title">Panel de <span>Administración</span></h2>
-        <div class="gold-line"></div>
-        <p class="section-sub">Administrá el catálogo de tu tienda y activá o desactivá productos al instante de manera global.</p>
-      </div>
-      <button class="panel-btn" onclick="abrirModalAdd()" style="margin: 0; width: auto; padding: 10px 22px; font-size: 0.8rem; border-radius: 20px;">➕ Añadir Producto</button>
+    <!-- TABS DE NAVEGACIÓN -->
+    <div class="admin-tabs" style="display: flex; gap: 8px; margin: 1.5rem 0 2rem; border-bottom: 1.5px solid rgba(201,168,76,0.15); padding-bottom: 1px;">
+      <button class="tab-btn active" id="btn-tab-productos" onclick="switchAdminTab('productos')" style="background: transparent; border: none; color: #C9A84C; font-family: 'Cinzel', serif; font-size: 0.9rem; font-weight: 600; cursor: pointer; padding: 10px 20px; transition: all 0.3s; border-bottom: 3px solid #C9A84C; outline: none; letter-spacing: 1px;">📦 Productos</button>
+      <button class="tab-btn" id="btn-tab-cupones" onclick="switchAdminTab('cupones')" style="background: transparent; border: none; color: #777; font-family: 'Cinzel', serif; font-size: 0.9rem; font-weight: 600; cursor: pointer; padding: 10px 20px; transition: all 0.3s; outline: none; letter-spacing: 1px;">🏷️ Cupones</button>
     </div>
-    
-    <div class="admin-stats">
-      <div class="stat-card">
-        <div class="stat-num" id="stat-total">0</div>
-        <div class="stat-label">Total Productos</div>
+
+    <!-- CONTENIDO PESTAÑA: PRODUCTOS -->
+    <div id="content-tab-productos">
+      <div class="admin-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h2 class="section-title">Panel de <span>Administración</span></h2>
+          <div class="gold-line"></div>
+          <p class="section-sub">Administrá el catálogo de tu tienda y activá o desactivá productos al instante de manera global.</p>
+        </div>
+        <button class="panel-btn" onclick="abrirModalAdd()" style="margin: 0; width: auto; padding: 10px 22px; font-size: 0.8rem; border-radius: 20px;">➕ Añadir Producto</button>
       </div>
-      <div class="stat-card">
-        <div class="stat-num" id="stat-activos" style="color: #4A9B6F;">0</div>
-        <div class="stat-label">Activos</div>
+      
+      <div class="admin-stats">
+        <div class="stat-card">
+          <div class="stat-num" id="stat-total">0</div>
+          <div class="stat-label">Total Productos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-activos" style="color: #4A9B6F;">0</div>
+          <div class="stat-label">Activos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-desactivados" style="color: #6A6A6A;">0</div>
+          <div class="stat-label">Desactivados</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-visitas-hoy" style="color: #E8C96A;">0</div>
+          <div class="stat-label">Visitas de Hoy</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-visitas-mes" style="color: #C9A84C;">0</div>
+          <div class="stat-label">Visitas del Mes</div>
+        </div>
       </div>
-      <div class="stat-card">
-        <div class="stat-num" id="stat-desactivados" style="color: #6A6A6A;">0</div>
-        <div class="stat-label">Desactivados</div>
+   
+      <!-- BARRA DE BÚSQUEDA Y FILTROS PREMIUM -->
+      <div class="admin-filters-bar" style="display: flex; gap: 12px; margin-bottom: 1.5rem; flex-wrap: wrap; align-items: center; background: #141414; padding: 12px 18px; border-radius: 10px; border: 1px solid rgba(201,168,76,0.15);">
+        <div style="flex: 1; min-width: 200px;">
+          <input type="text" id="admin-search" placeholder="🔍 Buscar producto por nombre o descripción..." oninput="applyAdminFilters()" style="width: 100%; padding: 8px 12px; background: #222; border: 1px solid rgba(201,168,76,0.3); border-radius: 6px; color: white; font-size: 0.82rem; outline: none;">
+        </div>
+        <div style="width: 160px;">
+          <select id="admin-filter-tipo" onchange="applyAdminFilters()" style="width: 100%; padding: 8px 12px; background: #222; border: 1px solid rgba(201,168,76,0.3); border-radius: 6px; color: white; font-size: 0.82rem; cursor: pointer; outline: none;">
+            <option value="">📁 Todos los Tipos</option>
+            <option value="marco">Cuadros</option>
+            <option value="roca">Rocas</option>
+            <option value="taza">Tazas</option>
+            <option value="llavero">Llaveros</option>
+            <option value="restauracion">Restauración</option>
+          </select>
+        </div>
+        <div style="width: 160px;">
+          <select id="admin-filter-marco" onchange="applyAdminFilters()" style="width: 100%; padding: 8px 12px; background: #222; border: 1px solid rgba(201,168,76,0.3); border-radius: 6px; color: white; font-size: 0.82rem; cursor: pointer; outline: none;">
+            <option value="">🖼️ Todos los Marcos</option>
+          </select>
+        </div>
+        <div style="width: 160px;">
+          <select id="admin-filter-formato" onchange="applyAdminFilters()" style="width: 100%; padding: 8px 12px; background: #222; border: 1px solid rgba(201,168,76,0.3); border-radius: 6px; color: white; font-size: 0.82rem; cursor: pointer; outline: none;">
+            <option value="">📏 Todos los Tamaños</option>
+          </select>
+        </div>
       </div>
-      <div class="stat-card">
-        <div class="stat-num" id="stat-visitas-hoy" style="color: #E8C96A;">0</div>
-        <div class="stat-label">Visitas de Hoy</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num" id="stat-visitas-mes" style="color: #C9A84C;">0</div>
-        <div class="stat-label">Visitas del Mes</div>
+   
+      <div class="admin-table-container">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Vista Previa</th>
+              <th>Producto</th>
+              <th>Precio Base</th>
+              <th>Estado</th>
+              <th style="text-align: right; padding-right: 2rem;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="admin-productos-rows">
+            <!-- Celdas dinámicas inyectadas por admin.js -->
+          </tbody>
+        </table>
       </div>
     </div>
- 
-    <!-- BARRA DE BÚSQUEDA Y FILTROS PREMIUM -->
-    <div class="admin-filters-bar" style="display: flex; gap: 12px; margin-bottom: 1.5rem; flex-wrap: wrap; align-items: center; background: #141414; padding: 12px 18px; border-radius: 10px; border: 1px solid rgba(201,168,76,0.15);">
-      <div style="flex: 1; min-width: 200px;">
-        <input type="text" id="admin-search" placeholder="🔍 Buscar producto por nombre o descripción..." oninput="applyAdminFilters()" style="width: 100%; padding: 8px 12px; background: #222; border: 1px solid rgba(201,168,76,0.3); border-radius: 6px; color: white; font-size: 0.82rem; outline: none;">
+
+    <!-- CONTENIDO PESTAÑA: CUPONES -->
+    <div id="content-tab-cupones" style="display: none;">
+      <div class="admin-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;">
+        <div>
+          <h2 class="section-title">Cupones de <span>Descuento</span></h2>
+          <div class="gold-line"></div>
+          <p class="section-sub">Crea y administra códigos promocionales para incentivar tus ventas en redes sociales y Cyber Days.</p>
+        </div>
+        <button class="panel-btn" onclick="abrirModalCupon()" style="margin: 0; width: auto; padding: 10px 22px; font-size: 0.8rem; border-radius: 20px; background: linear-gradient(135deg, #E8C96A, #A07830); color: black;">➕ Crear Cupón</button>
       </div>
-      <div style="width: 160px;">
-        <select id="admin-filter-tipo" onchange="applyAdminFilters()" style="width: 100%; padding: 8px 12px; background: #222; border: 1px solid rgba(201,168,76,0.3); border-radius: 6px; color: white; font-size: 0.82rem; cursor: pointer; outline: none;">
-          <option value="">📁 Todos los Tipos</option>
-          <option value="marco">Cuadros</option>
-          <option value="roca">Rocas</option>
-          <option value="taza">Tazas</option>
-          <option value="llavero">Llaveros</option>
-          <option value="restauracion">Restauración</option>
-        </select>
+
+      <div class="admin-table-container">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Código de Cupón</th>
+              <th>Tipo de Descuento</th>
+              <th>Valor Descuento</th>
+              <th>Compra Mínima</th>
+              <th>Estado</th>
+              <th style="text-align: right; padding-right: 2rem;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="admin-cupones-rows">
+            <!-- Celdas dinámicas inyectadas por admin.js -->
+          </tbody>
+        </table>
       </div>
-      <div style="width: 160px;">
-        <select id="admin-filter-marco" onchange="applyAdminFilters()" style="width: 100%; padding: 8px 12px; background: #222; border: 1px solid rgba(201,168,76,0.3); border-radius: 6px; color: white; font-size: 0.82rem; cursor: pointer; outline: none;">
-          <option value="">🖼️ Todos los Marcos</option>
-        </select>
-      </div>
-      <div style="width: 160px;">
-        <select id="admin-filter-formato" onchange="applyAdminFilters()" style="width: 100%; padding: 8px 12px; background: #222; border: 1px solid rgba(201,168,76,0.3); border-radius: 6px; color: white; font-size: 0.82rem; cursor: pointer; outline: none;">
-          <option value="">📏 Todos los Tamaños</option>
-        </select>
-      </div>
-    </div>
- 
-    <div class="admin-table-container">
-      <table class="admin-table">
-        <thead>
-          <tr>
-            <th>Vista Previa</th>
-            <th>Producto</th>
-            <th>Precio Base</th>
-            <th>Estado</th>
-            <th style="text-align: right; padding-right: 2rem;">Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="admin-productos-rows">
-          <!-- Celdas dinámicas inyectadas por admin.js -->
-        </tbody>
-      </table>
     </div>
   </section>
 </main>
@@ -248,6 +287,45 @@
       <div style="display: flex; gap: 12px; margin-top: 1.5rem;">
         <button type="button" class="panel-btn" onclick="cerrarModalEdit()" style="background: transparent; border: 1.5px solid rgba(201,168,76,0.3); color: #C9A84C; margin: 0; width: 50%; padding: 11px;">Cancelar</button>
         <button type="submit" class="panel-btn" style="background: linear-gradient(135deg, #E8C96A, #A07830); color: black; margin: 0; width: 50%; padding: 11px;">Guardar Cambios</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL DE ADICIÓN DE CUPONES -->
+<div id="modal-add-cupon" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 300; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
+  <div class="modal-content" style="background: #1A1A1A; border: 1px solid rgba(201,168,76,0.5); padding: 2rem; border-radius: 14px; width: 90%; max-width: 450px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; text-align: left;">
+    <h3 class="modal-titulo" style="font-family: 'Cinzel', serif; color: #F5F5F5; font-size: 1.3rem; margin-bottom: 0.5rem; text-align: center;">Crear <span>Nuevo Cupón</span></h3>
+    <div class="gold-line" style="margin: 0 auto 1.5rem; width: 60px;"></div>
+    
+    <form id="form-add-cupon" onsubmit="guardarNuevoCupon(event)">
+      <div class="form-group" style="margin-bottom: 1rem;">
+        <label class="form-label" style="display: block; font-size: 0.74rem; font-weight: 500; margin-bottom: 6px; color: #B8C0CC; text-transform: uppercase; letter-spacing: 0.5px;">Código de Cupón *</label>
+        <input class="form-input" type="text" id="cupon-codigo" placeholder="Ej: CYBER20" required style="width: 100%; padding: 10px; background: #222; border: 1px solid rgba(201,168,76,0.3); border-radius: 8px; color: white; text-transform: uppercase;">
+      </div>
+      
+      <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem;">
+        <div class="form-group">
+          <label class="form-label" style="display: block; font-size: 0.74rem; font-weight: 500; margin-bottom: 6px; color: #B8C0CC; text-transform: uppercase; letter-spacing: 0.5px;">Tipo de Descuento *</label>
+          <select class="form-input" id="cupon-tipo" required style="width: 100%; padding: 10px; background: #222; border: 1px solid rgba(201,168,76,0.3); border-radius: 8px; color: white;">
+            <option value="porcentaje">Porcentaje (%)</option>
+            <option value="fijo">Monto Fijo ($)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="display: block; font-size: 0.74rem; font-weight: 500; margin-bottom: 6px; color: #B8C0CC; text-transform: uppercase; letter-spacing: 0.5px;">Valor *</label>
+          <input class="form-input" type="number" id="cupon-valor" placeholder="Ej: 20 o 2500" required style="width: 100%; padding: 10px; background: #222; border: 1px solid rgba(201,168,76,0.3); border-radius: 8px; color: white;">
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 1.5rem;">
+        <label class="form-label" style="display: block; font-size: 0.74rem; font-weight: 500; margin-bottom: 6px; color: #B8C0CC; text-transform: uppercase; letter-spacing: 0.5px;">Compra Mínima ($) (Opcional)</label>
+        <input class="form-input" type="number" id="cupon-min-compra" placeholder="0 (Sin compra mínima)" style="width: 100%; padding: 10px; background: #222; border: 1px solid rgba(201,168,76,0.3); border-radius: 8px; color: white;">
+      </div>
+
+      <div style="display: flex; gap: 12px; margin-top: 1.5rem;">
+        <button type="button" class="panel-btn" onclick="cerrarModalCupon()" style="background: transparent; border: 1.5px solid rgba(201,168,76,0.3); color: #C9A84C; margin: 0; width: 50%; padding: 11px;">Cancelar</button>
+        <button type="submit" class="panel-btn" style="background: linear-gradient(135deg, #E8C96A, #A07830); color: black; margin: 0; width: 50%; padding: 11px;">Guardar Cupón</button>
       </div>
     </form>
   </div>
