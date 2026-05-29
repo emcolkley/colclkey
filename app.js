@@ -55,7 +55,13 @@ function renderCatalogo() {
           ${p.nombre}
           ${p.nuevo ? '<span class="tag-nuevo">NUEVO</span>' : ''}
         </div>
-        <div class="producto-precio">Desde $${p.precio.toLocaleString()}</div>
+        <div class="producto-precio" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          ${p.descuento ? `
+            <span class="precio-original" style="text-decoration: line-through; opacity: 0.5; font-size: 0.85em;">$${p.precio.toLocaleString()}</span>
+            <span class="precio-descuento" style="color: #E8C96A; font-weight: 600;">$${Math.round(p.precio * (1 - p.descuento / 100)).toLocaleString()}</span>
+            <span class="tag-descuento" style="background: #C9A84C; color: #0A0A0A; font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 4px;">-${p.descuento}%</span>
+          ` : `Desde $${p.precio.toLocaleString()}`}
+        </div>
         <div class="producto-desc">${p.desc}</div>
       </div>
     </div>
@@ -194,7 +200,7 @@ function agregarAlCarrito() {
     producto: productoSeleccionado,
     tamano: tamanoSeleccionado,
     cantidad,
-    precio: productoSeleccionado.precio * cantidad,
+    precio: (productoSeleccionado.descuento ? Math.round(productoSeleccionado.precio * (1 - productoSeleccionado.descuento / 100)) : productoSeleccionado.precio) * cantidad,
     foto: fotoBase64,
     fotoURL: fotoCloudinaryURL
   });

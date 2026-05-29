@@ -2,8 +2,9 @@
 // ESTADO Y PERSISTENCIA DEL ADMINISTRADOR
 // ══════════════════════════════════════════
 
-// Variable para guardar temporalmente la imagen cargada en Base64
+// Variables para guardar temporalmente las imágenes cargadas en Base64
 let newProductImageBase64 = null;
+let editProductImageBase64 = null;
 
 // Obtiene la lista de IDs desactivados desde localStorage
 function getDeactivatedIDs() {
@@ -54,8 +55,22 @@ function renderAdminDashboard() {
 
   tbody.innerHTML = allProds.map(p => {
     const isActive = !deactivated.includes(p.id);
+    
+    // Cálculo de precio final con descuento para la vista administrativa
+    const finalPrice = p.descuento ? Math.round(p.precio * (1 - p.descuento / 100)) : p.precio;
+    const priceDisplay = p.descuento ? `
+      <div style="font-size: 0.72rem; text-decoration: line-through; opacity: 0.5; margin-bottom: 2px;">$${p.precio.toLocaleString()}</div>
+      <div style="color: #E8C96A; font-weight: 600;">$${finalPrice.toLocaleString()} <span style="background: #C9A84C; color: #0A0A0A; font-size: 0.6rem; font-weight: 700; padding: 1px 4px; border-radius: 3px; margin-left: 2px; vertical-align: middle;">-${p.descuento}%</span></div>
+    ` : `$${p.precio.toLocaleString()}`;
+
+    // Botón de edición en oro disponible para TODOS los productos
+    const editBtn = `
+      <button class="edit-btn" onclick="abrirModalEdit(${p.id})" style="background: transparent; border: none; color: #C9A84C; font-size: 1.1rem; cursor: pointer; transition: color 0.2s, transform 0.2s; padding: 4px;" title="Editar Producto" onmouseover="this.style.color='#E8C96A'; this.style.transform='scale(1.15)';" onmouseout="this.style.color='#C9A84C'; this.style.transform='scale(1)';">✏️</button>
+    `;
+
+    // Botón de eliminación en oro disponible únicamente para productos personalizados o modificados
     const deleteBtn = p.isCustom ? `
-      <button class="delete-btn" onclick="eliminarProducto(${p.id})" style="background: transparent; border: none; color: #E74C3C; font-size: 1.1rem; cursor: pointer; transition: opacity 0.2s;" title="Eliminar Producto">🗑️</button>
+      <button class="delete-btn" onclick="eliminarProducto(${p.id})" style="background: transparent; border: none; color: #C9A84C; font-size: 1.1rem; cursor: pointer; transition: color 0.2s, transform 0.2s; padding: 4px;" title="Eliminar Producto" onmouseover="this.style.color='#E8C96A'; this.style.transform='scale(1.15)';" onmouseout="this.style.color='#C9A84C'; this.style.transform='scale(1)';">🗑️</button>
     ` : '';
     
     return `
@@ -70,8 +85,8 @@ function renderAdminDashboard() {
             Diseño: ${p.diseño} | Tipo: ${p.tipo}
           </div>
         </td>
-        <td style="font-family: 'Cinzel', serif; color: #C9A84C; font-weight: 500;">
-          $${p.precio.toLocaleString()}
+        <td style="font-family: 'Cinzel', serif; color: #C9A84C; font-weight: 500; font-size: 0.86rem; line-height: 1.2;">
+          ${priceDisplay}
         </td>
         <td>
           <span class="badge-status ${isActive ? 'active' : 'inactive'}">
@@ -84,6 +99,7 @@ function renderAdminDashboard() {
               <input type="checkbox" ${isActive ? 'checked' : ''} onchange="toggleProductStatus(${p.id})">
               <span class="slider"></span>
             </label>
+            ${editBtn}
             ${deleteBtn}
           </div>
         </td>
@@ -127,8 +143,9 @@ function cerrarModalAdd() {
   document.getElementById('modal-add-producto').style.display = 'none';
 }
 
-// Escuchar la subida del archivo mockup
+// Escuchar subida de archivos
 document.addEventListener('DOMContentLoaded', () => {
+  // Mockup creación
   const fileInput = document.getElementById('add-file');
   if (fileInput) {
     fileInput.addEventListener('change', (event) => {
@@ -138,6 +155,21 @@ document.addEventListener('DOMContentLoaded', () => {
       reader.onload = (e) => {
         newProductImageBase64 = e.target.result;
         document.getElementById('add-file-preview-text').style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Mockup edición
+  const fileEditInput = document.getElementById('edit-file');
+  if (fileEditInput) {
+    fileEditInput.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        editProductImageBase64 = e.target.result;
+        document.getElementById('edit-file-preview-text').style.display = 'block';
       };
       reader.readAsDataURL(file);
     });
@@ -179,6 +211,7 @@ function guardarNuevoProducto(event) {
 
   const name = document.getElementById('add-nombre').value.trim();
   const price = parseFloat(document.getElementById('add-precio').value);
+  const discount = parseInt(document.getElementById('add-descuento').value, 10) || 0;
   const type = document.getElementById('add-tipo').value;
   const description = document.getElementById('add-desc').value.trim();
   const sizesRaw = document.getElementById('add-tamanos').value;
@@ -198,6 +231,7 @@ function guardarNuevoProducto(event) {
       nombre: name,
       tipo: type,
       precio: price,
+      descuento: discount,
       desc: description,
       tamanos: sizes,
       diseño: design,
@@ -221,7 +255,99 @@ function guardarNuevoProducto(event) {
   });
 }
 
-// Elimina un producto personalizado
+// ══════════════════════════════════════════
+// GESTIÓN DEL MODAL DE EDICIÓN DE PRODUCTOS
+// ══════════════════════════════════════════
+
+// Abre el modal de edición cargando los datos del producto actual
+function abrirModalEdit(id) {
+  const allProds = getProductos();
+  const p = allProds.find(item => item.id === id);
+  if (!p) return;
+
+  document.getElementById('edit-id').value = p.id;
+  document.getElementById('edit-nombre').value = p.nombre;
+  document.getElementById('edit-precio').value = p.precio;
+  document.getElementById('edit-descuento').value = p.descuento || 0;
+  document.getElementById('edit-desc').value = p.desc;
+  document.getElementById('edit-tamanos').value = p.tamanos.join(', ');
+  document.getElementById('edit-tipo').value = p.tipo;
+  document.getElementById('edit-diseno').value = p.diseño;
+  
+  // Limpiar selector de archivo de edición
+  document.getElementById('edit-file').value = '';
+  document.getElementById('edit-file-preview-text').style.display = 'none';
+  editProductImageBase64 = null;
+
+  document.getElementById('modal-edit-producto').style.display = 'flex';
+}
+
+// Cierra el modal de edición
+function cerrarModalEdit() {
+  document.getElementById('modal-edit-producto').style.display = 'none';
+}
+
+// Guarda los cambios de edición en localStorage
+function guardarEdicionProducto(event) {
+  event.preventDefault();
+
+  const id = parseFloat(document.getElementById('edit-id').value);
+  const name = document.getElementById('edit-nombre').value.trim();
+  const price = parseFloat(document.getElementById('edit-precio').value);
+  const discount = parseInt(document.getElementById('edit-descuento').value, 10) || 0;
+  const type = document.getElementById('edit-tipo').value;
+  const description = document.getElementById('edit-desc').value.trim();
+  const sizesRaw = document.getElementById('edit-tamanos').value;
+  const design = document.getElementById('edit-diseno').value;
+
+  const sizes = sizesRaw.split(',').map(s => s.trim()).filter(Boolean);
+  const existingProd = getProductos().find(p => p.id === id);
+
+  const saveProductOverride = (base64Img) => {
+    const updatedProd = {
+      id: id,
+      nombre: name,
+      tipo: type,
+      precio: price,
+      descuento: discount,
+      desc: description,
+      tamanos: sizes,
+      diseño: design,
+      imagenBase64: base64Img,
+      nuevo: existingProd ? existingProd.nuevo : true,
+      isCustom: true // Forzamos true para permitir su borrado o override en localStorage
+    };
+
+    try {
+      const custom = localStorage.getItem('colkley_custom_productos');
+      let customList = custom ? JSON.parse(custom) : [];
+
+      const index = customList.findIndex(c => c.id === id);
+      if (index !== -1) {
+        customList[index] = updatedProd;
+      } else {
+        customList.push(updatedProd);
+      }
+      localStorage.setItem('colkley_custom_productos', JSON.stringify(customList));
+
+      cerrarModalEdit();
+      renderAdminDashboard();
+    } catch (e) {
+      console.error("Error al guardar la edición en localStorage", e);
+      alert("❌ Error al guardar los cambios. Intenta con una imagen de muestra más liviana.");
+    }
+  };
+
+  if (editProductImageBase64) {
+    compressImage(editProductImageBase64).then(compressed => {
+      saveProductOverride(compressed);
+    });
+  } else {
+    saveProductOverride(existingProd ? existingProd.imagenBase64 : null);
+  }
+}
+
+// Elimina un producto personalizado o modificado
 function eliminarProducto(id) {
   if (!confirm("⚠️ ¿Estás seguro de que querés eliminar este producto? Esta acción no se puede deshacer.")) return;
   

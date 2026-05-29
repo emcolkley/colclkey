@@ -437,7 +437,18 @@ function getProductos() {
   try {
     const custom = localStorage.getItem('colkley_custom_productos');
     const customList = custom ? JSON.parse(custom) : [];
-    return [...productos, ...customList];
+    
+    // Unificar reemplazando los estáticos que tengan una versión editada (mismo ID)
+    const result = productos.map(staticProd => {
+      const edited = customList.find(c => c.id === staticProd.id);
+      return edited ? edited : staticProd;
+    });
+    
+    // Y agregar los personalizados completamente nuevos (que no coinciden con ningún ID estático)
+    const staticIds = productos.map(p => p.id);
+    const brandNewCustoms = customList.filter(c => !staticIds.includes(c.id));
+    
+    return [...result, ...brandNewCustoms];
   } catch (e) {
     console.error("Error al unificar productos", e);
     return productos;
