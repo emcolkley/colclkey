@@ -10,6 +10,7 @@ let editProductImageBase64 = null;
 let filterSearch = "";
 let filterTipo = "";
 let filterFormato = "";
+let filterMarco = "";
 
 // Obtiene la lista de IDs desactivados desde localStorage
 function getDeactivatedIDs() {
@@ -58,10 +59,11 @@ function renderAdminDashboard() {
   document.getElementById('stat-visitas-hoy').textContent = parseInt(visitasHoy, 10).toLocaleString();
   document.getElementById('stat-visitas-mes').textContent = parseInt(visitasMes, 10).toLocaleString();
 
-  // 1. Poblar dinámicamente el selector de tamaños con formatos del catálogo real
+  // 1. Poblar dinámicamente los selectores de marcos y tamaños del catálogo real
+  populateMarcoFilter();
   populateSizeFilter();
 
-  // 2. Aplicar filtros de búsqueda, tipo de producto y formato
+  // 2. Aplicar filtros de búsqueda, tipo de producto, marco y formato
   let filteredProds = allProds;
   if (filterSearch) {
     filteredProds = filteredProds.filter(p => 
@@ -71,6 +73,9 @@ function renderAdminDashboard() {
   }
   if (filterTipo) {
     filteredProds = filteredProds.filter(p => p.tipo === filterTipo);
+  }
+  if (filterMarco) {
+    filteredProds = filteredProds.filter(p => p.diseño === filterMarco);
   }
   if (filterFormato) {
     filteredProds = filteredProds.filter(p => p.tamanos && p.tamanos.some(sz => sz.trim() === filterFormato));
@@ -158,6 +163,7 @@ function renderAdminDashboard() {
 function applyAdminFilters() {
   filterSearch = document.getElementById('admin-search').value.toLowerCase().trim();
   filterTipo = document.getElementById('admin-filter-tipo').value;
+  filterMarco = document.getElementById('admin-filter-marco').value;
   filterFormato = document.getElementById('admin-filter-formato').value;
   
   renderAdminDashboard();
@@ -190,6 +196,49 @@ function populateSizeFilter() {
   } else {
     select.value = "";
     filterFormato = "";
+  }
+}
+
+// Popula dinámicamente el selector de marcos buscando todos los diseños únicos del catálogo
+function populateMarcoFilter() {
+  const select = document.getElementById('admin-filter-marco');
+  if (!select) return;
+  
+  const currentVal = select.value;
+  const allProds = getProductos();
+  const marcosSet = new Set();
+  
+  allProds.forEach(p => {
+    if (p.diseño) {
+      marcosSet.add(p.diseño.trim());
+    }
+  });
+  
+  const sortedMarcos = Array.from(marcosSet).sort();
+  
+  const nameMapping = {
+    "dorado": "Marco Dorado Clásico",
+    "collage": "Marco Collage Romántico",
+    "roca": "Cuadro en Roca",
+    "taza": "Taza Personalizada",
+    "llavero": "Llavero con Foto",
+    "restauracion": "Restauración Profesional",
+    "spotify_negro": "Spotify Minimalista Negro",
+    "nordic_frame": "Nordic Frame Premium",
+    "nordic_room": "Nordic Room Premium"
+  };
+  
+  select.innerHTML = '<option value="">🖼️ Todos los Marcos</option>' + 
+    sortedMarcos.map(m => {
+      const displayName = nameMapping[m] || m.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      return `<option value="${m}">${displayName}</option>`;
+    }).join('');
+    
+  if (sortedMarcos.includes(currentVal)) {
+    select.value = currentVal;
+  } else {
+    select.value = "";
+    filterMarco = "";
   }
 }
 

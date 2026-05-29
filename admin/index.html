@@ -64,7 +64,7 @@
       <div style="flex: 1; min-width: 200px;">
         <input type="text" id="admin-search" placeholder="🔍 Buscar producto por nombre o descripción..." oninput="applyAdminFilters()" style="width: 100%; padding: 8px 12px; background: #222; border: 1px solid rgba(201,168,76,0.3); border-radius: 6px; color: white; font-size: 0.82rem; outline: none;">
       </div>
-      <div style="width: 180px;">
+      <div style="width: 160px;">
         <select id="admin-filter-tipo" onchange="applyAdminFilters()" style="width: 100%; padding: 8px 12px; background: #222; border: 1px solid rgba(201,168,76,0.3); border-radius: 6px; color: white; font-size: 0.82rem; cursor: pointer; outline: none;">
           <option value="">📁 Todos los Tipos</option>
           <option value="marco">Cuadros</option>
@@ -74,7 +74,12 @@
           <option value="restauracion">Restauración</option>
         </select>
       </div>
-      <div style="width: 180px;">
+      <div style="width: 160px;">
+        <select id="admin-filter-marco" onchange="applyAdminFilters()" style="width: 100%; padding: 8px 12px; background: #222; border: 1px solid rgba(201,168,76,0.3); border-radius: 6px; color: white; font-size: 0.82rem; cursor: pointer; outline: none;">
+          <option value="">🖼️ Todos los Marcos</option>
+        </select>
+      </div>
+      <div style="width: 160px;">
         <select id="admin-filter-formato" onchange="applyAdminFilters()" style="width: 100%; padding: 8px 12px; background: #222; border: 1px solid rgba(201,168,76,0.3); border-radius: 6px; color: white; font-size: 0.82rem; cursor: pointer; outline: none;">
           <option value="">📏 Todos los Tamaños</option>
         </select>
