@@ -1,17 +1,82 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Redireccionando...</title>
-  <script>
-    // Redirige automáticamente al panel de administración basado en hash
-    window.location.replace("/#admin");
-  </script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Colkley — Panel de Administración</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<!-- Estilo Modular del Administrador -->
+<link rel="stylesheet" href="admin.css">
 </head>
-<body style="background-color: #0A0A0A; color: #F5F5F5; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0;">
-  <div style="text-align: center;">
-    <h2 style="color: #C9A84C; font-weight: normal; letter-spacing: 2px;">COLKLEY</h2>
-    <p style="color: #888; font-size: 0.9rem; margin-top: 10px;">Redireccionando al panel de administración...</p>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo-wrap">
+    <div class="logo-circle">C</div>
+    <div class="logo-text">COL<span>K</span>LEY</div>
   </div>
+  <div style="font-family: 'Cinzel', serif; color: #C9A84C; font-size: 0.8rem; letter-spacing: 2px; font-weight: 600;">
+    PANEL ADMIN
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main>
+  <!-- SECCIÓN DE ADMINISTRACIÓN -->
+  <section id="seccion-admin">
+    <a href="/" class="back-btn">← Volver a la tienda</a>
+    
+    <div class="admin-header">
+      <h2 class="section-title">Panel de <span>Administración</span></h2>
+      <div class="gold-line"></div>
+      <p class="section-sub">Administrá el catálogo de tu tienda y activá o desactivá productos al instante de manera global.</p>
+    </div>
+    
+    <div class="admin-stats">
+      <div class="stat-card">
+        <div class="stat-num" id="stat-total">0</div>
+        <div class="stat-label">Total Productos</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-activos" style="color: #4A9B6F;">0</div>
+        <div class="stat-label">Activos</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-desactivados" style="color: #6A6A6A;">0</div>
+        <div class="stat-label">Desactivados</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-visitas-hoy" style="color: #E8C96A;">0</div>
+        <div class="stat-label">Visitas de Hoy</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-visitas-mes" style="color: #C9A84C;">0</div>
+        <div class="stat-label">Visitas del Mes</div>
+      </div>
+    </div>
+
+    <div class="admin-table-container">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Vista Previa</th>
+            <th>Producto</th>
+            <th>Precio Base</th>
+            <th>Estado</th>
+            <th style="text-align: right; padding-right: 2rem;">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="admin-productos-rows">
+          <!-- Celdas dinámicas inyectadas por admin.js -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<!-- Scripts Modularizados Centrales -->
+<script src="../productos.js" defer></script>
+<script src="admin.js" defer></script>
 </body>
 </html>
