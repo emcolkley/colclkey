@@ -58,7 +58,29 @@
         <div class="stat-label">Visitas del Mes</div>
       </div>
     </div>
-
+ 
+    <!-- BARRA DE BÚSQUEDA Y FILTROS PREMIUM -->
+    <div class="admin-filters-bar" style="display: flex; gap: 12px; margin-bottom: 1.5rem; flex-wrap: wrap; align-items: center; background: #141414; padding: 12px 18px; border-radius: 10px; border: 1px solid rgba(201,168,76,0.15);">
+      <div style="flex: 1; min-width: 200px;">
+        <input type="text" id="admin-search" placeholder="🔍 Buscar producto por nombre o descripción..." oninput="applyAdminFilters()" style="width: 100%; padding: 8px 12px; background: #222; border: 1px solid rgba(201,168,76,0.3); border-radius: 6px; color: white; font-size: 0.82rem; outline: none;">
+      </div>
+      <div style="width: 180px;">
+        <select id="admin-filter-tipo" onchange="applyAdminFilters()" style="width: 100%; padding: 8px 12px; background: #222; border: 1px solid rgba(201,168,76,0.3); border-radius: 6px; color: white; font-size: 0.82rem; cursor: pointer; outline: none;">
+          <option value="">📁 Todos los Tipos</option>
+          <option value="marco">Cuadros</option>
+          <option value="roca">Rocas</option>
+          <option value="taza">Tazas</option>
+          <option value="llavero">Llaveros</option>
+          <option value="restauracion">Restauración</option>
+        </select>
+      </div>
+      <div style="width: 180px;">
+        <select id="admin-filter-formato" onchange="applyAdminFilters()" style="width: 100%; padding: 8px 12px; background: #222; border: 1px solid rgba(201,168,76,0.3); border-radius: 6px; color: white; font-size: 0.82rem; cursor: pointer; outline: none;">
+          <option value="">📏 Todos los Tamaños</option>
+        </select>
+      </div>
+    </div>
+ 
     <div class="admin-table-container">
       <table class="admin-table">
         <thead>

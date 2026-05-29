@@ -6,6 +6,11 @@
 let newProductImageBase64 = null;
 let editProductImageBase64 = null;
 
+// Filtros del Administrador
+let filterSearch = "";
+let filterTipo = "";
+let filterFormato = "";
+
 // Obtiene la lista de IDs desactivados desde localStorage
 function getDeactivatedIDs() {
   try {
@@ -53,7 +58,26 @@ function renderAdminDashboard() {
   document.getElementById('stat-visitas-hoy').textContent = parseInt(visitasHoy, 10).toLocaleString();
   document.getElementById('stat-visitas-mes').textContent = parseInt(visitasMes, 10).toLocaleString();
 
-  tbody.innerHTML = allProds.map(p => {
+  // 1. Poblar dinámicamente el selector de tamaños con formatos del catálogo real
+  populateSizeFilter();
+
+  // 2. Aplicar filtros de búsqueda, tipo de producto y formato
+  let filteredProds = allProds;
+  if (filterSearch) {
+    filteredProds = filteredProds.filter(p => 
+      p.nombre.toLowerCase().includes(filterSearch) || 
+      (p.desc && p.desc.toLowerCase().includes(filterSearch))
+    );
+  }
+  if (filterTipo) {
+    filteredProds = filteredProds.filter(p => p.tipo === filterTipo);
+  }
+  if (filterFormato) {
+    filteredProds = filteredProds.filter(p => p.tamanos && p.tamanos.some(sz => sz.trim() === filterFormato));
+  }
+
+  // 3. Renderizar filas filtradas en la tabla
+  tbody.innerHTML = filteredProds.map(p => {
     const isActive = !deactivated.includes(p.id);
     
     // Cálculo de precio final con descuento para la vista administrativa
@@ -107,8 +131,8 @@ function renderAdminDashboard() {
     `;
   }).join('');
 
-  // Dibujar los mini canvases
-  allProds.forEach(p => {
+  // 4. Dibujar los mini canvases correspondientes a las filas filtradas
+  filteredProds.forEach(p => {
     const canvas = document.getElementById(`admin-thumb-${p.id}`);
     if (canvas) {
       const ctx = canvas.getContext('2d');
@@ -124,6 +148,49 @@ function renderAdminDashboard() {
       }
     }
   });
+}
+
+// ══════════════════════════════════════════
+// FILTROS Y BÚSQUEDAS DINÁMICAS (ADMINISTRADOR)
+// ══════════════════════════════════════════
+
+// Aplica los filtros seleccionados por el administrador
+function applyAdminFilters() {
+  filterSearch = document.getElementById('admin-search').value.toLowerCase().trim();
+  filterTipo = document.getElementById('admin-filter-tipo').value;
+  filterFormato = document.getElementById('admin-filter-formato').value;
+  
+  renderAdminDashboard();
+}
+
+// Popula dinámicamente el selector de formatos buscando todos los tamaños únicos del catálogo
+function populateSizeFilter() {
+  const select = document.getElementById('admin-filter-formato');
+  if (!select) return;
+  
+  const currentVal = select.value;
+  const allProds = getProductos();
+  const sizesSet = new Set();
+  
+  allProds.forEach(p => {
+    if (p.tamanos && Array.isArray(p.tamanos)) {
+      p.tamanos.forEach(sz => {
+        if (sz) sizesSet.add(sz.trim());
+      });
+    }
+  });
+  
+  const sortedSizes = Array.from(sizesSet).sort();
+  
+  select.innerHTML = '<option value="">📏 Todos los Tamaños</option>' + 
+    sortedSizes.map(sz => `<option value="${sz}">${sz}</option>`).join('');
+    
+  if (sortedSizes.includes(currentVal)) {
+    select.value = currentVal;
+  } else {
+    select.value = "";
+    filterFormato = "";
+  }
 }
 
 // ══════════════════════════════════════════
