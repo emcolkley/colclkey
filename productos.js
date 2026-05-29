@@ -67,28 +67,24 @@ const productos = [
   }
 ];
 
-// ══════════════════════════════════════════
 // IMÁGENES DE PLANTILLAS PREMIUM
-// ══════════════════════════════════════════
-// Detecta la ruta del archivo para cargar correctamente las imágenes en raíz o subdirectorios (/admin)
-const PATH_PREFIX = typeof window !== 'undefined' && window.location.pathname.includes('/admin') ? '../' : '';
-
+// Usamos rutas absolutas desde la raíz para evitar fallos de resolución en sub-páginas (como /admin)
 const imgSpotifyNegro = new Image();
-imgSpotifyNegro.src = PATH_PREFIX + 'cuadro_spotify_negro.png';
+imgSpotifyNegro.src = '/cuadro_spotify_negro.png';
 imgSpotifyNegro.onload = () => {
   if (typeof actualizarCanvas === 'function') actualizarCanvas();
   productos.forEach(p => dibujarThumb(p));
 };
 
 const imgNordicFrame = new Image();
-imgNordicFrame.src = PATH_PREFIX + 'cuadro_nordic_frame.png';
+imgNordicFrame.src = '/cuadro_nordic_frame.png';
 imgNordicFrame.onload = () => {
   if (typeof actualizarCanvas === 'function') actualizarCanvas();
   productos.forEach(p => dibujarThumb(p));
 };
 
 const imgNordicRoom = new Image();
-imgNordicRoom.src = PATH_PREFIX + 'cuadro_nordic_room.png';
+imgNordicRoom.src = '/cuadro_nordic_room.png';
 imgNordicRoom.onload = () => {
   if (typeof actualizarCanvas === 'function') actualizarCanvas();
   productos.forEach(p => dibujarThumb(p));
