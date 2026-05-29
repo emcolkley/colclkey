@@ -383,6 +383,63 @@
   }
   .back-btn:hover { color: var(--gold); }
   .divider-gold { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+
+  /* ── ADMIN PANEL ── */
+  .admin-header { margin-bottom: 2rem; }
+  .admin-stats { display: flex; gap: 1.5rem; margin-bottom: 2.5rem; flex-wrap: wrap; }
+  .stat-card {
+    background: var(--dark2); border: 1px solid var(--border);
+    border-top: 3px solid var(--gold); border-radius: 10px;
+    padding: 1.5rem; flex: 1; min-width: 200px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3); transition: transform 0.2s;
+  }
+  .stat-card:hover { transform: translateY(-2px); }
+  .stat-num { font-family: 'Cinzel', serif; font-size: 2.2rem; font-weight: 700; color: var(--white); margin-bottom: 0.25rem; }
+  .stat-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 400; }
+  
+  .admin-table-container {
+    background: var(--dark2); border: 1px solid var(--border);
+    border-radius: 10px; overflow-x: auto; margin-bottom: 2rem;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+  }
+  .admin-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.82rem; }
+  .admin-table th {
+    padding: 1.2rem; border-bottom: 1px solid var(--border);
+    font-family: 'Cinzel', serif; color: var(--gold);
+    font-weight: 600; font-size: 0.76rem; text-transform: uppercase; letter-spacing: 1px;
+    background: rgba(201,168,76,0.02);
+  }
+  .admin-table td { padding: 0.9rem 1.2rem; border-bottom: 1px solid rgba(201,168,76,0.1); vertical-align: middle; }
+  .admin-table tr:last-child td { border-bottom: none; }
+  .admin-table tr:hover { background: rgba(255,255,255,0.01); }
+  
+  .admin-thumb-canvas {
+    width: 60px; height: 57px; background: var(--dark3);
+    border: 1px solid var(--border); border-radius: 6px; display: block;
+  }
+  
+  .badge-status {
+    display: inline-block; padding: 4px 10px; border-radius: 12px;
+    font-size: 0.65rem; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  .badge-status.active { background: rgba(74,155,111,0.15); color: var(--success); border: 1px solid rgba(74,155,111,0.3); }
+  .badge-status.inactive { background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid rgba(255,255,255,0.1); }
+  
+  .switch { position: relative; display: inline-block; width: 44px; height: 22px; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute; cursor: pointer; inset: 0;
+    background-color: var(--dark3); border: 1px solid var(--border);
+    border-radius: 22px; transition: .25s ease;
+  }
+  .slider:before {
+    position: absolute; content: ""; height: 14px; width: 14px;
+    left: 3px; bottom: 3px; background-color: var(--muted);
+    border-radius: 50%; transition: .25s ease;
+  }
+  input:checked + .slider { background-color: rgba(201,168,76,0.12); border-color: var(--gold); }
+  input:checked + .slider:before { transform: translateX(22px); background-color: var(--gold); }
 </style>
 </head>
 <body>
@@ -423,6 +480,48 @@
 
 <!-- MAIN -->
 <main>
+
+  <!-- SECCIÓN DE ADMINISTRACIÓN -->
+  <section id="seccion-admin" style="display: none;">
+    <button class="back-btn" onclick="volverDeAdmin()">← Volver a la tienda</button>
+    <div class="admin-header">
+      <h2 class="section-title">Panel de <span>Administración</span></h2>
+      <div class="gold-line"></div>
+      <p class="section-sub">Administrá el catálogo de tu tienda y activá o desactivá productos al instante.</p>
+    </div>
+    
+    <div class="admin-stats">
+      <div class="stat-card">
+        <div class="stat-num" id="stat-total">0</div>
+        <div class="stat-label">Total Productos</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-activos" style="color: var(--success);">0</div>
+        <div class="stat-label">Activos</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-desactivados" style="color: var(--muted);">0</div>
+        <div class="stat-label">Desactivados</div>
+      </div>
+    </div>
+
+    <div class="admin-table-container">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Vista Previa</th>
+            <th>Producto</th>
+            <th>Precio Base</th>
+            <th>Estado</th>
+            <th style="text-align: right; padding-right: 2rem;">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="admin-productos-rows">
+          <!-- Celdas dinámicas -->
+        </tbody>
+      </table>
+    </div>
+  </section>
 
   <!-- SECCIÓN 1: CATÁLOGO -->
   <section id="seccion-catalogo">
@@ -679,7 +778,8 @@ let fotoCloudinaryURL = null;
 // ══════════════════════════════════════════
 function renderCatalogo() {
   const grid = document.getElementById('productos-grid');
-  grid.innerHTML = productos.map(p => `
+  const productosActivos = productos.filter(p => isProductActive(p.id));
+  grid.innerHTML = productosActivos.map(p => `
     <div class="producto-card" onclick="seleccionarProducto(${p.id})" id="card-${p.id}">
       <div class="producto-preview-thumb">
         <canvas id="thumb-${p.id}" width="400" height="380"></canvas>
@@ -694,7 +794,7 @@ function renderCatalogo() {
       </div>
     </div>
   `).join('');
-  productos.forEach(p => dibujarThumb(p));
+  productosActivos.forEach(p => dibujarThumb(p));
 }
 
 // ══════════════════════════════════════════
@@ -1329,6 +1429,164 @@ zone.addEventListener('drop', e => {
   const f = e.dataTransfer.files[0];
   if (f && f.type.startsWith('image/')) cargarFoto({ target: { files: [f] } });
 });
+
+// ══════════════════════════════════════════
+// ADMINISTRACIÓN & PERSISTENCIA
+// ══════════════════════════════════════════
+
+// Obtiene la lista de IDs desactivados desde localStorage
+function getDeactivatedIDs() {
+  try {
+    const list = localStorage.getItem('colkley_deactivated_ids');
+    return list ? JSON.parse(list) : [];
+  } catch (e) {
+    console.error("Error al acceder a localStorage", e);
+    return [];
+  }
+}
+
+// Retorna si un producto está activo (no está en la lista de desactivados)
+function isProductActive(id) {
+  const deactivated = getDeactivatedIDs();
+  return !deactivated.includes(id);
+}
+
+// Alterna el estado de un producto (activo/desactivado)
+function toggleProductStatus(id) {
+  let deactivated = getDeactivatedIDs();
+  if (deactivated.includes(id)) {
+    deactivated = deactivated.filter(dId => dId !== id);
+  } else {
+    deactivated.push(id);
+  }
+  localStorage.setItem('colkley_deactivated_ids', JSON.stringify(deactivated));
+  
+  // Re-renderizar paneles
+  renderAdminDashboard();
+  renderCatalogo();
+}
+
+// Dibuja el panel administrativo
+function renderAdminDashboard() {
+  const tbody = document.getElementById('admin-productos-rows');
+  if (!tbody) return;
+
+  const deactivated = getDeactivatedIDs();
+  const totalCount = productos.length;
+  const inactiveCount = deactivated.length;
+  const activeCount = totalCount - inactiveCount;
+
+  // Actualizar estadísticas con estética premium
+  document.getElementById('stat-total').textContent = totalCount;
+  document.getElementById('stat-activos').textContent = activeCount;
+  document.getElementById('stat-desactivados').textContent = inactiveCount;
+
+  tbody.innerHTML = productos.map(p => {
+    const isActive = !deactivated.includes(p.id);
+    return `
+      <tr>
+        <td>
+          <canvas id="admin-thumb-${p.id}" class="admin-thumb-canvas" width="120" height="114"></canvas>
+        </td>
+        <td style="font-weight: 500; font-size: 0.88rem; color: var(--white);">
+          ${p.nombre}
+          ${p.nuevo ? '<span class="tag-nuevo">NUEVO</span>' : ''}
+          <div style="font-size: 0.72rem; color: var(--muted); font-weight: 300; margin-top: 4px;">
+            Diseño: ${p.diseño} | Tipo: ${p.tipo}
+          </div>
+        </td>
+        <td style="font-family: 'Cinzel', serif; color: var(--gold); font-weight: 500;">
+          $${p.precio.toLocaleString()}
+        </td>
+        <td>
+          <span class="badge-status ${isActive ? 'active' : 'inactive'}">
+            ${isActive ? 'Activo' : 'Inactivo'}
+          </span>
+        </td>
+        <td style="text-align: right; padding-right: 2rem;">
+          <label class="switch">
+            <input type="checkbox" ${isActive ? 'checked' : ''} onchange="toggleProductStatus(${p.id})">
+            <span class="slider"></span>
+          </label>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  // Dibujar los mini canvases
+  productos.forEach(p => {
+    const canvas = document.getElementById(`admin-thumb-${p.id}`);
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      dibujarDiseño(ctx, p.diseño, canvas.width, canvas.height, null);
+    }
+  });
+}
+
+// Navegación de salida del Panel de Administración
+function volverDeAdmin() {
+  window.location.hash = '';
+}
+
+// Manejo del enrutamiento por hash
+function handleRouting() {
+  const hash = window.location.hash;
+  const adminSection = document.getElementById('seccion-admin');
+  const catalogSection = document.getElementById('seccion-catalogo');
+  const customizeSection = document.getElementById('seccion-personalizar');
+  const checkoutSection = document.getElementById('seccion-checkout');
+  
+  // Elementos generales a ocultar en admin
+  const heroElement = document.querySelector('.hero');
+  const stepsElement = document.querySelector('.steps');
+
+  if (hash === '#admin') {
+    // Cerrar carrito por si está abierto
+    cerrarCarrito();
+    
+    // Ocular todo lo demás
+    if (heroElement) heroElement.style.display = 'none';
+    if (stepsElement) stepsElement.style.display = 'none';
+    catalogSection.style.display = 'none';
+    customizeSection.style.display = 'none';
+    checkoutSection.style.display = 'none';
+    
+    // Mostrar y renderizar admin
+    adminSection.style.display = 'block';
+    renderAdminDashboard();
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } else {
+    // Mostrar hero y steps
+    if (heroElement) heroElement.style.display = 'block';
+    if (stepsElement) stepsElement.style.display = 'flex';
+    adminSection.style.display = 'none';
+    
+    // Restaurar flujo estándar según estado actual
+    if (productoSeleccionado) {
+      if (checkoutSection.style.display === 'block') {
+        catalogSection.style.display = 'none';
+        customizeSection.style.display = 'none';
+        checkoutSection.style.display = 'block';
+        actualizarStep(3);
+      } else {
+        catalogSection.style.display = 'none';
+        customizeSection.style.display = 'block';
+        checkoutSection.style.display = 'none';
+        actualizarStep(2);
+      }
+    } else {
+      catalogSection.style.display = 'block';
+      customizeSection.style.display = 'none';
+      checkoutSection.style.display = 'none';
+      actualizarStep(1);
+    }
+  }
+}
+
+// Registrar eventos de enrutamiento
+window.addEventListener('hashchange', handleRouting);
+window.addEventListener('load', handleRouting);
 
 // ══════════════════════════════════════════
 // INIT
