@@ -432,9 +432,32 @@ function superponeMarco(ctx, diseño, w, h) {
   ctx.restore();
 }
 
+// Obtiene la lista unificada de productos (estáticos + personalizados)
+function getProductos() {
+  try {
+    const custom = localStorage.getItem('colkley_custom_productos');
+    const customList = custom ? JSON.parse(custom) : [];
+    return [...productos, ...customList];
+  } catch (e) {
+    console.error("Error al unificar productos", e);
+    return productos;
+  }
+}
+
 function dibujarThumb(p) {
   const canvas = document.getElementById(`thumb-${p.id}`);
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-  dibujarDiseño(ctx, p.diseño, canvas.width, canvas.height, null);
+  
+  if (p.imagenBase64) {
+    // Cargar y dibujar la imagen de muestra cargada de forma personalizada
+    const img = new Image();
+    img.onload = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    };
+    img.src = p.imagenBase64;
+  } else {
+    dibujarDiseño(ctx, p.diseño, canvas.width, canvas.height, null);
+  }
 }

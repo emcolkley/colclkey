@@ -44,7 +44,7 @@ function renderCatalogo() {
   const grid = document.getElementById('productos-grid');
   if (!grid) return;
   
-  const productosActivos = productos.filter(p => isProductActive(p.id));
+  const productosActivos = getProductos().filter(p => isProductActive(p.id));
   grid.innerHTML = productosActivos.map(p => `
     <div class="producto-card" onclick="seleccionarProducto(${p.id})" id="card-${p.id}">
       <div class="producto-preview-thumb">
@@ -67,7 +67,7 @@ function renderCatalogo() {
 // NAVEGACIÓN Y FLUJO DE COMPRA
 // ══════════════════════════════════════════
 function seleccionarProducto(id) {
-  productoSeleccionado = productos.find(p => p.id === id);
+  productoSeleccionado = getProductos().find(p => p.id === id);
   tamanoSeleccionado = productoSeleccionado.tamanos[0];
   cantidad = 1;
   fotoURL = null; fotoBase64 = null; fotoCloudinaryURL = null;
