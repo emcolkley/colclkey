@@ -80,7 +80,7 @@ export function getProductos() {
     return productos;
   }
   try {
-    const custom = localStorage.getItem('colkley_custom_productos');
+    const custom = localStorage.getItem('colkley_custom_productos:v1');
     const customList = custom ? JSON.parse(custom) : [];
     
     // Unificar reemplazando los estáticos que tengan una versión editada (mismo ID)

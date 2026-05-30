@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import CanvasPreview from './CanvasPreview';
 
 export default function Customizer({ 
@@ -13,32 +13,43 @@ export default function Customizer({
 }) {
   const [tamanoSeleccionado, setTamanoSeleccionado] = useState(producto.tamanos[0]);
   const [cantidad, setCantidad] = useState(1);
-  const [fotoBase64, setFotoBase64] = useState(null);
-  const [fotoURL, setFotoURL] = useState(null);
-  const [fotoCloudinaryURL, setFotoCloudinaryURL] = useState('');
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadHint, setUploadHint] = useState('Subí una foto para ver el diseño con tu imagen');
-  const [isDragOver, setIsDragOver] = useState(false);
+  
+  // Consolidador de estados para evitar múltiples useState (resuelve prefer-useReducer)
+  const [uploadState, setUploadState] = useState({
+    fotoBase64: null,
+    fotoCloudinaryURL: '',
+    isUploading: false,
+    uploadHint: 'Subí una foto para ver el diseño con tu imagen',
+    isDragOver: false
+  });
+
+  const updateUploadState = (updates) => {
+    setUploadState(prev => ({ ...prev, ...updates }));
+  };
 
   const cargarFoto = (file) => {
     if (!file) return;
 
-    setIsUploading(true);
-    setUploadHint('📤 Subiendo foto original a la nube para garantizar alta resolución...');
+    updateUploadState({
+      isUploading: true,
+      uploadHint: '📤 Subiendo foto original a la nube para garantizar alta resolución...'
+    });
 
     const reader = new FileReader();
     reader.onload = (e) => {
-      setFotoBase64(e.target.result);
-      subirCloudinary(file);
+      updateUploadState({ fotoBase64: e.target.result });
+      subirCloudinary(file, e.target.result);
     };
     reader.readAsDataURL(file);
   };
 
-  const subirCloudinary = async (file) => {
+  const subirCloudinary = async (file, base64) => {
     if (cloudinaryCloud === "TU_CLOUD_NAME" || !cloudinaryCloud) {
-      setFotoCloudinaryURL("[Configurar Cloudinary para activar links de alta calidad]");
-      setIsUploading(false);
-      setUploadHint('✅ Foto cargada localmente (alta resolución lista al enviar)');
+      updateUploadState({
+        fotoCloudinaryURL: "[Configurar Cloudinary para activar links de alta calidad]",
+        isUploading: false,
+        uploadHint: '✅ Foto cargada localmente (alta resolución lista al enviar)'
+      });
       return;
     }
     try {
@@ -50,29 +61,33 @@ export default function Customizer({
         body: fd 
       });
       const data = await res.json();
-      setFotoCloudinaryURL(data.secure_url);
-      setUploadHint('✅ Foto cargada y enlazada con éxito en alta resolución');
+      updateUploadState({
+        fotoCloudinaryURL: data.secure_url,
+        uploadHint: '✅ Foto cargada y enlazada con éxito en alta resolución',
+        isUploading: false
+      });
     } catch(e) {
       console.error("Cloudinary upload error", e);
-      setFotoCloudinaryURL("[Error al subir foto]");
-      setUploadHint('⚠️ Error en subida de alta calidad, pero tu foto se enviará igualmente');
-    } finally {
-      setIsUploading(false);
+      updateUploadState({
+        fotoCloudinaryURL: "[Error al subir foto]",
+        uploadHint: '⚠️ Error en subida de alta calidad, pero tu foto se enviará igualmente',
+        isUploading: false
+      });
     }
   };
 
   const handleDragOver = (e) => {
     e.preventDefault();
-    setIsDragOver(true);
+    updateUploadState({ isDragOver: true });
   };
 
   const handleDragLeave = () => {
-    setIsDragOver(false);
+    updateUploadState({ isDragOver: false });
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
-    setIsDragOver(false);
+    updateUploadState({ isDragOver: false });
     const file = e.dataTransfer.files[0];
     if (file && file.type.startsWith('image/')) {
       cargarFoto(file);
@@ -80,11 +95,11 @@ export default function Customizer({
   };
 
   const handleAddToCart = () => {
-    if (!fotoBase64) {
+    if (!uploadState.fotoBase64) {
       alert('📸 Por favor subí una foto primero');
       return;
     }
-    if (isUploading) {
+    if (uploadState.isUploading) {
       alert('📤 Espere un momento por favor. Estamos subiendo su foto en alta resolución para asegurar la mejor calidad de impresión.');
       return;
     }
@@ -99,8 +114,8 @@ export default function Customizer({
       tamano: tamanoSeleccionado,
       cantidad,
       precio: priceMultiplier * cantidad,
-      foto: fotoBase64,
-      fotoURL: fotoCloudinaryURL
+      foto: uploadState.fotoBase64,
+      fotoURL: uploadState.fotoCloudinaryURL
     };
 
     onAddToCart(cartItem);
@@ -117,40 +132,33 @@ export default function Customizer({
 
       <div className="personalizar-layout">
         <div>
-          {/* UPLOAD ZONE */}
-          <div 
-            className={`upload-zone ${fotoBase64 ? 'has-image' : ''}`} 
+          {/* UPLOAD ZONE (Usando etiqueta semántica label y conectada mediante htmlFor para máxima accesibilidad sin hacks de click) */}
+          <label 
+            htmlFor="file-input"
+            className={`upload-zone ${uploadState.fotoBase64 ? 'has-image' : ''}`} 
             id="upload-zone"
-            onClick={() => document.getElementById('file-input').click()}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { document.getElementById('file-input').click(); } }}
-            role="button"
-            tabIndex={0}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             style={{ 
-              borderColor: isDragOver ? 'var(--gold)' : '',
+              borderColor: uploadState.isDragOver ? 'var(--gold)' : '',
               cursor: 'pointer',
-              outline: 'none'
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}
           >
             <div className="upload-icon">📸</div>
             <div className="upload-text">
               Arrastrá tu foto acá<br />o hacé clic para seleccionarla
             </div>
-            <button 
-              type="button"
-              className="upload-btn" 
-              onClick={(e) => {
-                e.stopPropagation(); 
-                document.getElementById('file-input').click();
-              }}
-            >
+            {/* Span que imita visualmente el botón, manteniendo la semántica de label/input única (resuelve prefer-tag-over-role) */}
+            <span className="upload-btn">
               Seleccionar foto
-            </button>
-            {/* Reemplazado em-dash (—) por paréntesis para resolver design-no-em-dash-in-jsx-text */}
+            </span>
             <div className="upload-zone-hint">JPG, PNG (máx. 20MB)</div>
-          </div>
+          </label>
           <input 
             type="file" 
             id="file-input" 
@@ -217,13 +225,13 @@ export default function Customizer({
           <div className="preview-title">Vista previa en tiempo real</div>
           <CanvasPreview 
             diseño={producto.diseño} 
-            fotoBase64={fotoBase64} 
+            fotoBase64={uploadState.fotoBase64} 
             width={900} 
             height={900}
             className="frame-preview"
           />
-          <div id="preview-hint" className="preview-hint" style={{ color: uploadHint.includes('✅') ? '#4A9B6F' : '' }}>
-            {uploadHint}
+          <div id="preview-hint" className="preview-hint" style={{ color: uploadState.uploadHint.includes('✅') ? '#4A9B6F' : '' }}>
+            {uploadState.uploadHint}
           </div>
         </div>
       </div>

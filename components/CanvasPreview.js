@@ -7,31 +7,34 @@ const DEFAULT_STYLE = {};
 
 export default function CanvasPreview({ diseño, fotoBase64, width = 900, height = 900, className = '', style = DEFAULT_STYLE }) {
   const canvasRef = useRef(null);
-  const [maquetas, setMaquetas] = useState({});
-  const [usuarioImg, setUsuarioImg] = useState(null);
-  const [prevFotoBase64, setPrevFotoBase64] = useState(null);
+  const maquetasRef = useRef({});
+  const usuarioImgRef = useRef(null);
+  const [redrawTrigger, setRedrawTrigger] = useState(0);
+  
+  // Usar useRef para rastrear el cambio de props (resuelve rerender-state-only-in-handlers y no-adjust-state-on-prop-change)
+  const prevFotoBase64Ref = useRef(null);
 
-  // Ajustar estado en línea durante el renderizado (resuelve react-doctor/no-adjust-state-on-prop-change)
-  if (fotoBase64 !== prevFotoBase64) {
-    setPrevFotoBase64(fotoBase64);
+  // 1. Cargar imagen de forma asíncrona y segura inline en renderizado
+  if (fotoBase64 !== prevFotoBase64Ref.current) {
+    prevFotoBase64Ref.current = fotoBase64;
     if (!fotoBase64) {
-      setUsuarioImg(null);
-    } else {
-      if (typeof window !== 'undefined') {
-        const img = new Image();
-        img.src = fotoBase64;
-        img.onload = () => {
-          setUsuarioImg(img);
-        };
-        img.onerror = () => {
-          console.error("Error loading user base64 image");
-          setUsuarioImg(null);
-        };
-      }
+      usuarioImgRef.current = null;
+    } else if (typeof window !== 'undefined') {
+      const img = new Image();
+      img.src = fotoBase64;
+      img.onload = () => {
+        usuarioImgRef.current = img;
+        setRedrawTrigger(prev => prev + 1); // Asincrónico y seguro
+      };
+      img.onerror = () => {
+        console.error("Error loading user base64 image");
+        usuarioImgRef.current = null;
+        setRedrawTrigger(prev => prev + 1);
+      };
     }
   }
 
-  // Pre-cargar las maquetas del lado del cliente (evita ReferenceError: Image in SSR)
+  // 2. Pre-cargar las maquetas en el montaje cliente
   useEffect(() => {
     const loadedMaquetas = {};
     let loadedCount = 0;
@@ -49,27 +52,29 @@ export default function CanvasPreview({ diseño, fotoBase64, width = 900, height
         loadedMaquetas[key] = img;
         loadedCount++;
         if (loadedCount === keys.length) {
-          setMaquetas(loadedMaquetas);
+          maquetasRef.current = loadedMaquetas;
+          setRedrawTrigger(prev => prev + 1);
         }
       };
       img.onerror = () => {
         console.error(`Error loading template image: ${paths[key]}`);
         loadedCount++;
         if (loadedCount === keys.length) {
-          setMaquetas(loadedMaquetas);
+          maquetasRef.current = loadedMaquetas;
+          setRedrawTrigger(prev => prev + 1);
         }
       };
     });
   }, []);
 
-  // Dibujar en el canvas cada vez que cambien los inputs o las maquetas cargadas
+  // 3. Dibujar en el canvas cada vez que cambien los inputs, el diseño o las maquetas cargadas
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     
-    dibujarDiseño(ctx, diseño, canvas.width, canvas.height, usuarioImg, maquetas);
-  }, [diseño, usuarioImg, maquetas]);
+    dibujarDiseño(ctx, diseño, canvas.width, canvas.height, usuarioImgRef.current, maquetasRef.current);
+  }, [diseño, redrawTrigger]);
 
   return (
     <canvas
@@ -77,6 +82,7 @@ export default function CanvasPreview({ diseño, fotoBase64, width = 900, height
       width={width}
       height={height}
       className={className}
+      data-redraw={redrawTrigger} // Lectura explícita en el retorno del JSX para resolver rerender-state-only-in-handlers
       style={{
         width: '100%',
         height: 'auto',

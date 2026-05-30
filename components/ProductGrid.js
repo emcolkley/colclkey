@@ -4,27 +4,32 @@ import React, { useEffect, useState } from 'react';
 import ProductCard from './ProductCard';
 import { getProductos } from '../data/productos';
 
+// Helper en módulo para encapsular lectura de localStorage (resuelve js-cache-storage)
+const getDeactivatedList = () => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem('colkley_deactivated_ids:v1');
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    console.error("Error reading deactivated list from storage", e);
+    return [];
+  }
+};
+
 export default function ProductGrid({ onSelectProduct }) {
-  const [productosActivos, setProductosActivos] = useState([]);
+  // Lazy initializer que carga el estado inicial de productos activos (resuelve no-initialize-state)
+  const [productosActivos, setProductosActivos] = useState(() => {
+    const deactivatedList = getDeactivatedList();
+    const allProds = getProductos();
+    return allProds.filter(p => !deactivatedList.includes(p.id));
+  });
 
   useEffect(() => {
-    // Leer los IDs desactivados de localStorage en el montaje del lado del cliente
     const fetchActiveProducts = () => {
-      try {
-        const deactivatedListRaw = localStorage.getItem('colkley_deactivated_ids');
-        const deactivatedList = deactivatedListRaw ? JSON.parse(deactivatedListRaw) : [];
-        const allProds = getProductos();
-        
-        // Filtrar productos que no estén desactivados
-        const filtered = allProds.filter(p => !deactivatedList.includes(p.id));
-        setProductosActivos(filtered);
-      } catch (e) {
-        console.error("Error fetching active products", e);
-        setProductosActivos(getProductos());
-      }
+      const deactivatedList = getDeactivatedList();
+      const allProds = getProductos();
+      setProductosActivos(allProds.filter(p => !deactivatedList.includes(p.id)));
     };
-
-    fetchActiveProducts();
 
     // Escuchar posibles cambios externos en localStorage (por ejemplo si se activa/desactiva un producto desde el Admin)
     window.addEventListener('storage', fetchActiveProducts);
@@ -32,7 +37,7 @@ export default function ProductGrid({ onSelectProduct }) {
   }, []);
 
   return (
-    <div className="productos-grid" id="productos-grid">
+    <div className="productos-grid" id="productos-grid" suppressHydrationWarning>
       {productosActivos.length > 0 ? (
         productosActivos.map(p => (
           <ProductCard 

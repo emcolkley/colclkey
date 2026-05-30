@@ -3,36 +3,45 @@
 import React, { useState } from 'react';
 
 export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumber = "5491100000000" }) {
-  const [nombre, setNombre] = useState('');
-  const [apellido, setApellido] = useState('');
-  const [email, setEmail] = useState('');
-  const [telefono, setTelefono] = useState('');
-  const [mensaje, setMensaje] = useState('');
-  const [couponCode, setCouponCode] = useState('');
-  const [couponMessage, setCouponMessage] = useState('');
-  const [couponMessageColor, setCouponMessageColor] = useState('');
-  const [activeCoupon, setActiveCoupon] = useState(null);
+  // Estado consolidado para evitar múltiples useState (resuelve prefer-useReducer)
+  const [formState, setFormState] = useState({
+    nombre: '',
+    apellido: '',
+    email: '',
+    telefono: '',
+    mensaje: '',
+    couponCode: '',
+    couponMessage: '',
+    couponMessageColor: '',
+    activeCoupon: null
+  });
+
+  const updateFormState = (updates) => {
+    setFormState(prev => ({ ...prev, ...updates }));
+  };
 
   // Calcular valores en línea (resuelve react-doctor/no-derived-state)
   const subtotal = cart.reduce((acc, item) => acc + item.precio, 0);
   
   let discountAmount = 0;
-  if (activeCoupon) {
-    if (activeCoupon.tipo === 'porcentaje') {
-      discountAmount = Math.round(subtotal * (activeCoupon.valor / 100));
-    } else if (activeCoupon.tipo === 'fijo') {
-      discountAmount = activeCoupon.valor;
+  if (formState.activeCoupon) {
+    if (formState.activeCoupon.tipo === 'porcentaje') {
+      discountAmount = Math.round(subtotal * (formState.activeCoupon.valor / 100));
+    } else if (formState.activeCoupon.tipo === 'fijo') {
+      discountAmount = formState.activeCoupon.valor;
     }
   }
   
   const total = Math.max(0, subtotal - discountAmount);
 
   const aplicarCupon = () => {
-    const code = couponCode.trim().toUpperCase();
+    const code = formState.couponCode.trim().toUpperCase();
     if (!code) {
-      setCouponMessage("⚠️ Ingresá un código primero.");
-      setCouponMessageColor("#E74C3C");
-      setActiveCoupon(null);
+      updateFormState({
+        couponMessage: "⚠️ Ingresá un código primero.",
+        couponMessageColor: "#E74C3C",
+        activeCoupon: null
+      });
       return;
     }
 
@@ -50,43 +59,51 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
     const coupon = cupones.find(c => c.codigo === code);
 
     if (!coupon) {
-      setCouponMessage("❌ El cupón no es válido.");
-      setCouponMessageColor("#E74C3C");
-      setActiveCoupon(null);
+      updateFormState({
+        couponMessage: "❌ El cupón no es válido.",
+        couponMessageColor: "#E74C3C",
+        activeCoupon: null
+      });
       return;
     }
 
     if (!coupon.activo) {
-      setCouponMessage("❌ Este cupón ya no está activo.");
-      setCouponMessageColor("#E74C3C");
-      setActiveCoupon(null);
+      updateFormState({
+        couponMessage: "❌ Este cupón ya no está activo.",
+        couponMessageColor: "#E74C3C",
+        activeCoupon: null
+      });
       return;
     }
 
     if (coupon.minCompra && subtotal < coupon.minCompra) {
-      setCouponMessage(`❌ Este cupón requiere una compra mínima de $${coupon.minCompra.toLocaleString()}.`);
-      setCouponMessageColor("#E74C3C");
-      setActiveCoupon(null);
+      updateFormState({
+        couponMessage: `❌ Este cupón requiere una compra mínima de $${coupon.minCompra.toLocaleString()}.`,
+        couponMessageColor: "#E74C3C",
+        activeCoupon: null
+      });
       return;
     }
 
-    setActiveCoupon(coupon);
     const discountText = coupon.tipo === 'porcentaje' ? `${coupon.valor}%` : `$${coupon.valor.toLocaleString()}`;
-    setCouponMessage(`✅ ¡Cupón ${coupon.codigo} aplicado! Descuento de ${discountText}`);
-    setCouponMessageColor("#4A9B6F");
+    updateFormState({
+      activeCoupon: coupon,
+      couponMessage: `✅ ¡Cupón ${coupon.codigo} aplicado! Descuento de ${discountText}`,
+      couponMessageColor: "#4A9B6F"
+    });
   };
 
   const handleConfirmarPedido = (e) => {
     e.preventDefault();
-    if (!nombre || !email) {
+    if (!formState.nombre || !formState.email) {
       alert('Por favor completá nombre y email');
       return;
     }
 
     let txt = `👑 *NUEVO PEDIDO — COLKLEY*\n\n`;
-    txt += `👤 *Cliente:* ${nombre} ${apellido}\n`;
-    txt += `📧 *Email:* ${email}\n`;
-    if (telefono) txt += `📱 *Teléfono:* ${telefono}\n`;
+    txt += `👤 *Cliente:* ${formState.nombre} ${formState.apellido}\n`;
+    txt += `📧 *Email:* ${formState.email}\n`;
+    if (formState.telefono) txt += `📱 *Teléfono:* ${formState.telefono}\n`;
     txt += `\n📦 *Productos:*\n`;
     cart.forEach((item, i) => {
       txt += `\n${i + 1}. ${item.producto.nombre}\n`;
@@ -95,22 +112,22 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
       txt += `   📷 Foto alta calidad: ${item.fotoURL || 'adjunta por email'}\n`;
     });
 
-    if (activeCoupon && discountAmount > 0) {
-      txt += `\n🏷️ *Cupón aplicado:* ${activeCoupon.codigo} (-$${discountAmount.toLocaleString()})`;
+    if (formState.activeCoupon && discountAmount > 0) {
+      txt += `\n🏷️ *Cupón aplicado:* ${formState.activeCoupon.codigo} (-$${discountAmount.toLocaleString()})`;
       txt += `\n💵 *Subtotal:* $${subtotal.toLocaleString()}`;
     }
 
     txt += `\n💰 *Total: $${total.toLocaleString()}*`;
-    if (mensaje) txt += `\n\n💬 *Nota:* ${mensaje}`;
+    if (formState.mensaje) txt += `\n\n💬 *Nota:* ${formState.mensaje}`;
 
     const waLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(txt)}`;
     
     onOrderPlaced({
       waLink,
-      nombre,
-      apellido,
-      email,
-      telefono,
+      nombre: formState.nombre,
+      apellido: formState.apellido,
+      email: formState.email,
+      telefono: formState.telefono,
       total
     });
   };
@@ -129,8 +146,8 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
               type="text" 
               id="input-nombre" 
               placeholder="Tu nombre" 
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
+              value={formState.nombre}
+              onChange={(e) => updateFormState({ nombre: e.target.value })}
               required 
             />
           </div>
@@ -141,8 +158,8 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
               type="text" 
               id="input-apellido" 
               placeholder="Tu apellido" 
-              value={apellido}
-              onChange={(e) => setApellido(e.target.value)}
+              value={formState.apellido}
+              onChange={(e) => updateFormState({ apellido: e.target.value })}
               required
             />
           </div>
@@ -154,8 +171,8 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
             type="email" 
             id="input-email" 
             placeholder="hola@mail.com" 
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={formState.email}
+            onChange={(e) => updateFormState({ email: e.target.value })}
             required 
           />
         </div>
@@ -166,8 +183,8 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
             type="tel" 
             id="input-telefono" 
             placeholder="+56 9 ..." 
-            value={telefono}
-            onChange={(e) => setTelefono(e.target.value)}
+            value={formState.telefono}
+            onChange={(e) => updateFormState({ telefono: e.target.value })}
           />
         </div>
         <div className="form-group">
@@ -177,8 +194,8 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
             id="input-mensaje" 
             rows="3" 
             placeholder="Ej: quiero que la foto quede centrada, tonos cálidos..."
-            value={mensaje}
-            onChange={(e) => setMensaje(e.target.value)}
+            value={formState.mensaje}
+            onChange={(e) => updateFormState({ mensaje: e.target.value })}
           />
         </div>
 
@@ -191,8 +208,8 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
               type="text" 
               id="input-coupon" 
               placeholder="Ingresá tu cupón"
-              value={couponCode}
-              onChange={(e) => setCouponCode(e.target.value)}
+              value={formState.couponCode}
+              onChange={(e) => updateFormState({ couponCode: e.target.value })}
               style={{ flex: 1 }}
             />
             <button 
@@ -203,13 +220,13 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
               Aplicar
             </button>
           </div>
-          {couponMessage && (
+          {formState.couponMessage && (
             <div 
               id="coupon-message" 
               className="coupon-message"
-              style={{ color: couponMessageColor, display: 'block', marginTop: '6px', fontSize: '0.8rem' }}
+              style={{ color: formState.couponMessageColor, display: 'block', marginTop: '6px', fontSize: '0.8rem' }}
             >
-              {couponMessage}
+              {formState.couponMessage}
             </div>
           )}
         </div>
@@ -224,9 +241,9 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
                 <span>${item.precio.toLocaleString()}</span>
               </div>
             ))}
-            {activeCoupon && discountAmount > 0 && (
+            {formState.activeCoupon && discountAmount > 0 && (
               <div className="resumen-linea" style={{ color: '#4A9B6F', fontWeight: 500, fontSize: '0.8rem', marginTop: '8px', borderTop: '1px dashed rgba(201,168,76,0.2)', paddingTop: '8px' }}>
-                <span>Descuento (Cupón: {activeCoupon.codigo})</span>
+                <span>Descuento (Cupón: {formState.activeCoupon.codigo})</span>
                 <span>-${discountAmount.toLocaleString()}</span>
               </div>
             )}
