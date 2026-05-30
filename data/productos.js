@@ -84,6 +84,32 @@ export const SILVER = '#B8C0CC';
 export const DARK = '#0A0A0A';
 
 // Obtiene la lista unificada de productos (estáticos + personalizados) - SSR Safe
+export const DEFAULT_CATEGORIAS = [
+  { id: 'todos', emoji: '✨', nombre: 'Todos' },
+  { id: 'madre', emoji: '👩', nombre: 'Día de la Madre' },
+  { id: 'padre', emoji: '👨', nombre: 'Día del Padre' },
+  { id: 'parejas', emoji: '❤️', nombre: 'Parejas' },
+  { id: 'spotify', emoji: '🎵', nombre: 'Estilo Spotify' },
+  { id: 'bebes', emoji: '👶', nombre: 'Bebés' },
+  { id: 'netflix', emoji: '🎬', nombre: 'Estilo Netflix' },
+  { id: 'collage', emoji: '🖼️', nombre: 'Collage' },
+  { id: 'familia', emoji: '🏠', nombre: 'Familia' },
+  { id: 'otros', emoji: '✦', nombre: 'Otros' }
+];
+
+export function getCategoriasList() {
+  if (typeof window === 'undefined') {
+    return DEFAULT_CATEGORIAS;
+  }
+  try {
+    const raw = localStorage.getItem('colkley_categorias:v1');
+    return raw ? JSON.parse(raw) : DEFAULT_CATEGORIAS;
+  } catch (e) {
+    console.error("Error reading categories list", e);
+    return DEFAULT_CATEGORIAS;
+  }
+}
+
 export function getProductos() {
   if (typeof window === 'undefined') {
     return productos;

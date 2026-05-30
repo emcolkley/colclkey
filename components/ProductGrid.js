@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import ProductCard from './ProductCard';
-import { getProductos } from '../data/productos';
+import { getProductos, getCategoriasList } from '../data/productos';
 
 // Helper en módulo para encapsular lectura de localStorage (resuelve js-cache-storage)
 const getDeactivatedList = () => {
@@ -15,19 +15,6 @@ const getDeactivatedList = () => {
     return [];
   }
 };
-
-const CATEGORIAS = [
-  { id: 'todos', label: '✨ Todos' },
-  { id: 'madre', label: '👩 Día de la Madre' },
-  { id: 'padre', label: '👨 Día del Padre' },
-  { id: 'parejas', label: '❤️ Parejas' },
-  { id: 'spotify', label: '🎵 Estilo Spotify' },
-  { id: 'bebes', label: '👶 Bebés' },
-  { id: 'netflix', label: '🎬 Estilo Netflix' },
-  { id: 'collage', label: '🖼️ Collage' },
-  { id: 'familia', label: '🏠 Familia' },
-  { id: 'otros', label: '✦ Otros' }
-];
 
 const BAR_CONTAINER_STYLE = {
   display: 'flex',
@@ -67,6 +54,7 @@ const BUTTON_ACTIVE_STYLE = {
 
 export default function ProductGrid({ onSelectProduct }) {
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('todos');
+  const [categorias, setCategorias] = useState(() => getCategoriasList());
 
   // Lazy initializer que carga el estado inicial de productos activos (resuelve no-initialize-state)
   const [productosActivos, setProductosActivos] = useState(() => {
@@ -80,6 +68,7 @@ export default function ProductGrid({ onSelectProduct }) {
       const deactivatedList = getDeactivatedList();
       const allProds = getProductos();
       setProductosActivos(allProds.filter(p => !deactivatedList.includes(p.id)));
+      setCategorias(getCategoriasList());
     };
 
     // Escuchar posibles cambios externos en localStorage (por ejemplo si se activa/desactiva un producto desde el Admin)
@@ -106,7 +95,7 @@ export default function ProductGrid({ onSelectProduct }) {
         style={BAR_CONTAINER_STYLE}
         aria-label="Filtrar productos por categoría"
       >
-        {CATEGORIAS.map(cat => {
+        {categorias.map(cat => {
           const isActive = cat.id === categoriaSeleccionada;
           return (
             <button
@@ -115,7 +104,7 @@ export default function ProductGrid({ onSelectProduct }) {
               style={isActive ? BUTTON_ACTIVE_STYLE : BUTTON_STYLE}
               onClick={() => setCategoriaSeleccionada(cat.id)}
             >
-              {cat.label}
+              {cat.emoji} {cat.nombre}
             </button>
           );
         })}

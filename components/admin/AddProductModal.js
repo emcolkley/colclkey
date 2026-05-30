@@ -41,7 +41,7 @@ const CONTENT_STYLE = {
 
 const BUTTON_STYLE = { margin: 0, width: 'auto' };
 
-export default function AddProductModal({ isOpen, onClose, onSave }) {
+export default function AddProductModal({ isOpen, onClose, onSave, categorias = [] }) {
   const dialogRef = useRef(null);
 
   // Form states grouped in a state object to avoid prefer-useReducer warning (only 3 states)
@@ -191,15 +191,9 @@ export default function AddProductModal({ isOpen, onClose, onSave }) {
                 value={formState.categoria} 
                 onChange={(e) => updateFormState({ categoria: e.target.value })}
               >
-                <option value="otros">Otros</option>
-                <option value="madre">Día de la Madre</option>
-                <option value="padre">Día del Padre</option>
-                <option value="parejas">Parejas</option>
-                <option value="spotify">Estilo Spotify</option>
-                <option value="bebes">Bebés</option>
-                <option value="netflix">Estilo Netflix</option>
-                <option value="collage">Collage</option>
-                <option value="familia">Familia</option>
+                {categorias.filter(c => c.id !== 'todos').map(cat => (
+                  <option key={cat.id} value={cat.id}>{cat.nombre}</option>
+                ))}
               </select>
             </div>
           </div>

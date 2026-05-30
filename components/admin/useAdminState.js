@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { getProductos } from '../../data/productos';
+import { getProductos, getCategoriasList } from '../../data/productos';
 
 // Helper en módulo para encapsular lectura de desactivados
 export const getDeactivatedList = () => {
@@ -78,7 +78,8 @@ export default function useAdminState() {
       productosList: getProductos(),
       deactivatedIds: deactivatedList,
       visitas: { hoy, mes },
-      cupones: cuponesList
+      cupones: cuponesList,
+      categorias: getCategoriasList()
     };
   });
 
@@ -92,7 +93,9 @@ export default function useAdminState() {
     modalAdd: false,
     modalEdit: false,
     modalCoupon: false,
-    selectedProduct: null
+    modalCategory: false,
+    selectedProduct: null,
+    selectedCategory: null
   });
 
   const toggleModal = (modalKey, val) => {
@@ -284,6 +287,39 @@ export default function useAdminState() {
     }
   };
 
+  // Guardar o Editar Categoría
+  const handleGuardarCategoria = (catData) => {
+    const existing = dataState.categorias.find(c => c.id === catData.id);
+    let updated;
+    if (existing) {
+      updated = dataState.categorias.map(c => c.id === catData.id ? catData : c);
+    } else {
+      updated = [...dataState.categorias, catData];
+    }
+
+    setDataState(prev => ({ ...prev, categorias: updated }));
+    localStorage.setItem('colkley_categorias:v1', JSON.stringify(updated));
+    toggleModal('modalCategory', false);
+  };
+
+  // Eliminar Categoría
+  const handleEliminarCategoria = (id) => {
+    if (id === 'todos') {
+      alert("⚠️ La categoría 'Todos' es del sistema y no puede eliminarse.");
+      return;
+    }
+    if (!confirm("⚠️ ¿Estás seguro de que deseas eliminar esta categoría? Esto podría afectar a los productos asociados.")) return;
+
+    const updated = dataState.categorias.filter(c => c.id !== id);
+    setDataState(prev => ({ ...prev, categorias: updated }));
+    localStorage.setItem('colkley_categorias:v1', JSON.stringify(updated));
+  };
+
+  // Abrir Modal de Categoría para editar
+  const handleAbrirModalCategoryEdit = (cat) => {
+    setUiState(prev => ({ ...prev, selectedCategory: cat, modalCategory: true }));
+  };
+
   // Filtrado de productos en frontend
   const filteredProducts = useMemo(() => {
     return dataState.productosList.filter(p => {
@@ -313,6 +349,9 @@ export default function useAdminState() {
     handleAbrirModalEdit,
     handleGuardarEdicionProducto,
     handleGuardarNuevoCupon,
+    handleGuardarCategoria,
+    handleEliminarCategoria,
+    handleAbrirModalCategoryEdit,
     filteredProducts
   };
 }

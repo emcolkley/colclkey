@@ -10,9 +10,11 @@ import useAdminState from './admin/useAdminState';
 import StatsCards from './admin/StatsCards';
 import ProductsTable from './admin/ProductsTable';
 import CouponsTable from './admin/CouponsTable';
+import CategoriesTable from './admin/CategoriesTable';
 import AddProductModal from './admin/AddProductModal';
 import EditProductModal from './admin/EditProductModal';
 import AddCouponModal from './admin/AddCouponModal';
+import AddCategoryModal from './admin/AddCategoryModal';
 
 // Mover constantes fijas al ámbito de módulo
 const NAME_MAPPING = {
@@ -104,7 +106,7 @@ const TAB_BUTTON_STYLE_INACTIVE = {
 };
 
 // Subcomponentes funcionales auxiliares (resuelve no-giant-component)
-function DashboardHeader({ activeTab, onOpenAddModal, onOpenCouponModal }) {
+function DashboardHeader({ activeTab, onOpenAddModal, onOpenCouponModal, onOpenCategoryModal }) {
   return (
     <div className="admin-header" style={HEADER_CONTAINER_STYLE}>
       <div>
@@ -112,13 +114,19 @@ function DashboardHeader({ activeTab, onOpenAddModal, onOpenCouponModal }) {
         <p style={HEADER_SUBTITLE_STYLE}>Administración central y métricas en tiempo real</p>
       </div>
       <div style={HEADER_ACTIONS_STYLE}>
-        {activeTab === 'productos' ? (
+        {activeTab === 'productos' && (
           <button type="button" className="panel-btn" onClick={onOpenAddModal} style={BUTTON_ACTION_STYLE}>
             ➕ Nuevo Producto
           </button>
-        ) : (
+        )}
+        {activeTab === 'cupones' && (
           <button type="button" className="panel-btn" onClick={onOpenCouponModal} style={BUTTON_ACTION_STYLE}>
             ➕ Nuevo Cupón
+          </button>
+        )}
+        {activeTab === 'categorias' && (
+          <button type="button" className="panel-btn" onClick={onOpenCategoryModal} style={BUTTON_ACTION_STYLE}>
+            ➕ Nueva Categoría
           </button>
         )}
         <Link href="/" className="panel-btn secondary" style={LINK_STORE_STYLE}>
@@ -205,6 +213,14 @@ function TabSelector({ activeTab, onSelectTab }) {
       >
         🏷️ Cupones de Descuento
       </button>
+      <button 
+        type="button"
+        className={`admin-tab-btn ${activeTab === 'categorias' ? 'active' : ''}`}
+        onClick={() => onSelectTab('categorias')}
+        style={activeTab === 'categorias' ? TAB_BUTTON_STYLE_ACTIVE : TAB_BUTTON_STYLE_INACTIVE}
+      >
+        🎗️ Cinta de Opciones
+      </button>
     </div>
   );
 }
@@ -246,6 +262,9 @@ export default function AdminDashboard() {
     handleAbrirModalEdit,
     handleGuardarEdicionProducto,
     handleGuardarNuevoCupon,
+    handleGuardarCategoria,
+    handleEliminarCategoria,
+    handleAbrirModalCategoryEdit,
     filteredProducts
   } = useAdminState();
 
@@ -257,6 +276,7 @@ export default function AdminDashboard() {
         activeTab={uiState.activeTab}
         onOpenAddModal={() => toggleModal('modalAdd', true)}
         onOpenCouponModal={() => toggleModal('modalCoupon', true)}
+        onOpenCategoryModal={() => toggleModal('modalCategory', true)}
       />
 
       {/* TARJETAS DE ESTADÍSTICAS */}
@@ -300,11 +320,23 @@ export default function AdminDashboard() {
         </div>
       )}
 
+      {/* CONTENIDO DE TAB CATEGORIAS */}
+      {uiState.activeTab === 'categorias' && (
+        <div id="content-tab-categorias">
+          <CategoriesTable 
+            categories={dataState.categorias}
+            onEdit={handleAbrirModalCategoryEdit}
+            onDelete={handleEliminarCategoria}
+          />
+        </div>
+      )}
+
       {/* MODALES SEMÁNTICOS NATIVAS <dialog> */}
       <AddProductModal 
         isOpen={uiState.modalAdd}
         onClose={() => toggleModal('modalAdd', false)}
         onSave={handleGuardarNuevoProducto}
+        categorias={dataState.categorias}
       />
 
       <EditProductModal 
@@ -312,12 +344,24 @@ export default function AdminDashboard() {
         onClose={() => toggleModal('modalEdit', false)}
         product={uiState.selectedProduct}
         onSave={handleGuardarEdicionProducto}
+        categorias={dataState.categorias}
       />
 
       <AddCouponModal 
         isOpen={uiState.modalCoupon}
         onClose={() => toggleModal('modalCoupon', false)}
         onSave={handleGuardarNuevoCupon}
+      />
+
+      <AddCategoryModal 
+        isOpen={uiState.modalCategory}
+        onClose={() => {
+          toggleModal('modalCategory', false);
+          // Limpiar categoría seleccionada al cerrar
+          setUiState(prev => ({ ...prev, selectedCategory: null }));
+        }}
+        category={uiState.selectedCategory}
+        onSave={handleGuardarCategoria}
       />
 
     </main>
