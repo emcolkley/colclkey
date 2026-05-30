@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import ProductGrid from '../components/ProductGrid';
 import Customizer from '../components/Customizer';
 import CartDrawer from '../components/CartDrawer';
@@ -247,13 +248,18 @@ export default function Home() {
             Terminaciones de galería de arte y atención 100% personalizada. Convertimos tus mejores momentos en piezas de diseño hechas para perdurar.
           </p>
           <div className="footer-links">
-            <a href="#" onClick={(e) => { e.preventDefault(); setStep(1); setSelectedProduct(null); setTimeout(() => {
-              document.getElementById('seccion-catalogo')?.scrollIntoView({ behavior: 'smooth' });
-            }, 100); }}>Productos</a>
-            <a href="/admin">Administración</a>
+            <button 
+              onClick={() => { setStep(1); setSelectedProduct(null); setTimeout(() => {
+                document.getElementById('seccion-catalogo')?.scrollIntoView({ behavior: 'smooth' });
+              }, 100); }}
+              style={{ background: 'none', border: 'none', color: 'inherit', font: 'inherit', cursor: 'pointer', padding: 0 }}
+            >
+              Productos
+            </button>
+            <Link href="/admin">Administración</Link>
           </div>
           <div className="footer-bottom">
-            <p>&copy; {new Date().getFullYear()} Colkley. Todos los derechos reservados. Diseñado con dedicación.</p>
+            <p suppressHydrationWarning>&copy; {new Date().getFullYear()} Colkley. Todos los derechos reservados. Diseñado con dedicación.</p>
           </div>
         </div>
       </footer>

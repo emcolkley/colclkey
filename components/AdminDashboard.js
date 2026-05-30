@@ -1,8 +1,51 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { getProductos } from '../data/productos';
 import CanvasPreview from './CanvasPreview';
+
+// Mover constantes fijas al ámbito de módulo (resuelve rerender-memo y static-value de react-doctor)
+const NAME_MAPPING = {
+  "dorado": "Marco Dorado Clásico",
+  "collage": "Marco Collage Romántico",
+  "roca": "Cuadro en Roca",
+  "taza": "Taza Personalizada",
+  "llavero": "Llavero con Foto",
+  "restauracion": "Restauración Profesional",
+  "spotify_negro": "Spotify Minimalista Negro",
+  "nordic_frame": "Nordic Frame Premium",
+  "nordic_room": "Nordic Room Premium"
+};
+
+// Comprimir imagen para localStorage - Pure helper function in module scope (resuelve prefer-module-scope-pure-function)
+const compressImage = (base64Str, maxWidth = 600, maxHeight = 600) => {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let width = img.width;
+      let height = img.height;
+      if (width > height) {
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+      } else {
+        if (height > maxHeight) {
+          width = Math.round((width * maxHeight) / height);
+          height = maxHeight;
+        }
+      }
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', 0.8));
+    };
+    img.src = base64Str;
+  });
+};
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('productos');
@@ -150,35 +193,6 @@ export default function AdminDashboard() {
     }
   };
 
-  // Comprimir imagen para localStorage
-  const compressImage = (base64Str, maxWidth = 600, maxHeight = 600) => {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let width = img.width;
-        let height = img.height;
-        if (width > height) {
-          if (width > maxWidth) {
-            height = Math.round((height * maxWidth) / width);
-            width = maxWidth;
-          }
-        } else {
-          if (height > maxHeight) {
-            width = Math.round((width * maxHeight) / height);
-            height = maxHeight;
-          }
-        }
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', 0.8));
-      };
-      img.src = base64Str;
-    });
-  };
-
   // Archivo agregar cargado
   const handleAddFileChange = (e) => {
     const file = e.target.files[0];
@@ -202,7 +216,8 @@ export default function AdminDashboard() {
       return;
     }
 
-    const sizes = addTamanos.split(',').map(s => s.trim()).filter(Boolean);
+    // Iteración en una sola pasada usando flatMap (resuelve js-flatmap-filter)
+    const sizes = addTamanos.split(',').flatMap(s => s.trim() ? [s.trim()] : []);
 
     compressImage(addImgBase64).then(compressed => {
       const newProd = {
@@ -269,7 +284,8 @@ export default function AdminDashboard() {
   // Guardar edición
   const handleGuardarEdicionProducto = (e) => {
     e.preventDefault();
-    const sizes = editTamanos.split(',').map(s => s.trim()).filter(Boolean);
+    // Iteración en una sola pasada usando flatMap (resuelve js-flatmap-filter)
+    const sizes = editTamanos.split(',').flatMap(s => s.trim() ? [s.trim()] : []);
     const existing = productosList.find(x => x.id === editId);
 
     const saveOverride = (base64Img) => {
@@ -362,18 +378,6 @@ export default function AdminDashboard() {
     return matchesSearch && matchesTipo && matchesMarco && matchesFormat;
   });
 
-  const nameMapping = {
-    "dorado": "Marco Dorado Clásico",
-    "collage": "Marco Collage Romántico",
-    "roca": "Cuadro en Roca",
-    "taza": "Taza Personalizada",
-    "llavero": "Llavero con Foto",
-    "restauracion": "Restauración Profesional",
-    "spotify_negro": "Spotify Minimalista Negro",
-    "nordic_frame": "Nordic Frame Premium",
-    "nordic_room": "Nordic Room Premium"
-  };
-
   return (
     <main className="admin-container" style={{ padding: '40px 20px', maxWidth: '1200px', margin: '0 auto', background: '#0A0A0A', color: '#FFF' }}>
       
@@ -393,9 +397,10 @@ export default function AdminDashboard() {
               ➕ Nuevo Cupón
             </button>
           )}
-          <a href="/" className="panel-btn secondary" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+          {/* Usar Link en vez de <a> para navegación óptima en Next.js (resuelve nextjs-no-a-element) */}
+          <Link href="/" className="panel-btn secondary" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
             Ir a la tienda →
-          </a>
+          </Link>
         </div>
       </div>
 
@@ -490,7 +495,7 @@ export default function AdminDashboard() {
             >
               <option value="">🖼️ Todos los Marcos</option>
               {availableMarcos.map(m => (
-                <option key={m} value={m}>{nameMapping[m] || m}</option>
+                <option key={m} value={m}>{NAME_MAPPING[m] || m}</option>
               ))}
             </select>
             <select 
