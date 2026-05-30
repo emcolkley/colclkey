@@ -55,7 +55,6 @@ export default function EditProductModal({ isOpen, onClose, product, onSave }) {
     tipo: 'marco',
     desc: '',
     tamanos: '',
-    diseño: 'nordic_frame',
     imgBase64: null
   });
 
@@ -74,7 +73,6 @@ export default function EditProductModal({ isOpen, onClose, product, onSave }) {
         tipo: product.tipo || 'marco',
         desc: product.desc || '',
         tamanos: product.tamanos ? product.tamanos.join(', ') : '',
-        diseño: product.diseño || 'nordic_frame',
         imgBase64: null
       });
     }
@@ -105,6 +103,16 @@ export default function EditProductModal({ isOpen, onClose, product, onSave }) {
       return;
     }
 
+    let diseno = product.diseño || 'nordic_frame';
+    // Si cambiaron el tipo del producto, recalculamos el diseño adecuado
+    if (formState.tipo !== product.tipo) {
+      if (formState.tipo === 'roca') diseno = 'roca';
+      else if (formState.tipo === 'taza') diseno = 'taza';
+      else if (formState.tipo === 'llavero') diseno = 'llavero';
+      else if (formState.tipo === 'restauracion') diseno = 'restauracion';
+      else if (formState.tipo === 'marco') diseno = 'nordic_frame';
+    }
+
     onSave({
       id: product.id,
       nombre: formState.nombre,
@@ -113,7 +121,7 @@ export default function EditProductModal({ isOpen, onClose, product, onSave }) {
       tipo: formState.tipo,
       desc: formState.desc,
       tamanos: formState.tamanos,
-      diseño: formState.diseño,
+      diseño: diseno,
       imgBase64: formState.imgBase64
     });
   };
@@ -165,41 +173,20 @@ export default function EditProductModal({ isOpen, onClose, product, onSave }) {
               />
             </div>
           </div>
-          <div className="form-row" style={{ display: 'flex', gap: '12px' }}>
-            <div className="form-group" style={{ flex: 1 }}>
-              <label htmlFor="edit-tipo" className="form-label">Tipo de Producto</label>
-              <select 
-                id="edit-tipo"
-                className="form-input" 
-                value={formState.tipo} 
-                onChange={(e) => updateFormState({ tipo: e.target.value })}
-              >
-                <option value="marco">Marcos</option>
-                <option value="roca">Rocas</option>
-                <option value="taza">Tazas</option>
-                <option value="llavero">Llaveros</option>
-                <option value="restauracion">Restauración</option>
-              </select>
-            </div>
-            <div className="form-group" style={{ flex: 1 }}>
-              <label htmlFor="edit-diseno" className="form-label">Diseño / Plantilla</label>
-              <select 
-                id="edit-diseno"
-                className="form-input" 
-                value={formState.diseño} 
-                onChange={(e) => updateFormState({ diseño: e.target.value })}
-              >
-                <option value="nordic_frame">Nordic Frame Premium</option>
-                <option value="nordic_room">Nordic Room Premium</option>
-                <option value="spotify_negro">Spotify Minimalista Negro</option>
-                <option value="dorado">Marco Dorado Clásico</option>
-                <option value="collage">Marco Collage Romántico</option>
-                <option value="roca">Cuadro en Roca</option>
-                <option value="taza">Taza Personalizada</option>
-                <option value="llavero">Llavero con Foto</option>
-                <option value="restauracion">Restauración Profesional</option>
-              </select>
-            </div>
+          <div className="form-group">
+            <label htmlFor="edit-tipo" className="form-label">Tipo de Producto</label>
+            <select 
+              id="edit-tipo"
+              className="form-input" 
+              value={formState.tipo} 
+              onChange={(e) => updateFormState({ tipo: e.target.value })}
+            >
+              <option value="marco">Marcos</option>
+              <option value="roca">Rocas</option>
+              <option value="taza">Tazas</option>
+              <option value="llavero">Llaveros</option>
+              <option value="restauracion">Restauración</option>
+            </select>
           </div>
           <div className="form-group">
             <label htmlFor="edit-tamanos" className="form-label">Tamaños / Formatos (separados por coma)</label>
