@@ -276,7 +276,10 @@ export default function AdminDashboard() {
         activeTab={uiState.activeTab}
         onOpenAddModal={() => toggleModal('modalAdd', true)}
         onOpenCouponModal={() => toggleModal('modalCoupon', true)}
-        onOpenCategoryModal={() => toggleModal('modalCategory', true)}
+        onOpenCategoryModal={() => {
+          setUiState(prev => ({ ...prev, selectedCategory: null }));
+          toggleModal('modalCategory', true);
+        }}
       />
 
       {/* TARJETAS DE ESTADÍSTICAS */}

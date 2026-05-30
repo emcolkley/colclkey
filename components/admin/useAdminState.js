@@ -299,7 +299,7 @@ export default function useAdminState() {
 
     setDataState(prev => ({ ...prev, categorias: updated }));
     localStorage.setItem('colkley_categorias:v1', JSON.stringify(updated));
-    toggleModal('modalCategory', false);
+    setUiState(prev => ({ ...prev, selectedCategory: null, modalCategory: false }));
   };
 
   // Eliminar Categoría

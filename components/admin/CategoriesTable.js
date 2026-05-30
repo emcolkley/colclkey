@@ -22,7 +22,7 @@ export default function CategoriesTable({ categories, onEdit, onDelete }) {
         <tbody>
           {categories.length > 0 ? (
             categories.map(cat => {
-              const isProtected = cat.id === 'todos' || cat.id === 'otros';
+              const isProtected = cat.id === 'todos';
               return (
                 <tr key={cat.id} style={{ borderBottom: '1px solid #1A1A1A' }}>
                   <td style={CODE_CELL_STYLE}>

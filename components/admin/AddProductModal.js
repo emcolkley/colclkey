@@ -68,6 +68,16 @@ export default function AddProductModal({ isOpen, onClose, onSave, categorias = 
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    if (isOpen && categorias.length > 0) {
+      const validCats = categorias.filter(c => c.id !== 'todos');
+      const currentCatExists = validCats.some(c => c.id === formState.categoria);
+      if (!currentCatExists && validCats.length > 0) {
+        updateFormState({ categoria: validCats[0].id });
+      }
+    }
+  }, [isOpen, categorias, formState.categoria]);
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
