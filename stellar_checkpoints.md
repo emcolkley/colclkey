@@ -18,7 +18,8 @@ Este archivo registra cada hito importante del proyecto. Si necesitas volver a u
 | 2026-05-30 | **Optimización de Navegación** | Ocultar sección Hero en pasos 2 y 3 para evitar scroll manual al seleccionar producto. | `424c13b` |
 | 2026-05-30 | **Filtros por Categorías Mobile-First** | Sistema de cápsulas deslizables por temática y campo de Categorías en administración. | `ea85685` |
 | 2026-05-30 | **Cinta de Opciones Autogestionable** | Panel dinámico completo para añadir, editar o borrar botones de la cinta de categorías. | `6308b20` |
-| 2026-05-30 | **Refinamiento de Cinta Autogestionable** | Desbloqueo de categoría 'Otros', limpieza de estado al crear categoría y fallbacks dinámicos. | `210d4b6` |
+| 2026-05-30 | **Refinamiento de Cinta Autogestionable** | Desbloqueo de categoría 'Otros', limpieza de estado al crear categoría y fallbacks dinámicos. | `1dcb905` |
+| 2026-05-30 | **Activación del Botón Nueva Categoría** | Corrección de error de referencia al destructurar setUiState en el dashboard de administración. | `36b0bd4` |
 
 ---
 

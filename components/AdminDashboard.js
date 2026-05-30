@@ -250,6 +250,7 @@ export default function AdminDashboard() {
   const {
     dataState,
     uiState,
+    setUiState,
     toggleModal,
     updateFilters,
     availableFormats,
