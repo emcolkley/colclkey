@@ -544,15 +544,15 @@ export default function AdminDashboard() {
                       <td style={{ padding: '12px 20px', fontWeight: 500 }}>
                         {p.nombre}
                         {p.nuevo && <span className="tag-nuevo">NUEVO</span>}
-                        <div style={{ fontSize: '0.72rem', color: '#6A6A6A', fontWeight: 300, marginTop: '4px' }}>
+                        <div style={{ fontSize: '0.75rem', color: '#6A6A6A', fontWeight: 300, marginTop: '4px' }}>
                           Diseño: {p.diseño} | Tipo: {p.tipo}
                         </div>
                       </td>
                       <td style={{ padding: '12px 20px', fontFamily: 'Cinzel, serif', color: '#C9A84C', fontSize: '0.9rem' }}>
                         {p.descuento ? (
                           <>
-                            <div style={{ fontSize: '0.72rem', textDecoration: 'line-through', opacity: 0.5, marginBottom: '2px' }}>${p.precio.toLocaleString()}</div>
-                            <div style={{ color: '#E8C96A', fontWeight: 600 }}>${finalPrice.toLocaleString()} <span style={{ background: '#C9A84C', color: '#0A0A0A', fontSize: '0.6rem', fontWeight: 700, padding: '1px 4px', borderRadius: '3px', marginLeft: '2px', verticalAlign: 'middle' }}>-{p.descuento}%</span></div>
+                            <div style={{ fontSize: '0.75rem', textDecoration: 'line-through', opacity: 0.5, marginBottom: '2px' }}>${p.precio.toLocaleString()}</div>
+                            <div style={{ color: '#E8C96A', fontWeight: 600 }}>${finalPrice.toLocaleString()} <span style={{ background: '#C9A84C', color: '#0A0A0A', fontSize: '0.75rem', fontWeight: 700, padding: '1px 4px', borderRadius: '3px', marginLeft: '2px', verticalAlign: 'middle' }}>-{p.descuento}%</span></div>
                           </>
                         ) : (
                           `$${p.precio.toLocaleString()}`

@@ -41,7 +41,7 @@ export default function ProductCard({ producto, onSelect }) {
               <span className="precio-descuento" style={{ color: '#E8C96A', fontWeight: 600 }}>
                 ${finalPrice.toLocaleString()}
               </span>
-              <span className="tag-descuento" style={{ background: '#C9A84C', color: '#0A0A0A', fontSize: '0.65rem', fontWeight: 700, padding: '2px 6px', borderRadius: '4px' }}>
+              <span className="tag-descuento" style={{ background: '#C9A84C', color: '#0A0A0A', fontSize: '0.75rem', fontWeight: 700, padding: '2px 6px', borderRadius: '4px' }}>
                 -{producto.descuento}%
               </span>
             </>

@@ -108,7 +108,7 @@ export default function Customizer({
 
   return (
     <section id="seccion-personalizar" style={{ display: 'block' }}>
-      <button className="back-btn" onClick={onBack}>← Volver al catálogo</button>
+      <button type="button" className="back-btn" onClick={onBack}>← Volver al catálogo</button>
       <h2 className="section-title">
         Personalizá tu <span>{producto.nombre}</span>
       </h2>
@@ -130,7 +130,8 @@ export default function Customizer({
             onDrop={handleDrop}
             style={{ 
               borderColor: isDragOver ? 'var(--gold)' : '',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              outline: 'none'
             }}
           >
             <div className="upload-icon">📸</div>
@@ -138,6 +139,7 @@ export default function Customizer({
               Arrastrá tu foto acá<br />o hacé clic para seleccionarla
             </div>
             <button 
+              type="button"
               className="upload-btn" 
               onClick={(e) => {
                 e.stopPropagation(); 
@@ -146,7 +148,8 @@ export default function Customizer({
             >
               Seleccionar foto
             </button>
-            <div className="upload-zone-hint">JPG, PNG — máx. 20MB</div>
+            {/* Reemplazado em-dash (—) por paréntesis para resolver design-no-em-dash-in-jsx-text */}
+            <div className="upload-zone-hint">JPG, PNG (máx. 20MB)</div>
           </div>
           <input 
             type="file" 
@@ -166,6 +169,7 @@ export default function Customizer({
             <div className="tamanos-grid" id="tamanos-grid">
               {producto.tamanos.map(t => (
                 <button 
+                  type="button"
                   key={t}
                   className={`tamano-btn ${t === tamanoSeleccionado ? 'active' : ''}`}
                   onClick={() => setTamanoSeleccionado(t)}
@@ -181,6 +185,7 @@ export default function Customizer({
             <div className="opciones-label">Cantidad</div>
             <div className="cantidad-selector">
               <button 
+                type="button"
                 className="tamano-btn" 
                 onClick={() => setCantidad(prev => Math.max(1, prev - 1))}
                 aria-label="Disminuir cantidad"
@@ -189,6 +194,7 @@ export default function Customizer({
               </button>
               <span id="cantidad-display">{cantidad}</span>
               <button 
+                type="button"
                 className="tamano-btn" 
                 onClick={() => setCantidad(prev => prev + 1)}
                 aria-label="Aumentar cantidad"
@@ -198,10 +204,10 @@ export default function Customizer({
             </div>
           </div>
 
-          <button className="panel-btn" onClick={handleAddToCart}>
+          <button type="button" className="panel-btn" onClick={handleAddToCart}>
             Agregar al carrito
           </button>
-          <button className="panel-btn secondary" onClick={onOpenCart}>
+          <button type="button" className="panel-btn secondary" onClick={onOpenCart}>
             Ver carrito →
           </button>
         </div>

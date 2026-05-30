@@ -120,7 +120,7 @@ export default function HomeClient() {
             <div className="logo-circle">C</div>
             <div className="logo-text">COL<span>K</span>LEY</div>
           </div>
-          <button className="nav-cart" onClick={() => setIsCartOpen(true)} aria-label="Ver mi pedido y abrir carrito de compras">
+          <button type="button" className="nav-cart" onClick={() => setIsCartOpen(true)} aria-label="Ver mi pedido y abrir carrito de compras">
             🛒 Mi pedido
             <span className="cart-count" id="cart-count">{totalCartCount}</span>
           </button>
@@ -137,7 +137,7 @@ export default function HomeClient() {
           <span className="hero-prod-tag">Tazas & Llaveros</span>
         </div>
         <p>Subí tu foto, elegí tu diseño y visualizalo en tiempo real. Tu regalo perfecto, hecho con dedicación.</p>
-        <button className="hero-cta" onClick={() => { setStep(1); setSelectedProduct(null); setTimeout(() => {
+        <button type="button" className="hero-cta" onClick={() => { setStep(1); setSelectedProduct(null); setTimeout(() => {
           document.getElementById('seccion-catalogo')?.scrollIntoView({ behavior: 'smooth' });
         }, 100); }}>
           Ver productos →
@@ -187,7 +187,7 @@ export default function HomeClient() {
         {/* SECCIÓN 3: CHECKOUT */}
         {step === 3 && (
           <section id="seccion-checkout" aria-label="Confirmación del pedido y checkout">
-            <button className="back-btn" onClick={() => { setStep(2); }}>
+            <button type="button" className="back-btn" onClick={() => { setStep(2); }}>
               ← Seguir comprando
             </button>
             
@@ -227,6 +227,7 @@ export default function HomeClient() {
               Tu pedido fue registrado correctamente. Recibirás confirmación por email y nos comunicaremos contigo para coordinar la entrega. ¡Gracias por elegir Colkley!
             </p>
             <button 
+              type="button"
               className="modal-btn" 
               id="btn-whatsapp-confirm" 
               onClick={handleConfirmOrderWhatsApp}
@@ -235,6 +236,7 @@ export default function HomeClient() {
               💬 Confirmar por WhatsApp
             </button>
             <button 
+              type="button"
               className="modal-close-link" 
               onClick={handleCancelConfirmation} 
               style={{ background: 'none', border: 'none', width: '100%', fontFamily: 'inherit', color: '#777', cursor: 'pointer', padding: '8px' }}
@@ -257,6 +259,7 @@ export default function HomeClient() {
           </p>
           <div className="footer-links">
             <button 
+              type="button"
               onClick={() => { setStep(1); setSelectedProduct(null); setTimeout(() => {
                 document.getElementById('seccion-catalogo')?.scrollIntoView({ behavior: 'smooth' });
               }, 100); }}

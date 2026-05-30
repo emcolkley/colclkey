@@ -59,7 +59,7 @@ export default function RootLayout({ children }) {
     <html lang="es" className={`${fontCinzel.variable} ${fontCormorant.variable} ${fontMontserrat.variable}`}>
       <head>
         {/* Fallbacks para asegurar compatibilidad directa con CSS estático */}
-        <style dangerouslySetInnerHTML={{__html: `
+        <style>{`
           body {
             font-family: var(--font-montserrat), 'Montserrat', sans-serif;
           }
@@ -69,7 +69,7 @@ export default function RootLayout({ children }) {
           em, .section-sub, .checkout-sub, .modal-texto {
             font-family: var(--font-cormorant), 'Cormorant Garamond', serif;
           }
-        `}} />
+        `}</style>
       </head>
       <body>{children}</body>
     </html>
