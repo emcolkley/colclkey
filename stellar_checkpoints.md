@@ -8,12 +8,14 @@ Este archivo registra cada hito importante del proyecto. Si necesitas volver a u
 
 | Fecha | Punto de Control | Descripción | ID de Versión (Git) |
 | :--- | :--- | :--- | :--- |
-| 2026-05-30 | **Setup de Seguridad** | Setup inicial del sistema de puntos de control para la Tienda de Cuadros. | `19343de` |
-| 2026-05-30 | **Optimización React Doctor 100/100** | Refactorización final logrando puntuación perfecta de 100/100 en React Doctor y accesibilidad optimizada. | `ae37104` |
-| 2026-05-30 | **Mejora Estilos y CartDrawer** | Optimización de tamaño de fuentes, estilos y componente Image de Next.js en CartDrawer. | `a49c872` |
-| 2026-05-30 | **Eliminación Errores React Doctor** | Corrección de advertencias y errores en componentes React para alcanzar 88/100. | `4d0b159` |
-| 2026-05-30 | **Refactorización Base React** | Optimización de componentes React para mejorar score a 83/100. | `0a42846` |
 | 2026-05-30 | **Limpieza del Proyecto** | Limpieza de archivos estáticos en desuso y scripts de Python antiguos. | `c85656e` |
+| 2026-05-30 | **Refactorización Base React** | Optimización de componentes React para mejorar score a 83/100. | `0a42846` |
+| 2026-05-30 | **Eliminación Errores React Doctor** | Corrección de advertencias y errores en componentes React para alcanzar 88/100. | `4d0b159` |
+| 2026-05-30 | **Mejora Estilos y CartDrawer** | Optimización de tamaño de fuentes, estilos y componente Image de Next.js en CartDrawer. | `a49c872` |
+| 2026-05-30 | **Optimización React Doctor 100/100** | Refactorización final logrando puntuación perfecta de 100/100 en React Doctor y accesibilidad optimizada. | `ae37104` |
+| 2026-05-30 | **Setup de Seguridad** | Setup inicial del sistema de puntos de control para la Tienda de Cuadros. | `15e7610` |
+| 2026-05-30 | **Simplificación de Formularios Admin** | Eliminación de selector manual de plantilla y automatización de diseño por tipo de producto. | `228848c` |
+
 
 ---
 
