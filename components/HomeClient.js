@@ -294,7 +294,7 @@ export default function HomeClient() {
         onNavigateHome={() => { setStep(1); setSelectedProduct(null); }}
       />
 
-      <HeroSection onNavigateCatalog={handleNavigateCatalog} />
+      {step === 1 && <HeroSection onNavigateCatalog={handleNavigateCatalog} />}
 
       <ProgressSteps step={step} />
 
