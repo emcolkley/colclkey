@@ -15,7 +15,7 @@ Este archivo registra cada hito importante del proyecto. Si necesitas volver a u
 | 2026-05-30 | **Optimización React Doctor 100/100** | Refactorización final logrando puntuación perfecta de 100/100 en React Doctor y accesibilidad optimizada. | `ae37104` |
 | 2026-05-30 | **Setup de Seguridad** | Setup inicial del sistema de puntos de control para la Tienda de Cuadros. | `15e7610` |
 | 2026-05-30 | **Simplificación de Formularios Admin** | Eliminación de selector manual de plantilla y automatización de diseño por tipo de producto. | `228848c` |
-
+| 2026-05-30 | **Optimización de Navegación** | Ocultar sección Hero en pasos 2 y 3 para evitar scroll manual al seleccionar producto. | `424c13b` |
 
 ---
 
