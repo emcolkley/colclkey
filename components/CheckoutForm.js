@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumber = "5491100000000" }) {
   const [nombre, setNombre] = useState('');
@@ -13,23 +13,19 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
   const [couponMessageColor, setCouponMessageColor] = useState('');
   const [activeCoupon, setActiveCoupon] = useState(null);
 
+  // Calcular valores en línea (resuelve react-doctor/no-derived-state)
   const subtotal = cart.reduce((acc, item) => acc + item.precio, 0);
-  const [discountAmount, setDiscountAmount] = useState(0);
-  const [total, setTotal] = useState(subtotal);
-
-  // Recalcular total cuando cambie el subtotal o el cupón activo
-  useEffect(() => {
-    let discount = 0;
-    if (activeCoupon) {
-      if (activeCoupon.tipo === 'porcentaje') {
-        discount = Math.round(subtotal * (activeCoupon.valor / 100));
-      } else if (activeCoupon.tipo === 'fijo') {
-        discount = activeCoupon.valor;
-      }
+  
+  let discountAmount = 0;
+  if (activeCoupon) {
+    if (activeCoupon.tipo === 'porcentaje') {
+      discountAmount = Math.round(subtotal * (activeCoupon.valor / 100));
+    } else if (activeCoupon.tipo === 'fijo') {
+      discountAmount = activeCoupon.valor;
     }
-    setDiscountAmount(discount);
-    setTotal(Math.max(0, subtotal - discount));
-  }, [subtotal, activeCoupon]);
+  }
+  
+  const total = Math.max(0, subtotal - discountAmount);
 
   const aplicarCupon = () => {
     const code = couponCode.trim().toUpperCase();
@@ -109,7 +105,6 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
 
     const waLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(txt)}`;
     
-    // Disparar confirmación de pedido al componente padre
     onOrderPlaced({
       waLink,
       nombre,

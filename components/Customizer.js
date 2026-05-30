@@ -11,7 +11,7 @@ export default function Customizer({
   cloudinaryCloud = "TU_CLOUD_NAME",
   cloudinaryPreset = "TU_UPLOAD_PRESET"
 }) {
-  const [tamanoSeleccionado, setTamanoSeleccionado] = useState('');
+  const [tamanoSeleccionado, setTamanoSeleccionado] = useState(producto.tamanos[0]);
   const [cantidad, setCantidad] = useState(1);
   const [fotoBase64, setFotoBase64] = useState(null);
   const [fotoURL, setFotoURL] = useState(null);
@@ -19,19 +19,6 @@ export default function Customizer({
   const [isUploading, setIsUploading] = useState(false);
   const [uploadHint, setUploadHint] = useState('Subí una foto para ver el diseño con tu imagen');
   const [isDragOver, setIsDragOver] = useState(false);
-
-  // Reiniciar estado cuando cambia el producto
-  useEffect(() => {
-    if (producto) {
-      setTamanoSeleccionado(producto.tamanos[0]);
-      setCantidad(1);
-      setFotoBase64(null);
-      setFotoURL(null);
-      setFotoCloudinaryURL('');
-      setIsUploading(false);
-      setUploadHint('Subí una foto para ver el diseño con tu imagen');
-    }
-  }, [producto]);
 
   const cargarFoto = (file) => {
     if (!file) return;
@@ -135,6 +122,9 @@ export default function Customizer({
             className={`upload-zone ${fotoBase64 ? 'has-image' : ''}`} 
             id="upload-zone"
             onClick={() => document.getElementById('file-input').click()}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { document.getElementById('file-input').click(); } }}
+            role="button"
+            tabIndex={0}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}

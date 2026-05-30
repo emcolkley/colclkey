@@ -12,8 +12,11 @@ export default function ProductCard({ producto, onSelect }) {
     <div 
       className="producto-card" 
       onClick={() => onSelect(producto.id)} 
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { onSelect(producto.id); } }}
       id={`card-${producto.id}`}
-      style={{ cursor: 'pointer' }}
+      role="button"
+      tabIndex={0}
+      style={{ cursor: 'pointer', outline: 'none' }}
     >
       <div className="producto-preview-thumb">
         <CanvasPreview 

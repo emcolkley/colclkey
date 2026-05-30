@@ -3,10 +3,33 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { dibujarDiseño } from '../data/productos';
 
-export default function CanvasPreview({ diseño, fotoBase64, width = 900, height = 900, className = '', style = {} }) {
+const DEFAULT_STYLE = {};
+
+export default function CanvasPreview({ diseño, fotoBase64, width = 900, height = 900, className = '', style = DEFAULT_STYLE }) {
   const canvasRef = useRef(null);
   const [maquetas, setMaquetas] = useState({});
   const [usuarioImg, setUsuarioImg] = useState(null);
+  const [prevFotoBase64, setPrevFotoBase64] = useState(null);
+
+  // Ajustar estado en línea durante el renderizado (resuelve react-doctor/no-adjust-state-on-prop-change)
+  if (fotoBase64 !== prevFotoBase64) {
+    setPrevFotoBase64(fotoBase64);
+    if (!fotoBase64) {
+      setUsuarioImg(null);
+    } else {
+      if (typeof window !== 'undefined') {
+        const img = new Image();
+        img.src = fotoBase64;
+        img.onload = () => {
+          setUsuarioImg(img);
+        };
+        img.onerror = () => {
+          console.error("Error loading user base64 image");
+          setUsuarioImg(null);
+        };
+      }
+    }
+  }
 
   // Pre-cargar las maquetas del lado del cliente (evita ReferenceError: Image in SSR)
   useEffect(() => {
@@ -38,23 +61,6 @@ export default function CanvasPreview({ diseño, fotoBase64, width = 900, height
       };
     });
   }, []);
-
-  // Cargar imagen de usuario cuando cambie la cadena base64
-  useEffect(() => {
-    if (!fotoBase64) {
-      setUsuarioImg(null);
-      return;
-    }
-    const img = new Image();
-    img.src = fotoBase64;
-    img.onload = () => {
-      setUsuarioImg(img);
-    };
-    img.onerror = () => {
-      console.error("Error loading user base64 image");
-      setUsuarioImg(null);
-    };
-  }, [fotoBase64]);
 
   // Dibujar en el canvas cada vez que cambien los inputs o las maquetas cargadas
   useEffect(() => {
