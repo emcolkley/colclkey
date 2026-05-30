@@ -16,7 +16,58 @@ const getDeactivatedList = () => {
   }
 };
 
+const CATEGORIAS = [
+  { id: 'todos', label: '✨ Todos' },
+  { id: 'madre', label: '👩 Día de la Madre' },
+  { id: 'padre', label: '👨 Día del Padre' },
+  { id: 'parejas', label: '❤️ Parejas' },
+  { id: 'spotify', label: '🎵 Estilo Spotify' },
+  { id: 'bebes', label: '👶 Bebés' },
+  { id: 'netflix', label: '🎬 Estilo Netflix' },
+  { id: 'collage', label: '🖼️ Collage' },
+  { id: 'familia', label: '🏠 Familia' },
+  { id: 'otros', label: '✦ Otros' }
+];
+
+const BAR_CONTAINER_STYLE = {
+  display: 'flex',
+  overflowX: 'auto',
+  gap: '8px',
+  padding: '10px 4px 20px 4px',
+  marginBottom: '20px',
+  scrollbarWidth: 'none', // Firefox
+  msOverflowStyle: 'none', // IE/Edge
+  maxWidth: '100%',
+};
+
+const BUTTON_STYLE = {
+  flexShrink: 0,
+  padding: '10px 18px',
+  borderRadius: '24px',
+  border: '1px solid #222',
+  background: '#111',
+  color: '#888',
+  fontSize: '0.85rem',
+  fontWeight: 600,
+  cursor: 'pointer',
+  transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+  fontFamily: 'inherit',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+};
+
+const BUTTON_ACTIVE_STYLE = {
+  ...BUTTON_STYLE,
+  border: '1px solid #C9A84C',
+  background: 'rgba(201, 168, 76, 0.1)',
+  color: '#E8C96A',
+  boxShadow: '0 0 12px rgba(201, 168, 76, 0.15)',
+};
+
 export default function ProductGrid({ onSelectProduct }) {
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('todos');
+
   // Lazy initializer que carga el estado inicial de productos activos (resuelve no-initialize-state)
   const [productosActivos, setProductosActivos] = useState(() => {
     const deactivatedList = getDeactivatedList();
@@ -36,21 +87,56 @@ export default function ProductGrid({ onSelectProduct }) {
     return () => window.removeEventListener('storage', fetchActiveProducts);
   }, []);
 
+  const productosFiltrados = productosActivos.filter(p => {
+    if (categoriaSeleccionada === 'todos') return true;
+    return p.categoria === categoriaSeleccionada;
+  });
+
   return (
-    <div className="productos-grid" id="productos-grid" suppressHydrationWarning>
-      {productosActivos.length > 0 ? (
-        productosActivos.map(p => (
-          <ProductCard 
-            key={p.id} 
-            producto={p} 
-            onSelect={onSelectProduct} 
-          />
-        ))
-      ) : (
-        <div style={{ textAlign: 'center', gridColumn: '1 / -1', color: '#888', padding: '40px 0' }}>
-          ✦ No hay productos disponibles en este momento ✦
-        </div>
-      )}
+    <div>
+      <style>{`
+        .categoria-scroll-bar::-webkit-scrollbar {
+          display: none !important;
+        }
+      `}</style>
+
+      {/* Selector de categorías horizontal */}
+      <div 
+        className="categoria-scroll-bar" 
+        style={BAR_CONTAINER_STYLE}
+        aria-label="Filtrar productos por categoría"
+      >
+        {CATEGORIAS.map(cat => {
+          const isActive = cat.id === categoriaSeleccionada;
+          return (
+            <button
+              type="button"
+              key={cat.id}
+              style={isActive ? BUTTON_ACTIVE_STYLE : BUTTON_STYLE}
+              onClick={() => setCategoriaSeleccionada(cat.id)}
+            >
+              {cat.label}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="productos-grid" id="productos-grid" suppressHydrationWarning>
+        {productosFiltrados.length > 0 ? (
+          productosFiltrados.map(p => (
+            <ProductCard 
+              key={p.id} 
+              producto={p} 
+              onSelect={onSelectProduct} 
+            />
+          ))
+        ) : (
+          <div style={{ textAlign: 'center', gridColumn: '1 / -1', color: '#888', padding: '60px 0', fontFamily: 'inherit' }}>
+            <span style={{ fontSize: '1.8rem', display: 'block', marginBottom: '10px' }}>✦</span>
+            Próximamente nuevos diseños en esta categoría
+          </div>
+        )}
+      </div>
     </div>
   );
 }

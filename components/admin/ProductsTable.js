@@ -53,7 +53,7 @@ export default function ProductsTable({ products, deactivatedIds, onToggleStatus
                     {p.nombre}
                     {p.nuevo && <span className="tag-nuevo">NUEVO</span>}
                     <div style={{ fontSize: '0.75rem', color: '#6A6A6A', fontWeight: 300, marginTop: '4px' }}>
-                      Diseño: {p.diseño} | Tipo: {p.tipo}
+                      Categoría: {p.categoria || 'otros'} | Tipo: {p.tipo}
                     </div>
                   </td>
                   <td style={{ padding: '12px 20px', fontFamily: 'Cinzel, serif', color: '#C9A84C', fontSize: '0.9rem' }}>

@@ -8,63 +8,72 @@ export const productos = [
     precio: 4500,
     desc: "Elegancia y durabilidad extrema. Impresión sobre roca natural.",
     tamanos: ["20x25", "30x35", "40x50"],
-    diseño: "roca", nuevo: true
+    diseño: "roca", nuevo: true,
+    categoria: "otros"
   },
   {
     id: 2, nombre: "Cuadro Collage Romántico", tipo: "marco",
     precio: 3800,
     desc: "Diseño estilo pizarra con texto personalizado y múltiples fotos.",
     tamanos: ["30x40", "40x60"],
-    diseño: "collage"
+    diseño: "collage",
+    categoria: "collage"
   },
   {
     id: 3, nombre: "Marco Clásico Dorado", tipo: "marco",
     precio: 2900,
     desc: "Marco elegante con terminación dorada. Atemporal y sofisticado.",
     tamanos: ["20x20", "30x30", "40x40", "30x40"],
-    diseño: "dorado"
+    diseño: "dorado",
+    categoria: "otros"
   },
   {
     id: 4, nombre: "Taza Personalizada", tipo: "taza",
     precio: 1600,
     desc: "Taza de cerámica premium con tu foto en alta calidad.",
     tamanos: ["Tamaño único"],
-    diseño: "taza", nuevo: true
+    diseño: "taza", nuevo: true,
+    categoria: "otros"
   },
   {
     id: 5, nombre: "Llavero con Foto", tipo: "llavero",
     precio: 900,
     desc: "El detalle perfecto. Tu foto en un llavero compacto y resistente.",
     tamanos: ["Redondo", "Rectangular"],
-    diseño: "llavero"
+    diseño: "llavero",
+    categoria: "otros"
   },
   {
     id: 6, nombre: "Restauración Profesional", tipo: "restauracion",
     precio: 3200,
     desc: "Devolvemos el color y la vida a tus fotos antiguas o dañadas.",
     tamanos: ["Tamaño original"],
-    diseño: "restauracion", nuevo: true
+    diseño: "restauracion", nuevo: true,
+    categoria: "otros"
   },
   {
     id: 7, nombre: "Cuadro Spotify Minimalista Negro", tipo: "marco",
     precio: 3800,
     desc: "Hermosa plantilla Spotify con tu canción favorita y tu foto, con elegante marco negro.",
     tamanos: ["20x25", "30x40", "40x60"],
-    diseño: "spotify_negro", nuevo: true
+    diseño: "spotify_negro", nuevo: true,
+    categoria: "spotify"
   },
   {
     id: 8, nombre: "Cuadro Nordic Frame Premium", tipo: "marco",
     precio: 4200,
     desc: "Elegante maqueta de sala de estar moderna con marco nórdico vertical negro.",
     tamanos: ["30x40", "40x50", "40x60"],
-    diseño: "nordic_frame", nuevo: true
+    diseño: "nordic_frame", nuevo: true,
+    categoria: "otros"
   },
   {
     id: 9, nombre: "Cuadro Nordic Room Premium", tipo: "marco",
     precio: 4500,
     desc: "Imponente cuadro vertical con marco de madera negra en un estudio de diseño nórdico.",
     tamanos: ["30x40", "40x50", "40x60"],
-    diseño: "nordic_room", nuevo: true
+    diseño: "nordic_room", nuevo: true,
+    categoria: "otros"
   }
 ];
 

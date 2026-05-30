@@ -53,6 +53,7 @@ export default function EditProductModal({ isOpen, onClose, product, onSave }) {
     precio: '',
     descuento: 0,
     tipo: 'marco',
+    categoria: 'otros',
     desc: '',
     tamanos: '',
     imgBase64: null
@@ -71,6 +72,7 @@ export default function EditProductModal({ isOpen, onClose, product, onSave }) {
         precio: product.precio || '',
         descuento: product.descuento || 0,
         tipo: product.tipo || 'marco',
+        categoria: product.categoria || 'otros',
         desc: product.desc || '',
         tamanos: product.tamanos ? product.tamanos.join(', ') : '',
         imgBase64: null
@@ -119,6 +121,7 @@ export default function EditProductModal({ isOpen, onClose, product, onSave }) {
       precio: parseFloat(formState.precio),
       descuento: parseInt(formState.descuento, 10) || 0,
       tipo: formState.tipo,
+      categoria: formState.categoria,
       desc: formState.desc,
       tamanos: formState.tamanos,
       diseño: diseno,
@@ -173,20 +176,41 @@ export default function EditProductModal({ isOpen, onClose, product, onSave }) {
               />
             </div>
           </div>
-          <div className="form-group">
-            <label htmlFor="edit-tipo" className="form-label">Tipo de Producto</label>
-            <select 
-              id="edit-tipo"
-              className="form-input" 
-              value={formState.tipo} 
-              onChange={(e) => updateFormState({ tipo: e.target.value })}
-            >
-              <option value="marco">Marcos</option>
-              <option value="roca">Rocas</option>
-              <option value="taza">Tazas</option>
-              <option value="llavero">Llaveros</option>
-              <option value="restauracion">Restauración</option>
-            </select>
+          <div className="form-row" style={{ display: 'flex', gap: '12px' }}>
+            <div className="form-group" style={{ flex: 1 }}>
+              <label htmlFor="edit-tipo" className="form-label">Tipo de Producto</label>
+              <select 
+                id="edit-tipo"
+                className="form-input" 
+                value={formState.tipo} 
+                onChange={(e) => updateFormState({ tipo: e.target.value })}
+              >
+                <option value="marco">Marcos</option>
+                <option value="roca">Rocas</option>
+                <option value="taza">Tazas</option>
+                <option value="llavero">Llaveros</option>
+                <option value="restauracion">Restauración</option>
+              </select>
+            </div>
+            <div className="form-group" style={{ flex: 1 }}>
+              <label htmlFor="edit-categoria" className="form-label">Categoría / Tema</label>
+              <select 
+                id="edit-categoria"
+                className="form-input" 
+                value={formState.categoria} 
+                onChange={(e) => updateFormState({ categoria: e.target.value })}
+              >
+                <option value="otros">Otros</option>
+                <option value="madre">Día de la Madre</option>
+                <option value="padre">Día del Padre</option>
+                <option value="parejas">Parejas</option>
+                <option value="spotify">Estilo Spotify</option>
+                <option value="bebes">Bebés</option>
+                <option value="netflix">Estilo Netflix</option>
+                <option value="collage">Collage</option>
+                <option value="familia">Familia</option>
+              </select>
+            </div>
           </div>
           <div className="form-group">
             <label htmlFor="edit-tamanos" className="form-label">Tamaños / Formatos (separados por coma)</label>
