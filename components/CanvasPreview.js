@@ -11,28 +11,34 @@ export default function CanvasPreview({ diseño, fotoBase64, width = 900, height
   const usuarioImgRef = useRef(null);
   const [redrawTrigger, setRedrawTrigger] = useState(0);
   
-  // Usar useRef para rastrear el cambio de props (resuelve rerender-state-only-in-handlers y no-adjust-state-on-prop-change)
-  const prevFotoBase64Ref = useRef(null);
-
-  // 1. Cargar imagen de forma asíncrona y segura inline en renderizado
-  if (fotoBase64 !== prevFotoBase64Ref.current) {
-    prevFotoBase64Ref.current = fotoBase64;
+  // Cargar imagen de forma asíncrona y segura cuando cambia fotoBase64
+  useEffect(() => {
     if (!fotoBase64) {
       usuarioImgRef.current = null;
-    } else if (typeof window !== 'undefined') {
+      setTimeout(() => {
+        setRedrawTrigger(prev => prev + 1);
+      }, 0);
+      return;
+    }
+
+    if (typeof window !== 'undefined') {
       const img = new Image();
       img.src = fotoBase64;
       img.onload = () => {
         usuarioImgRef.current = img;
-        setRedrawTrigger(prev => prev + 1); // Asincrónico y seguro
+        setTimeout(() => {
+          setRedrawTrigger(prev => prev + 1);
+        }, 0);
       };
       img.onerror = () => {
         console.error("Error loading user base64 image");
         usuarioImgRef.current = null;
-        setRedrawTrigger(prev => prev + 1);
+        setTimeout(() => {
+          setRedrawTrigger(prev => prev + 1);
+        }, 0);
       };
     }
-  }
+  }, [fotoBase64]);
 
   // 2. Pre-cargar las maquetas en el montaje cliente
   useEffect(() => {

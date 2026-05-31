@@ -22,7 +22,8 @@ Este archivo registra cada hito importante del proyecto. Si necesitas volver a u
 | 2026-05-30 | **Activación del Botón Nueva Categoría** | Corrección de error de referencia al destructurar setUiState en el dashboard de administración. | `36b0bd4` |
 | 2026-05-30 | **Servicio de Regalo Autogestionado** | Pestaña Admin, panel de preguntas configurable, cálculo dinámico de precio y formato en WhatsApp. | `0925396` |
 | 2026-05-30 | **Salvaguarda de Robustez del Checkout** | Protección con optional chaining en campos de envoltura de regalo contra objetos nulos. | `4f7e02a` |
-| 2026-05-30 | **Solución Hydration Checkout** | Carga asíncrona en useEffect de envolturas para prevenir crasheo de renderizado en Vercel. | `7f430f2` |
+| 2026-05-30 | **Solución Hydration Checkout** | Carga asíncrona en useEffect de envolturas para prevenir crasheo de renderizado en Vercel. | `e582802` |
+| 2026-05-30 | **Corrección ESLint Completa** | Resolución de advertencias de refs y setState en efectos para asegurar deploys exitosos. | `4a6fdb3` |
 
 ---
 

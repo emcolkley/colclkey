@@ -73,7 +73,10 @@ export default function AddProductModal({ isOpen, onClose, onSave, categorias = 
       const validCats = categorias.filter(c => c.id !== 'todos');
       const currentCatExists = validCats.some(c => c.id === formState.categoria);
       if (!currentCatExists && validCats.length > 0) {
-        updateFormState({ categoria: validCats[0].id });
+        const defaultCatId = validCats[0].id;
+        setTimeout(() => {
+          updateFormState({ categoria: defaultCatId });
+        }, 0);
       }
     }
   }, [isOpen, categorias, formState.categoria]);

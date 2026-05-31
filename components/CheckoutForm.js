@@ -8,7 +8,10 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
   const [giftConfig, setGiftConfig] = useState(null);
 
   useEffect(() => {
-    setGiftConfig(getGiftWrapConfig());
+    const config = getGiftWrapConfig();
+    setTimeout(() => {
+      setGiftConfig(config);
+    }, 0);
   }, []);
 
   // Estado consolidado para evitar múltiples useState (resuelve prefer-useReducer)
@@ -245,9 +248,9 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
               </label>
             </div>
 
-            {formState.wantGiftWrap && giftConfig?.fields && giftConfig.fields.length > 0 && (
+            {formState.wantGiftWrap && giftConfig?.fields?.length > 0 && (
               <div style={{ marginTop: '20px', borderTop: '1px dashed #333', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {giftConfig.fields.map(field => {
+                {giftConfig?.fields?.map(field => {
                   const val = formState.giftAnswers[field.id] || '';
                   const handleFieldChange = (newVal) => {
                     updateFormState({

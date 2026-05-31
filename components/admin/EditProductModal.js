@@ -43,9 +43,6 @@ const BUTTON_STYLE = { margin: 0, width: 'auto' };
 
 export default function EditProductModal({ isOpen, onClose, product, onSave, categorias = [] }) {
   const dialogRef = useRef(null);
-  
-  // Usar useRef para rastrear el cambio del producto y evitar warnings de estado innecesario
-  const prevProductRef = useRef(null);
 
   // Consolidated form state (resuelve prefer-useReducer)
   const [formState, setFormState] = useState({
@@ -63,22 +60,23 @@ export default function EditProductModal({ isOpen, onClose, product, onSave, cat
     setFormState(prev => ({ ...prev, ...updates }));
   };
 
-  // Ajuste en caliente durante el renderizado (resuelve no-derived-state y no-event-handler)
-  if (product !== prevProductRef.current) {
-    prevProductRef.current = product;
+  // Ajuste durante el montaje o cambio de producto
+  useEffect(() => {
     if (product) {
-      setFormState({
-        nombre: product.nombre || '',
-        precio: product.precio || '',
-        descuento: product.descuento || 0,
-        tipo: product.tipo || 'marco',
-        categoria: product.categoria || 'otros',
-        desc: product.desc || '',
-        tamanos: product.tamanos ? product.tamanos.join(', ') : '',
-        imgBase64: null
-      });
+      setTimeout(() => {
+        setFormState({
+          nombre: product.nombre || '',
+          precio: product.precio || '',
+          descuento: product.descuento || 0,
+          tipo: product.tipo || 'marco',
+          categoria: product.categoria || 'otros',
+          desc: product.desc || '',
+          tamanos: product.tamanos ? product.tamanos.join(', ') : '',
+          imgBase64: null
+        });
+      }, 0);
     }
-  }
+  }, [product]);
 
   useEffect(() => {
     if (isOpen) {
@@ -93,7 +91,10 @@ export default function EditProductModal({ isOpen, onClose, product, onSave, cat
       const validCats = categorias.filter(c => c.id !== 'todos');
       const currentCatExists = validCats.some(c => c.id === formState.categoria);
       if (!currentCatExists && validCats.length > 0) {
-        updateFormState({ categoria: validCats[0].id });
+        const defaultCatId = validCats[0].id;
+        setTimeout(() => {
+          updateFormState({ categoria: defaultCatId });
+        }, 0);
       }
     }
   }, [isOpen, categorias, formState.categoria]);

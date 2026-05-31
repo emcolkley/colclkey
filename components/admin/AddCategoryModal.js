@@ -43,7 +43,6 @@ const BUTTON_STYLE = { margin: 0, width: 'auto' };
 
 export default function AddCategoryModal({ isOpen, onClose, category, onSave }) {
   const dialogRef = useRef(null);
-  const prevCategoryRef = useRef(null);
 
   // Consolidated form state (resuelve prefer-useReducer)
   const [formState, setFormState] = useState({
@@ -55,21 +54,24 @@ export default function AddCategoryModal({ isOpen, onClose, category, onSave }) 
     setFormState(prev => ({ ...prev, ...updates }));
   };
 
-  // Ajuste en caliente durante el renderizado para cargar datos en edición
-  if (category !== prevCategoryRef.current) {
-    prevCategoryRef.current = category;
+  // Ajuste durante el montaje o cambio de categoría
+  useEffect(() => {
     if (category) {
-      setFormState({
-        emoji: category.emoji || '✨',
-        nombre: category.nombre || ''
-      });
+      setTimeout(() => {
+        setFormState({
+          emoji: category.emoji || '✨',
+          nombre: category.nombre || ''
+        });
+      }, 0);
     } else {
-      setFormState({
-        emoji: '✨',
-        nombre: ''
-      });
+      setTimeout(() => {
+        setFormState({
+          emoji: '✨',
+          nombre: ''
+        });
+      }, 0);
     }
-  }
+  }, [category]);
 
   useEffect(() => {
     if (isOpen) {
