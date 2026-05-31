@@ -20,7 +20,8 @@ Este archivo registra cada hito importante del proyecto. Si necesitas volver a u
 | 2026-05-30 | **Cinta de Opciones Autogestionable** | Panel dinámico completo para añadir, editar o borrar botones de la cinta de categorías. | `6308b20` |
 | 2026-05-30 | **Refinamiento de Cinta Autogestionable** | Desbloqueo de categoría 'Otros', limpieza de estado al crear categoría y fallbacks dinámicos. | `1dcb905` |
 | 2026-05-30 | **Activación del Botón Nueva Categoría** | Corrección de error de referencia al destructurar setUiState en el dashboard de administración. | `36b0bd4` |
-| 2026-05-30 | **Servicio de Regalo Autogestionado** | Pestaña Admin, panel de preguntas configurable, cálculo dinámico de precio y formato en WhatsApp. | `a39dbad` |
+| 2026-05-30 | **Servicio de Regalo Autogestionado** | Pestaña Admin, panel de preguntas configurable, cálculo dinámico de precio y formato en WhatsApp. | `0925396` |
+| 2026-05-30 | **Salvaguarda de Robustez del Checkout** | Protección con optional chaining en campos de envoltura de regalo contra objetos nulos. | `4f7e02a` |
 
 ---
 

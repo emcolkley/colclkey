@@ -125,7 +125,12 @@ export function getGiftWrapConfig() {
   }
   try {
     const raw = localStorage.getItem('colkley_gift_wrap_config:v1');
-    return raw ? JSON.parse(raw) : DEFAULT_GIFT_WRAP_CONFIG;
+    if (!raw) return DEFAULT_GIFT_WRAP_CONFIG;
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object' || !parsed.fields || typeof parsed.price !== 'number') {
+      return DEFAULT_GIFT_WRAP_CONFIG;
+    }
+    return parsed;
   } catch (e) {
     console.error("Error reading gift wrap config", e);
     return DEFAULT_GIFT_WRAP_CONFIG;
