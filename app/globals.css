@@ -182,7 +182,7 @@ main { max-width: 1100px; margin: 0 auto; padding: 2.5rem 2rem; }
 }
 
 /* ── PERSONALIZAR ── */
-#seccion-personalizar { display: none; }
+#seccion-personalizar { display: block; }
 .personalizar-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
 @media(max-width: 700px) { .personalizar-layout { grid-template-columns: 1fr; } }
 
@@ -303,7 +303,7 @@ main { max-width: 1100px; margin: 0 auto; padding: 2.5rem 2rem; }
 .carrito-empty { text-align: center; color: var(--muted); padding: 2.5rem 1rem; font-size: 0.85rem; line-height: 2; }
 
 /* ── CHECKOUT ── */
-#seccion-checkout { display: none; }
+#seccion-checkout { display: block; }
 .checkout-card {
   background: var(--dark2); border-radius: 12px;
   border: 1px solid var(--border);

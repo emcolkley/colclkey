@@ -10,6 +10,7 @@ import { getProductos } from '../data/productos';
 
 // Estilos estáticos constantes (resuelve no-inline-exhaustive-style)
 const DIALOG_STYLE = {
+  display: 'flex',
   position: 'fixed', 
   top: 0, 
   left: 0, 
@@ -329,7 +330,7 @@ export default function HomeClient() {
 
         {/* SECCIÓN 3: CHECKOUT */}
         {step === 3 && (
-          <section id="seccion-checkout" aria-label="Confirmación del pedido y checkout">
+          <section id="seccion-checkout" aria-label="Confirmación del pedido y checkout" style={{ display: 'block' }}>
             <button type="button" className="back-btn" onClick={() => { setStep(2); }}>
               ← Seguir comprando
             </button>
