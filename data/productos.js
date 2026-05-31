@@ -163,12 +163,20 @@ export function getProductos() {
     // Unificar reemplazando los estáticos que tengan una versión editada (mismo ID)
     const result = activeStatic.map(staticProd => {
       const edited = customList.find(c => c.id === staticProd.id);
-      return edited ? edited : staticProd;
+      return edited || staticProd;
     });
     
     // Y agregar los personalizados completamente nuevos (que no coinciden con ningún ID estático)
     const staticIds = productos.map(p => p.id);
-    const brandNewCustoms = customList.filter(c => !staticIds.includes(c.id));
+    const brandNewCustoms = customList
+      .filter(c => !staticIds.includes(c.id))
+      .map(p => {
+        // Migración autocorrectiva en renderizado para que los marcos nuevos tengan su nombre como diseño y salgan en el filtro
+        if (p.tipo === 'marco' && p.diseño === 'nordic_frame') {
+          return { ...p, diseño: p.nombre };
+        }
+        return p;
+      });
     
     return [...result, ...brandNewCustoms];
   } catch (e) {

@@ -117,13 +117,22 @@ export default function EditProductModal({ isOpen, onClose, product, onSave, cat
     }
 
     let diseno = product.diseño || 'nordic_frame';
+    
     // Si cambiaron el tipo del producto, recalculamos el diseño adecuado
     if (formState.tipo !== product.tipo) {
       if (formState.tipo === 'roca') diseno = 'roca';
       else if (formState.tipo === 'taza') diseno = 'taza';
       else if (formState.tipo === 'llavero') diseno = 'llavero';
       else if (formState.tipo === 'restauracion') diseno = 'restauracion';
-      else if (formState.tipo === 'marco') diseno = 'nordic_frame';
+      else if (formState.tipo === 'marco') {
+        diseno = (product.id > 9) ? formState.nombre.trim() : 'nordic_frame';
+      }
+    } else if (formState.tipo === 'marco') {
+      // Si sigue siendo marco y es un producto personalizado nuevo (id > 9),
+      // actualizamos su diseño a su nombre para mantenerlo sincronizado en el filtro
+      if (product.id > 9) {
+        diseno = formState.nombre.trim();
+      }
     }
 
     onSave({

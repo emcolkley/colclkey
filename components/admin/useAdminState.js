@@ -119,7 +119,9 @@ export default function useAdminState() {
   const availableMarcos = useMemo(() => {
     const marcos = new Set();
     dataState.productosList.forEach(p => {
-      if (p.diseño) marcos.add(p.diseño.trim());
+      if (p.tipo === 'marco' && p.diseño) {
+        marcos.add(p.diseño.trim());
+      }
     });
     return Array.from(marcos).sort();
   }, [dataState.productosList]);

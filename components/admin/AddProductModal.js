@@ -102,11 +102,12 @@ export default function AddProductModal({ isOpen, onClose, onSave, categorias = 
       return;
     }
 
-    let diseno = 'nordic_frame';
+    let diseno = formState.nombre.trim();
     if (formState.tipo === 'roca') diseno = 'roca';
     else if (formState.tipo === 'taza') diseno = 'taza';
     else if (formState.tipo === 'llavero') diseno = 'llavero';
     else if (formState.tipo === 'restauracion') diseno = 'restauracion';
+    else if (formState.tipo === 'marco') diseno = formState.nombre.trim();
 
     onSave({
       nombre: formState.nombre,
