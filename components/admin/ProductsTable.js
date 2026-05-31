@@ -41,13 +41,22 @@ export default function ProductsTable({ products, deactivatedIds, onToggleStatus
               return (
                 <tr key={p.id} style={{ borderBottom: '1px solid #1A1A1A' }}>
                   <td style={{ padding: '12px 20px' }}>
-                    <CanvasPreview 
-                      diseño={p.diseño} 
-                      fotoBase64={p.imagenBase64 || null} 
-                      width={120} 
-                      height={114} 
-                      style={CANVAS_STYLE}
-                    />
+                    {p.imagenBase64 ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img 
+                        src={p.imagenBase64} 
+                        alt={p.nombre} 
+                        style={{ ...CANVAS_STYLE, objectFit: 'cover' }}
+                      />
+                    ) : (
+                      <CanvasPreview 
+                        diseño={p.diseño} 
+                        fotoBase64={null} 
+                        width={120} 
+                        height={114} 
+                        style={CANVAS_STYLE}
+                      />
+                    )}
                   </td>
                   <td style={{ padding: '12px 20px', fontWeight: 500 }}>
                     {p.nombre}

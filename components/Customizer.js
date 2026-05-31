@@ -222,14 +222,30 @@ export default function Customizer({
 
         {/* CANVAS PREVIEW CONTAINER */}
         <div className="preview-container">
-          <div className="preview-title">Vista previa en tiempo real</div>
-          <CanvasPreview 
-            diseño={producto.diseño} 
-            fotoBase64={uploadState.fotoBase64} 
-            width={900} 
-            height={900}
-            className="frame-preview"
-          />
+          <div className="preview-title">Vista previa</div>
+          {uploadState.fotoBase64 ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img 
+              src={uploadState.fotoBase64} 
+              alt="Vista previa de tu foto" 
+              style={{ width: '100%', height: 'auto', maxHeight: '400px', borderRadius: '8px', boxShadow: '0 20px 40px rgba(0,0,0,0.5)', display: 'block', margin: '0 auto', objectFit: 'contain' }}
+            />
+          ) : producto.imagenBase64 ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img 
+              src={producto.imagenBase64} 
+              alt={producto.nombre} 
+              style={{ width: '100%', height: 'auto', maxHeight: '400px', borderRadius: '8px', boxShadow: '0 20px 40px rgba(0,0,0,0.5)', display: 'block', margin: '0 auto', objectFit: 'contain' }}
+            />
+          ) : (
+            <CanvasPreview 
+              diseño={producto.diseño} 
+              fotoBase64={null} 
+              width={900} 
+              height={900}
+              className="frame-preview"
+            />
+          )}
           <div id="preview-hint" className="preview-hint" style={{ color: uploadState.uploadHint.includes('✅') ? '#4A9B6F' : '' }}>
             {uploadState.uploadHint}
           </div>

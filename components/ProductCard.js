@@ -57,13 +57,22 @@ export default function ProductCard({ producto, onSelect }) {
       style={CARD_STYLE}
     >
       <div className="producto-preview-thumb">
-        <CanvasPreview 
-          diseño={producto.diseño} 
-          fotoBase64={producto.imagenBase64 || null} 
-          width={400} 
-          height={380} 
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-        />
+        {producto.imagenBase64 ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img 
+            src={producto.imagenBase64} 
+            alt={producto.nombre} 
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          />
+        ) : (
+          <CanvasPreview 
+            diseño={producto.diseño} 
+            fotoBase64={null} 
+            width={400} 
+            height={380} 
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        )}
       </div>
       <div className="producto-info">
         <div className="producto-nombre">
