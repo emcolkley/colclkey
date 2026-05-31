@@ -137,16 +137,31 @@ export function getGiftWrapConfig() {
   }
 }
 
+export function getDeletedStaticIds() {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem('colkley_deleted_static_ids:v1');
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    console.error("Error reading deleted static ids", e);
+    return [];
+  }
+}
+
 export function getProductos() {
   if (typeof window === 'undefined') {
     return productos;
   }
   try {
+    const deletedStaticIds = getDeletedStaticIds();
     const custom = localStorage.getItem('colkley_custom_productos:v1');
     const customList = custom ? JSON.parse(custom) : [];
     
+    // Filtrar los estáticos eliminados
+    const activeStatic = productos.filter(p => !deletedStaticIds.includes(p.id));
+
     // Unificar reemplazando los estáticos que tengan una versión editada (mismo ID)
-    const result = productos.map(staticProd => {
+    const result = activeStatic.map(staticProd => {
       const edited = customList.find(c => c.id === staticProd.id);
       return edited ? edited : staticProd;
     });

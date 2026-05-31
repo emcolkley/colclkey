@@ -100,17 +100,15 @@ export default function ProductsTable({ products, deactivatedIds, onToggleStatus
                       >
                         ✏️
                       </button>
-                      {p.isCustom && (
-                        <button 
-                          type="button"
-                          className="delete-btn" 
-                          onClick={() => onDelete(p.id)}
-                          style={DELETE_BUTTON_STYLE}
-                          title="Eliminar Producto"
-                        >
-                          🗑️
-                        </button>
-                      )}
+                      <button 
+                        type="button"
+                        className="delete-btn" 
+                        onClick={() => onDelete(p.id)}
+                        style={DELETE_BUTTON_STYLE}
+                        title="Eliminar Producto"
+                      >
+                        🗑️
+                      </button>
                     </div>
                   </td>
                 </tr>

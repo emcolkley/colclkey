@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { getProductos, getCategoriasList, getGiftWrapConfig } from '../../data/productos';
+import { getProductos, getCategoriasList, getGiftWrapConfig, getDeletedStaticIds } from '../../data/productos';
 
 // Helper en módulo para encapsular lectura de desactivados
 export const getDeactivatedList = () => {
@@ -156,14 +156,25 @@ export default function useAdminState() {
     localStorage.setItem('colkley_cupones:v1', JSON.stringify(updated));
   };
 
-  // Eliminar producto personalizado
+  // Eliminar producto personalizado o estático
   const handleEliminarProducto = (id) => {
     if (!confirm("⚠️ ¿Estás seguro de que querés eliminar este producto? Esta acción no se puede deshacer.")) return;
     
     try {
+      // 1. Si es personalizado o editado
       let customList = getCustomProductos();
       customList = customList.filter(p => p.id !== id);
       localStorage.setItem('colkley_custom_productos:v1', JSON.stringify(customList));
+
+      // 2. Si es estático (IDs 1 a 9)
+      const staticIds = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+      if (staticIds.includes(id)) {
+        const deletedStatic = getDeletedStaticIds();
+        if (!deletedStatic.includes(id)) {
+          const updatedDeleted = [...deletedStatic, id];
+          localStorage.setItem('colkley_deleted_static_ids:v1', JSON.stringify(updatedDeleted));
+        }
+      }
 
       const updatedDeactivated = dataState.deactivatedIds.filter(x => x !== id);
       localStorage.setItem('colkley_deactivated_ids:v1', JSON.stringify(updatedDeactivated));
