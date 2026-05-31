@@ -131,7 +131,7 @@ function ProgressSteps({ step }) {
       </div>
       <span className="step-arrow" aria-hidden="true">→</span>
       <div className={`step ${step === 2 ? 'active' : ''} ${step > 2 ? 'done' : ''}`} id="step-2">
-        <span className="step-num" id="sn2">2</span> Subí tu foto
+        <span className="step-num" id="sn2">2</span> Detalle y Medidas
       </div>
       <span className="step-arrow" aria-hidden="true">→</span>
       <div className={`step ${step === 3 ? 'active' : ''} ${step > 3 ? 'done' : ''}`} id="step-3">
