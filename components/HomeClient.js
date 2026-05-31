@@ -365,7 +365,7 @@ export default function HomeClient() {
             <div className="modal-icon" aria-hidden="true" style={{ fontSize: '2.5rem', marginBottom: '16px' }}>✨</div>
             <h3 className="modal-titulo" id="modal-confirmacion-titulo" style={{ fontFamily: 'Cinzel, serif', color: '#E8C96A', fontSize: '1.4rem', marginTop: 0 }}>¡Pedido recibido!</h3>
             <p className="modal-texto" id="modal-texto" style={{ color: '#DDD', fontSize: '0.9rem', lineHeight: '1.5', marginBottom: '24px' }}>
-              Tu pedido fue registrado correctamente. Recibirás confirmación por email y nos comunicaremos contigo para coordinar la entrega. ¡Gracias por elegir Colkley!
+              Tu pedido fue registrado correctamente. Nos comunicaremos contigo para coordinar la entrega. ¡Gracias por elegir Colkley!
             </p>
             <button 
               type="button"

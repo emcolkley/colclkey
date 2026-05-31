@@ -112,14 +112,13 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
 
   const handleConfirmarPedido = (e) => {
     e.preventDefault();
-    if (!formState.nombre || !formState.email) {
-      alert('Por favor completá nombre y email');
+    if (!formState.nombre) {
+      alert('Por favor completá tu nombre');
       return;
     }
 
     let txt = `👑 *NUEVO PEDIDO — COLKLEY*\n\n`;
     txt += `👤 *Cliente:* ${formState.nombre} ${formState.apellido}\n`;
-    txt += `📧 *Email:* ${formState.email}\n`;
     if (formState.telefono) txt += `📱 *Teléfono:* ${formState.telefono}\n`;
     txt += `\n📦 *Productos:*\n`;
     if (Array.isArray(cart)) {
@@ -159,7 +158,6 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
       waLink,
       nombre: formState.nombre,
       apellido: formState.apellido,
-      email: formState.email,
       telefono: formState.telefono,
       total
     });
@@ -197,18 +195,7 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
             />
           </div>
         </div>
-        <div className="form-group">
-          <label htmlFor="input-email" className="form-label">Email *</label>
-          <input 
-            className="form-input" 
-            type="email" 
-            id="input-email" 
-            placeholder="hola@mail.com" 
-            value={formState.email}
-            onChange={(e) => updateFormState({ email: e.target.value })}
-            required 
-          />
-        </div>
+
         <div className="form-group">
           <label htmlFor="input-telefono" className="form-label">Teléfono / WhatsApp</label>
           <input 
