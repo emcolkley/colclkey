@@ -24,7 +24,7 @@ Este archivo registra cada hito importante del proyecto. Si necesitas volver a u
 | 2026-05-30 | **Salvaguarda de Robustez del Checkout** | Protección con optional chaining en campos de envoltura de regalo contra objetos nulos. | `4f7e02a` |
 | 2026-05-30 | **Solución Hydration Checkout** | Carga asíncrona en useEffect de envolturas para prevenir crasheo de renderizado en Vercel. | `e582802` |
 | 2026-05-30 | **Corrección ESLint Completa** | Resolución de advertencias de refs y setState en efectos para asegurar deploys exitosos. | `d185ccf` |
-| 2026-05-30 | **Blindaje Defensivo del Checkout** | Implementación de Array.isArray y mapeo seguro de carrito para prevenir crasheo por datos corruptos. | `d98a49e` |
+| 2026-05-30 | **Blindaje Defensivo del Checkout** | Implementación de Array.isArray y mapeo seguro de carrito para prevenir crasheo por datos corruptos. | `75fe0d4` |
 
 ---
 

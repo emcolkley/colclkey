@@ -63,8 +63,9 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
 
     let cupones = [];
     try {
-      const list = localStorage.getItem('colkley_cupones');
-      cupones = list ? JSON.parse(list) : [
+      const list = localStorage.getItem('colkley_cupones:v1');
+      const parsed = list ? JSON.parse(list) : null;
+      cupones = Array.isArray(parsed) ? parsed : [
         { codigo: "BIENVENIDA", tipo: "porcentaje", valor: 10, minCompra: 0, activo: true }
       ];
     } catch (e) {
@@ -72,7 +73,7 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
       cupones = [{ codigo: "BIENVENIDA", tipo: "porcentaje", valor: 10, minCompra: 0, activo: true }];
     }
 
-    const coupon = cupones.find(c => c.codigo === code);
+    const coupon = Array.isArray(cupones) ? cupones.find(c => c && c.codigo === code) : null;
 
     if (!coupon) {
       updateFormState({
@@ -282,7 +283,7 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
                           onChange={(e) => handleFieldChange(e.target.value)}
                         >
                           <option value="">-- Seleccionar --</option>
-                          {field.options.map(opt => (
+                          {Array.isArray(field.options) && field.options.map(opt => (
                             <option key={opt} value={opt}>{opt}</option>
                           ))}
                         </select>

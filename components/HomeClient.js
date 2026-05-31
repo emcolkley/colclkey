@@ -180,9 +180,11 @@ export default function HomeClient() {
     if (typeof window !== 'undefined') {
       try {
         const storedCart = localStorage.getItem('colkley_carrito:v1');
-        return { items: storedCart ? JSON.parse(storedCart) : [], isOpen: false };
+        const parsed = storedCart ? JSON.parse(storedCart) : [];
+        return { items: Array.isArray(parsed) ? parsed : [], isOpen: false };
       } catch (e) {
         console.error("Error reading cart in lazy init", e);
+        return { items: [], isOpen: false };
       }
     }
     return { items: [], isOpen: false };
@@ -284,7 +286,9 @@ export default function HomeClient() {
     }, 100);
   };
 
-  const totalCartCount = cartState.items.reduce((acc, item) => acc + item.cantidad, 0);
+  const totalCartCount = (cartState && Array.isArray(cartState.items))
+    ? cartState.items.reduce((acc, item) => acc + (item?.cantidad || 1), 0)
+    : 0;
 
   return (
     <>
