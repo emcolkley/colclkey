@@ -1,8 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
+import { getGiftWrapConfig } from '../data/productos';
 
 export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumber = "5491100000000" }) {
+  // Cargar configuración de regalo de forma autónoma
+  const [giftConfig] = useState(() => getGiftWrapConfig());
+
   // Estado consolidado para evitar múltiples useState (resuelve prefer-useReducer)
   const [formState, setFormState] = useState({
     nombre: '',
@@ -13,7 +17,9 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
     couponCode: '',
     couponMessage: '',
     couponMessageColor: '',
-    activeCoupon: null
+    activeCoupon: null,
+    wantGiftWrap: false,
+    giftAnswers: {}
   });
 
   const updateFormState = (updates) => {
@@ -22,6 +28,9 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
 
   // Calcular valores en línea (resuelve react-doctor/no-derived-state)
   const subtotal = cart.reduce((acc, item) => acc + item.precio, 0);
+  
+  // Agregar costo de regalo si corresponde
+  const giftWrapPrice = (formState.wantGiftWrap && giftConfig?.enabled) ? giftConfig.price : 0;
   
   let discountAmount = 0;
   if (formState.activeCoupon) {
@@ -32,7 +41,7 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
     }
   }
   
-  const total = Math.max(0, subtotal - discountAmount);
+  const total = Math.max(0, subtotal - discountAmount + giftWrapPrice);
 
   const aplicarCupon = () => {
     const code = formState.couponCode.trim().toUpperCase();
@@ -111,6 +120,16 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
       txt += `   Precio: $${item.precio.toLocaleString()}\n`;
       txt += `   📷 Foto alta calidad: ${item.fotoURL || 'adjunta por email'}\n`;
     });
+
+    if (formState.wantGiftWrap && giftConfig?.enabled) {
+      txt += `\n🎁 *SERVICIO DE REGALO: SÍ (+$${giftConfig.price.toLocaleString()})*\n`;
+      giftConfig.fields.forEach(field => {
+        const answer = formState.giftAnswers[field.id];
+        if (answer) {
+          txt += `   - ${field.label}: ${answer}\n`;
+        }
+      });
+    }
 
     if (formState.activeCoupon && discountAmount > 0) {
       txt += `\n🏷️ *Cupón aplicado:* ${formState.activeCoupon.codigo} (-$${discountAmount.toLocaleString()})`;
@@ -199,6 +218,90 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
           />
         </div>
 
+        {/* SECCIÓN DE SERVICIO DE REGALO */}
+        {giftConfig?.enabled && (
+          <div className="gift-wrap-section" style={{
+            background: '#151515',
+            border: formState.wantGiftWrap ? '1px solid #C9A84C' : '1px solid #222',
+            borderRadius: '8px',
+            padding: '20px',
+            marginBottom: '24px',
+            transition: 'all 0.3s ease'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <input 
+                id="checkbox-want-gift-wrap"
+                type="checkbox"
+                checked={formState.wantGiftWrap}
+                onChange={(e) => updateFormState({ wantGiftWrap: e.target.checked })}
+                style={{ width: '20px', height: '20px', cursor: 'pointer', accentColor: '#C9A84C' }}
+              />
+              <label htmlFor="checkbox-want-gift-wrap" style={{ fontWeight: 600, fontSize: '1.05rem', color: '#FFF', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                🎁 ¿Es para un regalo? <span style={{ color: '#E8C96A', fontSize: '0.95rem' }}>(+ ${giftConfig.price.toLocaleString()})</span>
+              </label>
+            </div>
+
+            {formState.wantGiftWrap && giftConfig.fields && giftConfig.fields.length > 0 && (
+              <div style={{ marginTop: '20px', borderTop: '1px dashed #333', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {giftConfig.fields.map(field => {
+                  const val = formState.giftAnswers[field.id] || '';
+                  const handleFieldChange = (newVal) => {
+                    updateFormState({
+                      giftAnswers: {
+                        ...formState.giftAnswers,
+                        [field.id]: newVal
+                      }
+                    });
+                  };
+
+                  return (
+                    <div className="form-group" key={field.id} style={{ margin: 0 }}>
+                      <label htmlFor={`gift-input-${field.id}`} className="form-label">
+                        {field.label} {field.required && <span style={{ color: '#E74C3C' }}>*</span>}
+                      </label>
+
+                      {field.type === 'select' ? (
+                        <select
+                          id={`gift-input-${field.id}`}
+                          className="form-input"
+                          required={field.required}
+                          value={val}
+                          onChange={(e) => handleFieldChange(e.target.value)}
+                        >
+                          <option value="">-- Seleccionar --</option>
+                          {field.options.map(opt => (
+                            <option key={opt} value={opt}>{opt}</option>
+                          ))}
+                        </select>
+                      ) : field.type === 'textarea' ? (
+                        <textarea
+                          id={`gift-input-${field.id}`}
+                          className="form-input"
+                          rows="2"
+                          required={field.required}
+                          placeholder={field.placeholder || ''}
+                          value={val}
+                          onChange={(e) => handleFieldChange(e.target.value)}
+                        />
+                      ) : (
+                        <input
+                          id={`gift-input-${field.id}`}
+                          type="text"
+                          className="form-input"
+                          required={field.required}
+                          placeholder={field.placeholder || ''}
+                          value={val}
+                          onChange={(e) => handleFieldChange(e.target.value)}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* SECCIÓN DE CUPÓN DE DESCUENTO */}
         <div className="coupon-section" style={{ marginBottom: '24px' }}>
           <label htmlFor="input-coupon" className="form-label">¿Tenés un código de descuento?</label>
@@ -245,6 +348,12 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
               <div className="resumen-linea" style={{ color: '#4A9B6F', fontWeight: 500, fontSize: '0.8rem', marginTop: '8px', borderTop: '1px dashed rgba(201,168,76,0.2)', paddingTop: '8px' }}>
                 <span>Descuento (Cupón: {formState.activeCoupon.codigo})</span>
                 <span>-${discountAmount.toLocaleString()}</span>
+              </div>
+            )}
+            {formState.wantGiftWrap && giftConfig?.enabled && (
+              <div className="resumen-linea" style={{ color: '#E8C96A', fontWeight: 500, fontSize: '0.85rem', marginTop: '8px', borderTop: '1px dashed rgba(201,168,76,0.2)', paddingTop: '8px' }}>
+                <span>🎁 Servicio de Envoltura de Regalo</span>
+                <span>+${giftConfig.price.toLocaleString()}</span>
               </div>
             )}
           </div>

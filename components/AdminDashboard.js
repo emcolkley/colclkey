@@ -15,6 +15,7 @@ import AddProductModal from './admin/AddProductModal';
 import EditProductModal from './admin/EditProductModal';
 import AddCouponModal from './admin/AddCouponModal';
 import AddCategoryModal from './admin/AddCategoryModal';
+import GiftWrapPanel from './admin/GiftWrapPanel';
 
 // Mover constantes fijas al ámbito de módulo
 const NAME_MAPPING = {
@@ -221,6 +222,14 @@ function TabSelector({ activeTab, onSelectTab }) {
       >
         🎗️ Cinta de Opciones
       </button>
+      <button 
+        type="button"
+        className={`admin-tab-btn ${activeTab === 'regalos' ? 'active' : ''}`}
+        onClick={() => onSelectTab('regalos')}
+        style={activeTab === 'regalos' ? TAB_BUTTON_STYLE_ACTIVE : TAB_BUTTON_STYLE_INACTIVE}
+      >
+        🎁 Servicio de Regalo
+      </button>
     </div>
   );
 }
@@ -266,6 +275,7 @@ export default function AdminDashboard() {
     handleGuardarCategoria,
     handleEliminarCategoria,
     handleAbrirModalCategoryEdit,
+    handleGuardarGiftWrapConfig,
     filteredProducts
   } = useAdminState();
 
@@ -331,6 +341,16 @@ export default function AdminDashboard() {
             categories={dataState.categorias}
             onEdit={handleAbrirModalCategoryEdit}
             onDelete={handleEliminarCategoria}
+          />
+        </div>
+      )}
+
+      {/* CONTENIDO DE TAB REGALOS */}
+      {uiState.activeTab === 'regalos' && (
+        <div id="content-tab-regalos">
+          <GiftWrapPanel 
+            config={dataState.giftWrapConfig}
+            onSave={handleGuardarGiftWrapConfig}
           />
         </div>
       )}

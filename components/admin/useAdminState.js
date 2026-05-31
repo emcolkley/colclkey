@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { getProductos, getCategoriasList } from '../../data/productos';
+import { getProductos, getCategoriasList, getGiftWrapConfig } from '../../data/productos';
 
 // Helper en módulo para encapsular lectura de desactivados
 export const getDeactivatedList = () => {
@@ -79,7 +79,8 @@ export default function useAdminState() {
       deactivatedIds: deactivatedList,
       visitas: { hoy, mes },
       cupones: cuponesList,
-      categorias: getCategoriasList()
+      categorias: getCategoriasList(),
+      giftWrapConfig: getGiftWrapConfig()
     };
   });
 
@@ -320,6 +321,12 @@ export default function useAdminState() {
     setUiState(prev => ({ ...prev, selectedCategory: cat, modalCategory: true }));
   };
 
+  // Guardar configuración del servicio de regalo
+  const handleGuardarGiftWrapConfig = (newConfig) => {
+    setDataState(prev => ({ ...prev, giftWrapConfig: newConfig }));
+    localStorage.setItem('colkley_gift_wrap_config:v1', JSON.stringify(newConfig));
+  };
+
   // Filtrado de productos en frontend
   const filteredProducts = useMemo(() => {
     return dataState.productosList.filter(p => {
@@ -352,6 +359,7 @@ export default function useAdminState() {
     handleGuardarCategoria,
     handleEliminarCategoria,
     handleAbrirModalCategoryEdit,
+    handleGuardarGiftWrapConfig,
     filteredProducts
   };
 }

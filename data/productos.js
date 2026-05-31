@@ -110,6 +110,28 @@ export function getCategoriasList() {
   }
 }
 
+export const DEFAULT_GIFT_WRAP_CONFIG = {
+  enabled: true,
+  price: 2500,
+  fields: [
+    { id: 'field_paper', label: 'Estilo de envoltura', type: 'select', options: ['Papel Dorado Elegante', 'Papel Kraft Rústico', 'Papel Infantil Navideño'], required: true },
+    { id: 'field_message', label: 'Mensaje para la dedicatoria', type: 'textarea', placeholder: 'Escribe tu mensaje con amor...', required: false }
+  ]
+};
+
+export function getGiftWrapConfig() {
+  if (typeof window === 'undefined') {
+    return DEFAULT_GIFT_WRAP_CONFIG;
+  }
+  try {
+    const raw = localStorage.getItem('colkley_gift_wrap_config:v1');
+    return raw ? JSON.parse(raw) : DEFAULT_GIFT_WRAP_CONFIG;
+  } catch (e) {
+    console.error("Error reading gift wrap config", e);
+    return DEFAULT_GIFT_WRAP_CONFIG;
+  }
+}
+
 export function getProductos() {
   if (typeof window === 'undefined') {
     return productos;
