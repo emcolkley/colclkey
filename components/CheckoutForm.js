@@ -34,7 +34,7 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
   };
 
   // Calcular valores en línea (resuelve react-doctor/no-derived-state)
-  const subtotal = cart.reduce((acc, item) => acc + item.precio, 0);
+  const subtotal = Array.isArray(cart) ? cart.reduce((acc, item) => acc + (item?.precio || 0), 0) : 0;
   
   // Agregar costo de regalo si corresponde
   const giftWrapPrice = (formState.wantGiftWrap && giftConfig?.enabled) ? (giftConfig?.price || 0) : 0;
@@ -121,12 +121,18 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
     txt += `📧 *Email:* ${formState.email}\n`;
     if (formState.telefono) txt += `📱 *Teléfono:* ${formState.telefono}\n`;
     txt += `\n📦 *Productos:*\n`;
-    cart.forEach((item, i) => {
-      txt += `\n${i + 1}. ${item.producto.nombre}\n`;
-      txt += `   Tamaño: ${item.tamano} | Cantidad: ${item.cantidad}\n`;
-      txt += `   Precio: $${item.precio.toLocaleString()}\n`;
-      txt += `   📷 Foto alta calidad: ${item.fotoURL || 'adjunta por email'}\n`;
-    });
+    if (Array.isArray(cart)) {
+      cart.forEach((item, i) => {
+        const prodNombre = item?.producto?.nombre || 'Producto';
+        const tam = item?.tamano || 'Estándar';
+        const cant = item?.cantidad || 1;
+        const prec = (item?.precio || 0).toLocaleString();
+        txt += `\n${i + 1}. ${prodNombre}\n`;
+        txt += `   Tamaño: ${tam} | Cantidad: ${cant}\n`;
+        txt += `   Precio: $${prec}\n`;
+        txt += `   📷 Foto alta calidad: ${item?.fotoURL || 'adjunta por email'}\n`;
+      });
+    }
 
     if (formState.wantGiftWrap && giftConfig?.enabled) {
       txt += `\n🎁 *SERVICIO DE REGALO: SÍ (+$${(giftConfig?.price || 0).toLocaleString()})*\n`;
@@ -248,9 +254,9 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
               </label>
             </div>
 
-            {formState.wantGiftWrap && giftConfig?.fields?.length > 0 && (
+            {formState.wantGiftWrap && Array.isArray(giftConfig?.fields) && giftConfig.fields.length > 0 && (
               <div style={{ marginTop: '20px', borderTop: '1px dashed #333', paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {giftConfig?.fields?.map(field => {
+                {giftConfig.fields.map(field => {
                   const val = formState.giftAnswers[field.id] || '';
                   const handleFieldChange = (newVal) => {
                     updateFormState({
@@ -345,12 +351,18 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
         <div className="resumen-pedido" aria-label="Resumen de tu compra">
           <div className="resumen-titulo">Resumen del pedido</div>
           <div id="resumen-items">
-            {cart.map((item, idx) => (
-              <div className="resumen-linea" key={item.id || idx}>
-                <span>{item.producto.nombre} ({item.tamano}) ×{item.cantidad}</span>
-                <span>${item.precio.toLocaleString()}</span>
-              </div>
-            ))}
+            {Array.isArray(cart) && cart.map((item, idx) => {
+              const prodNombre = item?.producto?.nombre || 'Producto';
+              const tam = item?.tamano || 'Estándar';
+              const cant = item?.cantidad || 1;
+              const prec = (item?.precio || 0).toLocaleString();
+              return (
+                <div className="resumen-linea" key={item?.id || idx}>
+                  <span>{prodNombre} ({tam}) ×{cant}</span>
+                  <span>${prec}</span>
+                </div>
+              );
+            })}
             {formState.activeCoupon && discountAmount > 0 && (
               <div className="resumen-linea" style={{ color: '#4A9B6F', fontWeight: 500, fontSize: '0.8rem', marginTop: '8px', borderTop: '1px dashed rgba(201,168,76,0.2)', paddingTop: '8px' }}>
                 <span>Descuento (Cupón: {formState.activeCoupon.codigo})</span>
