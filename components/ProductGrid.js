@@ -81,6 +81,9 @@ export default function ProductGrid({ onSelectProduct }) {
     return p.categoria === categoriaSeleccionada;
   });
 
+  const selectedCatObj = categorias.find(c => c.id === categoriaSeleccionada);
+  const selectedCatName = selectedCatObj ? selectedCatObj.nombre : '';
+
   return (
     <div>
       <style>{`
@@ -126,6 +129,45 @@ export default function ProductGrid({ onSelectProduct }) {
           </div>
         )}
       </div>
+
+      {/* Botón WhatsApp de consulta de catálogo específico */}
+      {categoriaSeleccionada !== 'todos' && selectedCatName && (
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '40px', marginBottom: '20px' }}>
+          <a
+            href={`https://wa.me/5491100000000?text=${encodeURIComponent(`Hola! Me gustaría consultar el catálogo de: ${selectedCatName}`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '10px',
+              background: '#25D366',
+              color: '#FFF',
+              padding: '14px 28px',
+              borderRadius: '50px',
+              fontWeight: 600,
+              fontSize: '1rem',
+              textDecoration: 'none',
+              boxShadow: '0 8px 24px rgba(37, 211, 102, 0.25)',
+              transition: 'all 0.2s ease',
+              cursor: 'pointer'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 12px 28px rgba(37, 211, 102, 0.4)';
+              e.currentTarget.style.backgroundColor = '#20ba56';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 8px 24px rgba(37, 211, 102, 0.25)';
+              e.currentTarget.style.backgroundColor = '#25D366';
+            }}
+          >
+            <span style={{ fontSize: '1.25rem' }}>💬</span>
+            Consultar catálogo: {selectedCatName}
+          </a>
+        </div>
+      )}
     </div>
   );
 }
