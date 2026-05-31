@@ -17,8 +17,6 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
   // Estado consolidado para evitar múltiples useState (resuelve prefer-useReducer)
   const [formState, setFormState] = useState({
     nombre: '',
-    apellido: '',
-    email: '',
     telefono: '',
     mensaje: '',
     couponCode: '',
@@ -113,12 +111,12 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
   const handleConfirmarPedido = (e) => {
     e.preventDefault();
     if (!formState.nombre) {
-      alert('Por favor completá tu nombre');
+      alert('Por favor completá tu nombre y apellido');
       return;
     }
 
     let txt = `👑 *NUEVO PEDIDO — COLKLEY*\n\n`;
-    txt += `👤 *Cliente:* ${formState.nombre} ${formState.apellido}\n`;
+    txt += `👤 *Cliente:* ${formState.nombre}\n`;
     if (formState.telefono) txt += `📱 *Teléfono:* ${formState.telefono}\n`;
     txt += `\n📦 *Productos:*\n`;
     if (Array.isArray(cart)) {
@@ -157,7 +155,6 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
     onOrderPlaced({
       waLink,
       nombre: formState.nombre,
-      apellido: formState.apellido,
       telefono: formState.telefono,
       total
     });
@@ -169,31 +166,17 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
       <p className="checkout-sub">Completá tus datos y te contactamos para coordinar la entrega</p>
 
       <form onSubmit={handleConfirmarPedido}>
-        <div className="form-row">
-          <div className="form-group">
-            <label htmlFor="input-nombre" className="form-label">Nombre *</label>
-            <input 
-              className="form-input" 
-              type="text" 
-              id="input-nombre" 
-              placeholder="Tu nombre" 
-              value={formState.nombre}
-              onChange={(e) => updateFormState({ nombre: e.target.value })}
-              required 
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="input-apellido" className="form-label">Apellido *</label>
-            <input 
-              className="form-input" 
-              type="text" 
-              id="input-apellido" 
-              placeholder="Tu apellido" 
-              value={formState.apellido}
-              onChange={(e) => updateFormState({ apellido: e.target.value })}
-              required
-            />
-          </div>
+        <div className="form-group">
+          <label htmlFor="input-nombre" className="form-label">Nombre y Apellido *</label>
+          <input 
+            className="form-input" 
+            type="text" 
+            id="input-nombre" 
+            placeholder="Tu nombre y apellido" 
+            value={formState.nombre}
+            onChange={(e) => updateFormState({ nombre: e.target.value })}
+            required 
+          />
         </div>
 
         <div className="form-group">
