@@ -95,7 +95,7 @@ export default function ProductGrid({ onSelectProduct }) {
         style={BAR_CONTAINER_STYLE}
         aria-label="Filtrar productos por categoría"
       >
-        {categorias.map(cat => {
+        {categorias.filter(cat => cat.activo !== false).map(cat => {
           const isActive = cat.id === categoriaSeleccionada;
           return (
             <button

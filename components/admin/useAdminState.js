@@ -306,14 +306,30 @@ export default function useAdminState() {
     const existing = dataState.categorias.find(c => c.id === catData.id);
     let updated;
     if (existing) {
-      updated = dataState.categorias.map(c => c.id === catData.id ? catData : c);
+      updated = dataState.categorias.map(c => c.id === catData.id ? { ...catData, activo: c.activo !== false } : c);
     } else {
-      updated = [...dataState.categorias, catData];
+      updated = [...dataState.categorias, { ...catData, activo: true }];
     }
 
     setDataState(prev => ({ ...prev, categorias: updated }));
     localStorage.setItem('colkley_categorias:v1', JSON.stringify(updated));
     setUiState(prev => ({ ...prev, selectedCategory: null, modalCategory: false }));
+  };
+
+  // Alternar el estado activo/inactivo de una categoría
+  const handleToggleCategoryStatus = (id) => {
+    if (id === 'todos') {
+      alert("⚠️ La categoría 'Todos' es del sistema y no se puede desactivar.");
+      return;
+    }
+    const updated = dataState.categorias.map(c => {
+      if (c.id === id) {
+        return { ...c, activo: c.activo === false ? true : false };
+      }
+      return c;
+    });
+    setDataState(prev => ({ ...prev, categorias: updated }));
+    localStorage.setItem('colkley_categorias:v1', JSON.stringify(updated));
   };
 
   // Eliminar Categoría
@@ -370,6 +386,7 @@ export default function useAdminState() {
     handleGuardarEdicionProducto,
     handleGuardarNuevoCupon,
     handleGuardarCategoria,
+    handleToggleCategoryStatus,
     handleEliminarCategoria,
     handleAbrirModalCategoryEdit,
     handleGuardarGiftWrapConfig,

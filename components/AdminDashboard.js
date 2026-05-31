@@ -273,6 +273,7 @@ export default function AdminDashboard() {
     handleGuardarEdicionProducto,
     handleGuardarNuevoCupon,
     handleGuardarCategoria,
+    handleToggleCategoryStatus,
     handleEliminarCategoria,
     handleAbrirModalCategoryEdit,
     handleGuardarGiftWrapConfig,
@@ -339,6 +340,7 @@ export default function AdminDashboard() {
         <div id="content-tab-categorias">
           <CategoriesTable 
             categories={dataState.categorias}
+            onToggleStatus={handleToggleCategoryStatus}
             onEdit={handleAbrirModalCategoryEdit}
             onDelete={handleEliminarCategoria}
           />

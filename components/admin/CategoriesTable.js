@@ -7,7 +7,7 @@ const EDIT_BUTTON_STYLE = { background: 'transparent', border: 'none', color: '#
 const DELETE_BUTTON_STYLE = { background: 'transparent', border: 'none', color: '#C9A84C', fontSize: '1.1rem', cursor: 'pointer', padding: '4px' };
 const CODE_CELL_STYLE = { padding: '16px 20px', fontWeight: 600, color: '#E8C96A', fontFamily: 'monospace' };
 
-export default function CategoriesTable({ categories, onEdit, onDelete }) {
+export default function CategoriesTable({ categories, onToggleStatus, onEdit, onDelete }) {
   return (
     <div className="table-responsive" style={{ overflowX: 'auto', background: '#111', border: '1px solid #222', borderRadius: '12px' }}>
       <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
@@ -16,6 +16,7 @@ export default function CategoriesTable({ categories, onEdit, onDelete }) {
             <th style={{ padding: '16px 20px', color: '#666', fontWeight: 600 }}>Identificador (ID)</th>
             <th style={{ padding: '16px 20px', color: '#666', fontWeight: 600, width: '80px', textAlign: 'center' }}>Emoji</th>
             <th style={{ padding: '16px 20px', color: '#666', fontWeight: 600 }}>Nombre en la Cinta</th>
+            <th style={{ padding: '16px 20px', color: '#666', fontWeight: 600, width: '120px', textAlign: 'center' }}>Estado</th>
             <th style={{ padding: '16px 20px', color: '#666', fontWeight: 600, textAlign: 'right', paddingRight: '2.5rem' }}>Acciones</th>
           </tr>
         </thead>
@@ -34,6 +35,47 @@ export default function CategoriesTable({ categories, onEdit, onDelete }) {
                   <td style={{ padding: '16px 20px', fontWeight: 500, color: '#FFF' }}>
                     {cat.nombre}
                     {isProtected && <span style={{ fontSize: '0.7rem', color: '#666', marginLeft: '8px', background: '#1C1C1C', padding: '2px 6px', borderRadius: '4px', border: '1px solid #222' }}>SISTEMA</span>}
+                  </td>
+                  <td style={{ padding: '16px 20px', textAlign: 'center' }}>
+                    {isProtected ? (
+                      <span style={{ fontSize: '0.8rem', color: '#666', fontStyle: 'italic' }}>Siempre Activo</span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => onToggleStatus(cat.id)}
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          padding: 0
+                        }}
+                        title={cat.activo !== false ? "Desactivar Categoría" : "Activar Categoría"}
+                        aria-label={cat.activo !== false ? "Desactivar Categoría" : "Activar Categoría"}
+                      >
+                        <span style={{
+                          width: '38px',
+                          height: '20px',
+                          background: cat.activo !== false ? '#C9A84C' : '#333',
+                          borderRadius: '20px',
+                          position: 'relative',
+                          transition: 'background 0.3s',
+                          display: 'inline-block'
+                        }}>
+                          <span style={{
+                            width: '14px',
+                            height: '14px',
+                            background: '#FFF',
+                            borderRadius: '50%',
+                            position: 'absolute',
+                            top: '3px',
+                            left: cat.activo !== false ? '21px' : '3px',
+                            transition: 'left 0.3s'
+                          }} />
+                        </span>
+                      </button>
+                    )}
                   </td>
                   <td style={{ padding: '16px 20px', textAlign: 'right', paddingRight: '2rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '16px' }}>
