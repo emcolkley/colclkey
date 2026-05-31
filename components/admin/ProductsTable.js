@@ -4,7 +4,7 @@ import React from 'react';
 import CanvasPreview from '../CanvasPreview';
 
 // Definición de estilos constantes fuera del componente (resuelve no-inline-exhaustive-style)
-const CANVAS_STYLE = { width: '120px', height: '114px', borderRadius: '6px', objectFit: 'cover' };
+const CANVAS_STYLE = { width: '120px', height: '114px', borderRadius: '6px', objectFit: 'contain', background: '#151515' };
 const SWITCH_LABEL_STYLE = { margin: 0 };
 const EDIT_BUTTON_STYLE = { background: 'transparent', border: 'none', color: '#C9A84C', fontSize: '1.1rem', cursor: 'pointer', padding: '4px' };
 const DELETE_BUTTON_STYLE = { background: 'transparent', border: 'none', color: '#C9A84C', fontSize: '1.1rem', cursor: 'pointer', padding: '4px' };
@@ -46,7 +46,7 @@ export default function ProductsTable({ products, deactivatedIds, onToggleStatus
                       <img 
                         src={p.imagenBase64} 
                         alt={p.nombre} 
-                        style={{ ...CANVAS_STYLE, objectFit: 'cover' }}
+                        style={CANVAS_STYLE}
                       />
                     ) : (
                       <CanvasPreview 
