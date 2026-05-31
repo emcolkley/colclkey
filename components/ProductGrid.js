@@ -104,7 +104,7 @@ export default function ProductGrid({ onSelectProduct }) {
               style={isActive ? BUTTON_ACTIVE_STYLE : BUTTON_STYLE}
               onClick={() => setCategoriaSeleccionada(cat.id)}
             >
-              {cat.emoji} {cat.nombre}
+              {cat.emoji ? `${cat.emoji} ` : ''}{cat.nombre}
             </button>
           );
         })}

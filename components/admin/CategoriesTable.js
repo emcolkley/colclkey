@@ -30,7 +30,7 @@ export default function CategoriesTable({ categories, onToggleStatus, onEdit, on
                     {cat.id}
                   </td>
                   <td style={{ padding: '16px 20px', fontSize: '1.5rem', textAlign: 'center' }}>
-                    {cat.emoji}
+                    {cat.emoji || '—'}
                   </td>
                   <td style={{ padding: '16px 20px', fontWeight: 500, color: '#FFF' }}>
                     {cat.nombre}

@@ -46,7 +46,7 @@ export default function AddCategoryModal({ isOpen, onClose, category, onSave }) 
 
   // Consolidated form state (resuelve prefer-useReducer)
   const [formState, setFormState] = useState({
-    emoji: '✨',
+    emoji: '',
     nombre: ''
   });
 
@@ -59,14 +59,14 @@ export default function AddCategoryModal({ isOpen, onClose, category, onSave }) 
     if (category) {
       setTimeout(() => {
         setFormState({
-          emoji: category.emoji || '✨',
+          emoji: category.emoji || '',
           nombre: category.nombre || ''
         });
       }, 0);
     } else {
       setTimeout(() => {
         setFormState({
-          emoji: '✨',
+          emoji: '',
           nombre: ''
         });
       }, 0);
@@ -84,9 +84,9 @@ export default function AddCategoryModal({ isOpen, onClose, category, onSave }) 
   const handleSubmit = (e) => {
     e.preventDefault();
     const cleanNombre = formState.nombre.trim();
-    const cleanEmoji = formState.emoji.trim();
+    const cleanEmoji = formState.emoji ? formState.emoji.trim() : '';
 
-    if (!cleanNombre || !cleanEmoji) {
+    if (!cleanNombre) {
       alert("Completá los campos requeridos");
       return;
     }
@@ -112,7 +112,7 @@ export default function AddCategoryModal({ isOpen, onClose, category, onSave }) 
 
     // Reset
     setFormState({
-      emoji: '✨',
+      emoji: '',
       nombre: ''
     });
   };
@@ -143,12 +143,11 @@ export default function AddCategoryModal({ isOpen, onClose, category, onSave }) 
             </div>
           )}
           <div className="form-group">
-            <label htmlFor="cat-emoji" className="form-label">Emoji / Icono *</label>
+            <label htmlFor="cat-emoji" className="form-label">Emoji / Icono (Opcional)</label>
             <input 
               id="cat-emoji"
               type="text" 
               className="form-input" 
-              required 
               maxLength="5"
               placeholder="Ej: 👩, 🎄, 🎁" 
               value={formState.emoji} 
