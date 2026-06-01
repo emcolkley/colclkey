@@ -68,6 +68,56 @@ export default function ProductGrid({ onSelectProduct }) {
     const fetchActiveProducts = async () => {
       if (isSupabaseConfigured) {
         try {
+          // --- MIGRACIÓN AUTOMÁTICA DE LOCALSTORAGE A SUPABASE ---
+          if (typeof window !== 'undefined') {
+            const localCustoms = localStorage.getItem('colkley_custom_productos:v1');
+            const customList = localCustoms ? JSON.parse(localCustoms) : [];
+            
+            if (customList.length > 0) {
+              const mappedCustoms = customList.map(p => ({
+                id: p.id,
+                nombre: p.nombre,
+                tipo: p.tipo,
+                precio: parseInt(p.precio, 10),
+                descuento: parseInt(p.descuento || '0', 10),
+                desc: p.desc,
+                tamanos: p.tamanos,
+                diseño: p.diseño,
+                imagenBase64: p.imagenBase64 || p.imagenBase64,
+                nuevo: p.nuevo !== false,
+                is_custom: true,
+                activo: true,
+                categoria: p.categoria || 'otros'
+              }));
+
+              await supabase
+                .from('productos')
+                .upsert(mappedCustoms);
+
+              localStorage.removeItem('colkley_custom_productos:v1');
+            }
+
+            const localCats = localStorage.getItem('colkley_categorias:v1');
+            const localCatsList = localCats ? JSON.parse(localCats) : [];
+            if (localCatsList.length > 0) {
+              const customCats = localCatsList.filter(c => !['todos', 'madre', 'padre', 'parejas', 'spotify', 'bebes', 'netflix', 'collage', 'familia', 'otros'].includes(c.id));
+              if (customCats.length > 0) {
+                const mappedCats = customCats.map(c => ({
+                  id: c.id,
+                  nombre: c.nombre,
+                  emoji: c.emoji,
+                  activo: c.activo !== false
+                }));
+                await supabase
+                  .from('categorias')
+                  .upsert(mappedCats);
+                
+                localStorage.removeItem('colkley_categorias:v1');
+              }
+            }
+          }
+          // --- FIN MIGRACIÓN ---
+
           // 1. Cargar productos activos de Supabase
           const { data: prods, error: errProds } = await supabase
             .from('productos')
