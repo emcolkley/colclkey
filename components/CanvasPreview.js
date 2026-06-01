@@ -3,6 +3,55 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { dibujarDiseño } from '../data/productos';
 
+// Caché global en memoria para las maquetas precargadas (evita duplicar descargas por cada instancia)
+let globalMaquetasCache = null;
+let globalMaquetasLoadingPromise = null;
+
+function loadGlobalMaquetas() {
+  if (globalMaquetasCache) return Promise.resolve(globalMaquetasCache);
+  if (globalMaquetasLoadingPromise) return globalMaquetasLoadingPromise;
+
+  globalMaquetasLoadingPromise = new Promise((resolve) => {
+    if (typeof window === 'undefined') {
+      resolve({});
+      return;
+    }
+
+    const paths = {
+      spotify_negro: '/cuadro_spotify_negro.png',
+      nordic_frame: '/cuadro_nordic_frame.png',
+      nordic_room: '/cuadro_nordic_room.png'
+    };
+
+    const loadedMaquetas = {};
+    let loadedCount = 0;
+    const keys = Object.keys(paths);
+
+    keys.forEach(key => {
+      const img = new Image();
+      img.src = paths[key];
+      img.onload = () => {
+        loadedMaquetas[key] = img;
+        loadedCount++;
+        if (loadedCount === keys.length) {
+          globalMaquetasCache = loadedMaquetas;
+          resolve(loadedMaquetas);
+        }
+      };
+      img.onerror = () => {
+        console.error(`Error loading template image: ${paths[key]}`);
+        loadedCount++;
+        if (loadedCount === keys.length) {
+          globalMaquetasCache = loadedMaquetas;
+          resolve(loadedMaquetas);
+        }
+      };
+    });
+  });
+
+  return globalMaquetasLoadingPromise;
+}
+
 const DEFAULT_STYLE = {};
 
 export default function CanvasPreview({ diseño, fotoBase64, width = 900, height = 900, className = '', style = DEFAULT_STYLE }) {
@@ -40,36 +89,11 @@ export default function CanvasPreview({ diseño, fotoBase64, width = 900, height
     }
   }, [fotoBase64]);
 
-  // 2. Pre-cargar las maquetas en el montaje cliente
+  // 2. Pre-cargar las maquetas en el montaje cliente (utilizando caché global compartida)
   useEffect(() => {
-    const loadedMaquetas = {};
-    let loadedCount = 0;
-    const paths = {
-      spotify_negro: '/cuadro_spotify_negro.png',
-      nordic_frame: '/cuadro_nordic_frame.png',
-      nordic_room: '/cuadro_nordic_room.png'
-    };
-
-    const keys = Object.keys(paths);
-    keys.forEach(key => {
-      const img = new Image();
-      img.src = paths[key];
-      img.onload = () => {
-        loadedMaquetas[key] = img;
-        loadedCount++;
-        if (loadedCount === keys.length) {
-          maquetasRef.current = loadedMaquetas;
-          setRedrawTrigger(prev => prev + 1);
-        }
-      };
-      img.onerror = () => {
-        console.error(`Error loading template image: ${paths[key]}`);
-        loadedCount++;
-        if (loadedCount === keys.length) {
-          maquetasRef.current = loadedMaquetas;
-          setRedrawTrigger(prev => prev + 1);
-        }
-      };
+    loadGlobalMaquetas().then(maquetas => {
+      maquetasRef.current = maquetas;
+      setRedrawTrigger(prev => prev + 1);
     });
   }, []);
 

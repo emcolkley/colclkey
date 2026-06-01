@@ -176,8 +176,38 @@ export default function HomeClient() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [orderConfirmation, setOrderConfirmation] = useState(null);
   const dialogRef = useRef(null);
-  const [productosList, setProductosList] = useState(() => getProductos());
-  const [categoriasList, setCategoriasList] = useState(() => getCategoriasList());
+  const [productosList, setProductosList] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('colkley_supabase_cached_productos:v1');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed;
+          }
+        }
+      } catch (e) {
+        console.error("Error reading cached prods", e);
+      }
+    }
+    return getProductos();
+  });
+  const [categoriasList, setCategoriasList] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('colkley_supabase_cached_categorias:v1');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed;
+          }
+        }
+      } catch (e) {
+        console.error("Error reading cached cats", e);
+      }
+    }
+    return getCategoriasList();
+  });
 
   // Lazy initializer del carrito que lee de forma directa y segura en carga (resuelve no-initialize-state)
   const [cartState, setCartState] = useState(() => {
@@ -290,7 +320,15 @@ export default function HomeClient() {
             .select('*')
             .order('id', { ascending: true });
           if (!errProds && prods) {
-            setProductosList(prods);
+            setProductosList(prev => {
+              const newStr = JSON.stringify(prods);
+              const oldStr = JSON.stringify(prev);
+              if (newStr !== oldStr) {
+                return prods;
+              }
+              return prev;
+            });
+            localStorage.setItem('colkley_supabase_cached_productos:v1', JSON.stringify(prods));
           }
 
           // 2. Cargar categorías
@@ -299,7 +337,15 @@ export default function HomeClient() {
             .select('*')
             .order('orden', { ascending: true });
           if (!errCats && cats) {
-            setCategoriasList(cats);
+            setCategoriasList(prev => {
+              const newStr = JSON.stringify(cats);
+              const oldStr = JSON.stringify(prev);
+              if (newStr !== oldStr) {
+                return cats;
+              }
+              return prev;
+            });
+            localStorage.setItem('colkley_supabase_cached_categorias:v1', JSON.stringify(cats));
           }
         } catch (e) {
           console.error("Error loading data in HomeClient:", e);
