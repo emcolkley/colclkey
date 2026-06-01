@@ -243,6 +243,18 @@ export default function HomeClient() {
     return getGiftWrapConfig();
   });
 
+  const [cuponesList, setCuponesList] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('colkley_supabase_cached_cupones:v1');
+        if (cached) return JSON.parse(cached);
+      } catch (e) {
+        console.error("Error reading cached coupons", e);
+      }
+    }
+    return [{ codigo: "BIENVENIDA", tipo: "porcentaje", valor: 10, minCompra: 0, activo: true }];
+  });
+
   // Lazy initializer del carrito que lee de forma directa y segura en carga (resuelve no-initialize-state)
   const [cartState, setCartState] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -425,6 +437,23 @@ export default function HomeClient() {
             });
             localStorage.setItem('colkley_supabase_cached_gift_wrap:v1', JSON.stringify(giftWrapSetting.value));
           }
+
+          // 4. Cargar cupones de Supabase
+          const { data: cups, error: errCups } = await supabase
+            .from('cupones')
+            .select('*')
+            .order('codigo', { ascending: true });
+          if (!errCups && cups) {
+            setCuponesList(prev => {
+              const newStr = JSON.stringify(cups);
+              const oldStr = JSON.stringify(prev);
+              if (newStr !== oldStr) {
+                return cups;
+              }
+              return prev;
+            });
+            localStorage.setItem('colkley_supabase_cached_cupones:v1', JSON.stringify(cups));
+          }
         } catch (e) {
           console.error("Error loading data in HomeClient:", e);
         }
@@ -554,6 +583,7 @@ export default function HomeClient() {
               onBack={() => setStep(2)}
               onOrderPlaced={handleOrderPlaced}
               giftWrapConfig={giftWrapConfig}
+              cupones={cuponesList}
             />
           </section>
         )}

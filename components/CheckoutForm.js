@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { getGiftWrapConfig } from '../data/productos';
 
-export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumber = "5491100000000", giftWrapConfig }) {
+export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumber = "5491100000000", giftWrapConfig, cupones }) {
   // Cargar configuración de regalo de forma autónoma en useEffect para prevenir hydration mismatches en Next.js
   const [giftConfig, setGiftConfig] = useState(null);
 
@@ -59,19 +59,23 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
       return;
     }
 
-    let cupones = [];
-    try {
-      const list = localStorage.getItem('colkley_cupones:v1');
-      const parsed = list ? JSON.parse(list) : null;
-      cupones = Array.isArray(parsed) ? parsed : [
-        { codigo: "BIENVENIDA", tipo: "porcentaje", valor: 10, minCompra: 0, activo: true }
-      ];
-    } catch (e) {
-      console.error("Error reading coupons", e);
-      cupones = [{ codigo: "BIENVENIDA", tipo: "porcentaje", valor: 10, minCompra: 0, activo: true }];
+    let cuponesValidos = [];
+    if (Array.isArray(cupones) && cupones.length > 0) {
+      cuponesValidos = cupones;
+    } else {
+      try {
+        const list = localStorage.getItem('colkley_cupones:v1');
+        const parsed = list ? JSON.parse(list) : null;
+        cuponesValidos = Array.isArray(parsed) ? parsed : [
+          { codigo: "BIENVENIDA", tipo: "porcentaje", valor: 10, minCompra: 0, activo: true }
+        ];
+      } catch (e) {
+        console.error("Error reading coupons", e);
+        cuponesValidos = [{ codigo: "BIENVENIDA", tipo: "porcentaje", valor: 10, minCompra: 0, activo: true }];
+      }
     }
 
-    const coupon = Array.isArray(cupones) ? cupones.find(c => c && c.codigo === code) : null;
+    const coupon = Array.isArray(cuponesValidos) ? cuponesValidos.find(c => c && c.codigo === code) : null;
 
     if (!coupon) {
       updateFormState({

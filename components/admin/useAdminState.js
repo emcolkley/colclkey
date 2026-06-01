@@ -652,6 +652,20 @@ export default function useAdminState() {
     });
   }, [dataState.productosList, uiState]);
 
+  // Sincronizar automáticamente el estado de datos en el caché local de Supabase
+  useEffect(() => {
+    if (typeof window !== 'undefined' && isSupabaseConfigured) {
+      try {
+        localStorage.setItem('colkley_supabase_cached_productos:v1', JSON.stringify(dataState.productosList));
+        localStorage.setItem('colkley_supabase_cached_categorias:v1', JSON.stringify(dataState.categorias));
+        localStorage.setItem('colkley_supabase_cached_cupones:v1', JSON.stringify(dataState.cupones));
+        localStorage.setItem('colkley_supabase_cached_gift_wrap:v1', JSON.stringify(dataState.giftWrapConfig));
+      } catch (e) {
+        console.error("Error syncing admin state to cache", e);
+      }
+    }
+  }, [dataState.productosList, dataState.categorias, dataState.cupones, dataState.giftWrapConfig]);
+
   return {
     dataState,
     uiState,
