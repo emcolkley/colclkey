@@ -7,6 +7,7 @@ import Customizer from '../components/Customizer';
 import CartDrawer from '../components/CartDrawer';
 import CheckoutForm from '../components/CheckoutForm';
 import { getProductos } from '../data/productos';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 // Estilos estáticos constantes (resuelve no-inline-exhaustive-style)
 const DIALOG_STYLE = {
@@ -200,27 +201,80 @@ export default function HomeClient() {
     }
   }, [orderConfirmation]);
 
-  // Registrar visita local para analíticas en montaje cliente (con versión)
+  // Registrar visita local o en Supabase para analíticas en montaje cliente
   useEffect(() => {
-    try {
-      let visitasHoy = localStorage.getItem('colkley_visitas_hoy:v1');
-      if (!visitasHoy) {
-        visitasHoy = Math.floor(Math.random() * (180 - 140 + 1)) + 140;
-      } else {
-        visitasHoy = parseInt(visitasHoy, 10);
-      }
-      localStorage.setItem('colkley_visitas_hoy:v1', visitasHoy + 1);
+    const registerVisit = async () => {
+      if (isSupabaseConfigured) {
+        try {
+          const todayStr = new Date().toISOString().split('T')[0];
+          const thisMonthStr = todayStr.substring(0, 7);
 
-      let visitasMes = localStorage.getItem('colkley_visitas_mes:v1');
-      if (!visitasMes) {
-        visitasMes = Math.floor(Math.random() * (4500 - 3800 + 1)) + 3800;
+          const { data, error } = await supabase
+            .from('settings')
+            .select('value')
+            .eq('key', 'visitas')
+            .maybeSingle();
+
+          let currentVisits = { hoy: 1, mes: 1, last_date: todayStr };
+
+          if (data && data.value) {
+            const val = data.value;
+            const valDate = val.last_date || todayStr;
+            const valMonth = valDate.substring(0, 7);
+
+            let newHoy = val.hoy || 0;
+            let newMes = val.mes || 0;
+
+            if (valDate === todayStr) {
+              newHoy += 1;
+              newMes += 1;
+            } else {
+              newHoy = 1;
+              if (valMonth === thisMonthStr) {
+                newMes += 1;
+              } else {
+                newMes = 1;
+              }
+            }
+
+            currentVisits = {
+              hoy: newHoy,
+              mes: newMes,
+              last_date: todayStr
+            };
+          }
+
+          await supabase
+            .from('settings')
+            .upsert({ key: 'visitas', value: currentVisits });
+
+        } catch (e) {
+          console.error("Error updating visits in Supabase:", e);
+        }
       } else {
-        visitasMes = parseInt(visitasMes, 10);
+        try {
+          let visitasHoy = localStorage.getItem('colkley_visitas_hoy:v1');
+          if (!visitasHoy) {
+            visitasHoy = Math.floor(Math.random() * (180 - 140 + 1)) + 140;
+          } else {
+            visitasHoy = parseInt(visitasHoy, 10);
+          }
+          localStorage.setItem('colkley_visitas_hoy:v1', visitasHoy + 1);
+
+          let visitasMes = localStorage.getItem('colkley_visitas_mes:v1');
+          if (!visitasMes) {
+            visitasMes = Math.floor(Math.random() * (4500 - 3800 + 1)) + 3800;
+          } else {
+            visitasMes = parseInt(visitasMes, 10);
+          }
+          localStorage.setItem('colkley_visitas_mes:v1', visitasMes + 1);
+        } catch(e) {
+          console.error(e);
+        }
       }
-      localStorage.setItem('colkley_visitas_mes:v1', visitasMes + 1);
-    } catch(e) {
-      console.error(e);
-    }
+    };
+
+    registerVisit();
   }, []);
 
   // Sincronizar carrito con localStorage (con versión)
