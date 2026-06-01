@@ -62,6 +62,7 @@ export default function ProductCard({ producto, onSelect }) {
           <img 
             src={producto.imagenBase64} 
             alt={producto.nombre} 
+            loading="lazy"
             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
           />
         ) : (
