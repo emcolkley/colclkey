@@ -8,6 +8,7 @@ import CartDrawer from '../components/CartDrawer';
 import CheckoutForm from '../components/CheckoutForm';
 import { getProductos, getCategoriasList } from '../data/productos';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { loadGlobalMaquetas } from './CanvasPreview';
 
 // Estilos estáticos constantes (resuelve no-inline-exhaustive-style)
 const DIALOG_STYLE = {
@@ -324,6 +325,15 @@ export default function HomeClient() {
     };
 
     registerVisit();
+
+    // Pre-cargar de forma proactiva las maquetas pesadas en segundo plano para que el personalizador abra en 0ms
+    if (typeof window !== 'undefined') {
+      try {
+        loadGlobalMaquetas();
+      } catch (e) {
+        console.error("Error preloading maquetas on mount:", e);
+      }
+    }
   }, []);
 
   // Cargar productos y categorías actualizados desde Supabase o fallback local

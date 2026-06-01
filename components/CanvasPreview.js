@@ -7,7 +7,7 @@ import { dibujarDiseño } from '../data/productos';
 let globalMaquetasCache = null;
 let globalMaquetasLoadingPromise = null;
 
-function loadGlobalMaquetas() {
+export function loadGlobalMaquetas() {
   if (globalMaquetasCache) return Promise.resolve(globalMaquetasCache);
   if (globalMaquetasLoadingPromise) return globalMaquetasLoadingPromise;
 
