@@ -176,6 +176,7 @@ export default function HomeClient() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [orderConfirmation, setOrderConfirmation] = useState(null);
   const dialogRef = useRef(null);
+  const [productosList, setProductosList] = useState(() => getProductos());
 
   // Lazy initializer del carrito que lee de forma directa y segura en carga (resuelve no-initialize-state)
   const [cartState, setCartState] = useState(() => {
@@ -277,6 +278,26 @@ export default function HomeClient() {
     registerVisit();
   }, []);
 
+  // Cargar productos actualizados desde Supabase o fallback local
+  useEffect(() => {
+    const loadProducts = async () => {
+      if (isSupabaseConfigured) {
+        try {
+          const { data, error } = await supabase
+            .from('productos')
+            .select('*')
+            .order('id', { ascending: true });
+          if (!error && data) {
+            setProductosList(data);
+          }
+        } catch (e) {
+          console.error("Error loading products in HomeClient:", e);
+        }
+      }
+    };
+    loadProducts();
+  }, []);
+
   // Sincronizar carrito con localStorage (con versión)
   const updateCart = (newCart) => {
     setCartState(prev => ({ ...prev, items: newCart }));
@@ -288,7 +309,7 @@ export default function HomeClient() {
   };
 
   const handleSelectProduct = (id) => {
-    const prod = getProductos().find(p => p.id === id);
+    const prod = productosList.find(p => p.id === id);
     if (prod) {
       setSelectedProduct(prod);
       setStep(2);
