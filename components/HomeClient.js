@@ -236,11 +236,28 @@ export default function HomeClient() {
   // Registrar visita local o en Supabase para analíticas en montaje cliente
   useEffect(() => {
     const registerVisit = async () => {
+      // Evitar inflar visitas por recargas o navegación en la misma sesión
+      if (typeof window !== 'undefined') {
+        try {
+          if (sessionStorage.getItem('colkley_visita_registrada:v1')) {
+            return; // Ya registrado en esta sesión
+          }
+          sessionStorage.setItem('colkley_visita_registrada:v1', 'true');
+        } catch (e) {
+          console.error("Error setting session flag for visits", e);
+        }
+      }
+
+      // Obtener la fecha local real YYYY-MM-DD en lugar de UTC para corregir zonas horarias
+      const localDate = new Date();
+      const year = localDate.getFullYear();
+      const month = String(localDate.getMonth() + 1).padStart(2, '0');
+      const day = String(localDate.getDate()).padStart(2, '0');
+      const todayStr = `${year}-${month}-${day}`;
+      const thisMonthStr = `${year}-${month}`;
+
       if (isSupabaseConfigured) {
         try {
-          const todayStr = new Date().toISOString().split('T')[0];
-          const thisMonthStr = todayStr.substring(0, 7);
-
           const { data, error } = await supabase
             .from('settings')
             .select('value')
