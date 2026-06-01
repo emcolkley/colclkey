@@ -62,6 +62,8 @@ export default function useAdminState() {
     let hoy = 0;
     let mes = 0;
     let cuponesList = [{ codigo: "BIENVENIDA", tipo: "porcentaje", valor: 10, minCompra: 0, activo: true }];
+    let prodList = getProductos();
+    let catList = getCategoriasList();
     
     if (typeof window !== 'undefined') {
       try {
@@ -70,17 +72,35 @@ export default function useAdminState() {
         
         const cup = localStorage.getItem('colkley_cupones:v1');
         if (cup) cuponesList = JSON.parse(cup);
+
+        if (isSupabaseConfigured) {
+          const cachedProds = localStorage.getItem('colkley_supabase_cached_productos:v1');
+          if (cachedProds) {
+            const parsed = JSON.parse(cachedProds);
+            if (Array.isArray(parsed) && parsed.length > 0) prodList = parsed;
+          }
+          const cachedCats = localStorage.getItem('colkley_supabase_cached_categorias:v1');
+          if (cachedCats) {
+            const parsed = JSON.parse(cachedCats);
+            if (Array.isArray(parsed) && parsed.length > 0) catList = parsed;
+          }
+          const cachedCups = localStorage.getItem('colkley_supabase_cached_cupones:v1');
+          if (cachedCups) {
+            const parsed = JSON.parse(cachedCups);
+            if (Array.isArray(parsed) && parsed.length > 0) cuponesList = parsed;
+          }
+        }
       } catch (e) {
-        console.error(e);
+        console.error("Error reading cached data in useAdminState init", e);
       }
     }
     
     return {
-      productosList: getProductos(),
+      productosList: prodList,
       deactivatedIds: deactivatedList,
       visitas: { hoy, mes },
       cupones: cuponesList,
-      categorias: getCategoriasList(),
+      categorias: catList,
       giftWrapConfig: getGiftWrapConfig()
     };
   });
@@ -130,6 +150,17 @@ export default function useAdminState() {
           
           const vis = settings.find(s => s.key === 'visitas');
           if (vis) visitas = vis.value;
+        }
+
+        // Persistir caché en localStorage para visitas rápidas e instantáneas sin saltos de datos
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.setItem('colkley_supabase_cached_productos:v1', JSON.stringify(prods));
+            localStorage.setItem('colkley_supabase_cached_categorias:v1', JSON.stringify(cats));
+            localStorage.setItem('colkley_supabase_cached_cupones:v1', JSON.stringify(cups || []));
+          } catch (e) {
+            console.error("Error writing supabase caches in admin", e);
+          }
         }
 
         setDataState({
