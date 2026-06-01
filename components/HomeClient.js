@@ -190,7 +190,7 @@ export default function HomeClient() {
         console.error("Error reading cached prods", e);
       }
     }
-    return getProductos();
+    return isSupabaseConfigured ? [] : getProductos();
   });
   const [categoriasList, setCategoriasList] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -206,7 +206,7 @@ export default function HomeClient() {
         console.error("Error reading cached cats", e);
       }
     }
-    return getCategoriasList();
+    return isSupabaseConfigured ? [] : getCategoriasList();
   });
 
   // Lazy initializer del carrito que lee de forma directa y segura en carga (resuelve no-initialize-state)

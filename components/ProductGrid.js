@@ -171,6 +171,8 @@ export default function ProductGrid({ onSelectProduct, activeProducts, categorie
     return p.categoria === categoriaSeleccionada;
   });
 
+  const isCargando = productosActivos.length === 0;
+
   const selectedCatObj = categorias.find(c => c.id === categoriaSeleccionada);
   const selectedCatName = selectedCatObj ? selectedCatObj.nombre : '';
 
@@ -204,7 +206,26 @@ export default function ProductGrid({ onSelectProduct, activeProducts, categorie
       </div>
 
       <div className="productos-grid" id="productos-grid" suppressHydrationWarning>
-        {productosFiltrados.length > 0 ? (
+        {isCargando ? (
+          Array.from({ length: 6 }).map((_, idx) => (
+            <div className="skeleton-card" key={idx}>
+              <div className="skeleton-preview">
+                <div className="skeleton-shimmer"></div>
+              </div>
+              <div className="skeleton-info">
+                <div className="skeleton-line title">
+                  <div className="skeleton-shimmer"></div>
+                </div>
+                <div className="skeleton-line price">
+                  <div className="skeleton-shimmer"></div>
+                </div>
+                <div className="skeleton-line desc">
+                  <div className="skeleton-shimmer"></div>
+                </div>
+              </div>
+            </div>
+          ))
+        ) : productosFiltrados.length > 0 ? (
           productosFiltrados.map(p => (
             <ProductCard 
               key={p.id} 
