@@ -277,6 +277,7 @@ export default function AdminDashboard() {
     handleEliminarCategoria,
     handleAbrirModalCategoryEdit,
     handleGuardarGiftWrapConfig,
+    handleReorderCategory,
     filteredProducts
   } = useAdminState();
 
@@ -343,6 +344,7 @@ export default function AdminDashboard() {
             onToggleStatus={handleToggleCategoryStatus}
             onEdit={handleAbrirModalCategoryEdit}
             onDelete={handleEliminarCategoria}
+            onReorder={handleReorderCategory}
           />
         </div>
       )}

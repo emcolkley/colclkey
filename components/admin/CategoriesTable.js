@@ -7,7 +7,7 @@ const EDIT_BUTTON_STYLE = { background: 'transparent', border: 'none', color: '#
 const DELETE_BUTTON_STYLE = { background: 'transparent', border: 'none', color: '#C9A84C', fontSize: '1.1rem', cursor: 'pointer', padding: '4px' };
 const CODE_CELL_STYLE = { padding: '16px 20px', fontWeight: 600, color: '#E8C96A', fontFamily: 'monospace' };
 
-export default function CategoriesTable({ categories, onToggleStatus, onEdit, onDelete }) {
+export default function CategoriesTable({ categories, onToggleStatus, onEdit, onDelete, onReorder }) {
   return (
     <div className="table-responsive" style={{ overflowX: 'auto', background: '#111', border: '1px solid #222', borderRadius: '12px' }}>
       <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
@@ -22,7 +22,7 @@ export default function CategoriesTable({ categories, onToggleStatus, onEdit, on
         </thead>
         <tbody>
           {categories.length > 0 ? (
-            categories.map(cat => {
+            categories.map((cat, index) => {
               const isProtected = cat.id === 'todos';
               return (
                 <tr key={cat.id} style={{ borderBottom: '1px solid #1A1A1A' }}>
@@ -79,6 +79,43 @@ export default function CategoriesTable({ categories, onToggleStatus, onEdit, on
                   </td>
                   <td style={{ padding: '16px 20px', textAlign: 'right', paddingRight: '2rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '16px' }}>
+                      {onReorder && (
+                        <div style={{ display: 'inline-flex', gap: '8px' }}>
+                          <button
+                            type="button"
+                            onClick={() => onReorder(cat.id, 'up')}
+                            disabled={index === 0}
+                            style={{ 
+                              background: 'transparent', 
+                              border: 'none', 
+                              color: index === 0 ? '#333' : '#C9A84C', 
+                              fontSize: '1rem', 
+                              cursor: index === 0 ? 'not-allowed' : 'pointer', 
+                              padding: '4px' 
+                            }}
+                            title="Subir Categoría"
+                          >
+                            ▲
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => onReorder(cat.id, 'down')}
+                            disabled={index === categories.length - 1}
+                            style={{ 
+                              background: 'transparent', 
+                              border: 'none', 
+                              color: index === categories.length - 1 ? '#333' : '#C9A84C', 
+                              fontSize: '1rem', 
+                              cursor: index === categories.length - 1 ? 'not-allowed' : 'pointer', 
+                              padding: '4px' 
+                            }}
+                            title="Bajar Categoría"
+                          >
+                            ▼
+                          </button>
+                        </div>
+                      )}
+                      
                       <button 
                         type="button"
                         className="edit-btn" 

@@ -129,7 +129,7 @@ export default function ProductGrid({ onSelectProduct }) {
           const { data: cats, error: errCats } = await supabase
             .from('categorias')
             .select('*')
-            .order('id', { ascending: true });
+            .order('orden', { ascending: true });
 
           if (errProds || errCats) {
             console.error("Error loading products/categories from Supabase:", errProds, errCats);

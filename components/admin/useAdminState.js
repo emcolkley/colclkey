@@ -101,7 +101,7 @@ export default function useAdminState() {
         const { data: cats, error: errCats } = await supabase
           .from('categorias')
           .select('*')
-          .order('id', { ascending: true });
+          .order('orden', { ascending: true });
 
         // 3. Cargar cupones
         const { data: cups, error: errCups } = await supabase
@@ -478,7 +478,7 @@ export default function useAdminState() {
         return;
       }
       setUiState(prev => ({ ...prev, selectedCategory: null, modalCategory: false }));
-      const { data: cats } = await supabase.from('categorias').select('*').order('id', { ascending: true });
+      const { data: cats } = await supabase.from('categorias').select('*').order('orden', { ascending: true });
       if (cats) setDataState(prev => ({ ...prev, categorias: cats }));
     } else {
       let updated;
@@ -540,7 +540,7 @@ export default function useAdminState() {
         alert("❌ Error al eliminar categoría en Supabase: " + error.message);
         return;
       }
-      const { data: cats } = await supabase.from('categorias').select('*').order('id', { ascending: true });
+      const { data: cats } = await supabase.from('categorias').select('*').order('orden', { ascending: true });
       if (cats) setDataState(prev => ({ ...prev, categorias: cats }));
     } else {
       const updated = dataState.categorias.filter(c => c.id !== id);
@@ -565,6 +565,46 @@ export default function useAdminState() {
       if (error) console.error("Error saving gift wrap config to Supabase:", error);
     } else {
       localStorage.setItem('colkley_gift_wrap_config:v1', JSON.stringify(newConfig));
+    }
+  };
+
+  // Reordenar categorías
+  const handleReorderCategory = async (id, direction) => {
+    const list = [...dataState.categorias];
+    const index = list.findIndex(c => c.id === id);
+    if (index === -1) return;
+
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= list.length) return; // Fuera de límites
+
+    // Intercambiar elementos
+    const temp = list[index];
+    list[index] = list[newIndex];
+    list[newIndex] = temp;
+
+    // Actualizar el índice 'orden'
+    const updatedList = list.map((cat, idx) => ({
+      ...cat,
+      orden: idx
+    }));
+
+    setDataState(prev => ({ ...prev, categorias: updatedList }));
+
+    if (isSupabaseConfigured) {
+      const mappedCats = updatedList.map(c => ({
+        id: c.id,
+        nombre: c.nombre,
+        emoji: c.emoji,
+        activo: c.activo !== false,
+        orden: c.orden
+      }));
+
+      const { error } = await supabase
+        .from('categorias')
+        .upsert(mappedCats);
+      if (error) console.error("Error al reordenar categorías en Supabase:", error);
+    } else {
+      localStorage.setItem('colkley_categorias:v1', JSON.stringify(updatedList));
     }
   };
 
@@ -602,6 +642,7 @@ export default function useAdminState() {
     handleEliminarCategoria,
     handleAbrirModalCategoryEdit,
     handleGuardarGiftWrapConfig,
+    handleReorderCategory,
     filteredProducts
   };
 }
