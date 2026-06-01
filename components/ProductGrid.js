@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import ProductCard from './ProductCard';
 import { getProductos, getCategoriasList } from '../data/productos';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 // Helper en módulo para encapsular lectura de localStorage (resuelve js-cache-storage)
 const getDeactivatedList = () => {
@@ -64,16 +65,47 @@ export default function ProductGrid({ onSelectProduct }) {
   });
 
   useEffect(() => {
-    const fetchActiveProducts = () => {
-      const deactivatedList = getDeactivatedList();
-      const allProds = getProductos();
-      setProductosActivos(allProds.filter(p => !deactivatedList.includes(p.id)));
-      setCategorias(getCategoriasList());
+    const fetchActiveProducts = async () => {
+      if (isSupabaseConfigured) {
+        try {
+          // 1. Cargar productos activos de Supabase
+          const { data: prods, error: errProds } = await supabase
+            .from('productos')
+            .select('*')
+            .eq('activo', true)
+            .order('id', { ascending: true });
+
+          // 2. Cargar categorías activas de Supabase
+          const { data: cats, error: errCats } = await supabase
+            .from('categorias')
+            .select('*')
+            .order('id', { ascending: true });
+
+          if (errProds || errCats) {
+            console.error("Error loading products/categories from Supabase:", errProds, errCats);
+            return;
+          }
+
+          if (prods) setProductosActivos(prods);
+          if (cats) setCategorias(cats);
+        } catch (e) {
+          console.error("Error fetching active products:", e);
+        }
+      } else {
+        const deactivatedList = getDeactivatedList();
+        const allProds = getProductos();
+        setProductosActivos(allProds.filter(p => !deactivatedList.includes(p.id)));
+        setCategorias(getCategoriasList());
+      }
     };
 
-    // Escuchar posibles cambios externos en localStorage (por ejemplo si se activa/desactiva un producto desde el Admin)
-    window.addEventListener('storage', fetchActiveProducts);
-    return () => window.removeEventListener('storage', fetchActiveProducts);
+    fetchActiveProducts();
+
+    // Escuchar posibles cambios externos en localStorage (para fallback local)
+    if (!isSupabaseConfigured) {
+      window.addEventListener('storage', fetchActiveProducts);
+      return () => window.removeEventListener('storage', fetchActiveProducts);
+    }
   }, []);
 
   const productosFiltrados = productosActivos.filter(p => {

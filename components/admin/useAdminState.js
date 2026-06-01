@@ -1,5 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { getProductos, getCategoriasList, getGiftWrapConfig, getDeletedStaticIds } from '../../data/productos';
+import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 
 // Helper en módulo para encapsular lectura de desactivados
 export const getDeactivatedList = () => {
@@ -84,6 +85,69 @@ export default function useAdminState() {
     };
   });
 
+  // Carga asíncrona de datos desde Supabase si está configurado
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+
+    const fetchSupabaseData = async () => {
+      try {
+        // 1. Cargar productos
+        const { data: prods, error: errProds } = await supabase
+          .from('productos')
+          .select('*')
+          .order('id', { ascending: true });
+
+        // 2. Cargar categorías
+        const { data: cats, error: errCats } = await supabase
+          .from('categorias')
+          .select('*')
+          .order('id', { ascending: true });
+
+        // 3. Cargar cupones
+        const { data: cups, error: errCups } = await supabase
+          .from('cupones')
+          .select('*')
+          .order('codigo', { ascending: true });
+
+        // 4. Cargar configuraciones (gift_wrap, visitas)
+        const { data: settings, error: errSettings } = await supabase
+          .from('settings')
+          .select('*');
+
+        if (errProds || errCats || errCups || errSettings) {
+          console.error("Error cargando datos de Supabase:", { errProds, errCats, errCups, errSettings });
+          return;
+        }
+
+        const deactivatedIds = prods.filter(p => !p.activo).map(p => p.id);
+        
+        let giftWrapConfig = getGiftWrapConfig();
+        let visitas = { hoy: dataState.visitas.hoy, mes: dataState.visitas.mes };
+        
+        if (settings) {
+          const gw = settings.find(s => s.key === 'gift_wrap');
+          if (gw) giftWrapConfig = gw.value;
+          
+          const vis = settings.find(s => s.key === 'visitas');
+          if (vis) visitas = vis.value;
+        }
+
+        setDataState({
+          productosList: prods,
+          deactivatedIds: deactivatedIds,
+          visitas: visitas,
+          cupones: cups || [],
+          categorias: cats || [],
+          giftWrapConfig: giftWrapConfig
+        });
+      } catch (e) {
+        console.error("Error en fetchSupabaseData:", e);
+      }
+    };
+
+    fetchSupabaseData();
+  }, []);
+
   // 2. Consolidated UI State
   const [uiState, setUiState] = useState({
     activeTab: 'productos',
@@ -127,67 +191,118 @@ export default function useAdminState() {
   }, [dataState.productosList]);
 
   // Alternar el estado activo/inactivo de un producto
-  const handleToggleProductStatus = (id) => {
-    let updated;
-    if (dataState.deactivatedIds.includes(id)) {
-      updated = dataState.deactivatedIds.filter(x => x !== id);
+  const handleToggleProductStatus = async (id) => {
+    const isDeactivated = dataState.deactivatedIds.includes(id);
+    let updatedDeactivated;
+    if (isDeactivated) {
+      updatedDeactivated = dataState.deactivatedIds.filter(x => x !== id);
     } else {
-      updated = [...dataState.deactivatedIds, id];
+      updatedDeactivated = [...dataState.deactivatedIds, id];
     }
-    setDataState(prev => ({ ...prev, deactivatedIds: updated }));
-    localStorage.setItem('colkley_deactivated_ids:v1', JSON.stringify(updated));
+    setDataState(prev => ({ ...prev, deactivatedIds: updatedDeactivated }));
+
+    if (isSupabaseConfigured) {
+      const { error } = await supabase
+        .from('productos')
+        .update({ activo: isDeactivated })
+        .eq('id', id);
+      if (error) console.error("Error updating product status in Supabase:", error);
+    } else {
+      localStorage.setItem('colkley_deactivated_ids:v1', JSON.stringify(updatedDeactivated));
+    }
   };
 
   // Alternar estado de cupón
-  const handleToggleCouponStatus = (codigo) => {
+  const handleToggleCouponStatus = async (codigo) => {
+    const cup = dataState.cupones.find(c => c.codigo === codigo);
+    if (!cup) return;
+    const newActivo = !cup.activo;
+
     const updated = dataState.cupones.map(c => {
       if (c.codigo === codigo) {
-        return { ...c, activo: !c.activo };
+        return { ...c, activo: newActivo };
       }
       return c;
     });
     setDataState(prev => ({ ...prev, cupones: updated }));
-    localStorage.setItem('colkley_cupones:v1', JSON.stringify(updated));
+
+    if (isSupabaseConfigured) {
+      const { error } = await supabase
+        .from('cupones')
+        .update({ activo: newActivo })
+        .eq('codigo', codigo);
+      if (error) console.error(error);
+    } else {
+      localStorage.setItem('colkley_cupones:v1', JSON.stringify(updated));
+    }
   };
 
   // Eliminar cupón
-  const handleEliminarCupon = (codigo) => {
+  const handleEliminarCupon = async (codigo) => {
     if (!confirm(`⚠️ ¿Estás seguro de que querés eliminar el cupón "${codigo}"?`)) return;
     const updated = dataState.cupones.filter(c => c.codigo !== codigo);
     setDataState(prev => ({ ...prev, cupones: updated }));
-    localStorage.setItem('colkley_cupones:v1', JSON.stringify(updated));
+
+    if (isSupabaseConfigured) {
+      const { error } = await supabase
+        .from('cupones')
+        .delete()
+        .eq('codigo', codigo);
+      if (error) console.error(error);
+    } else {
+      localStorage.setItem('colkley_cupones:v1', JSON.stringify(updated));
+    }
   };
 
   // Eliminar producto personalizado o estático
-  const handleEliminarProducto = (id) => {
+  const handleEliminarProducto = async (id) => {
     if (!confirm("⚠️ ¿Estás seguro de que querés eliminar este producto? Esta acción no se puede deshacer.")) return;
     
-    try {
-      // 1. Si es personalizado o editado
-      let customList = getCustomProductos();
-      customList = customList.filter(p => p.id !== id);
-      localStorage.setItem('colkley_custom_productos:v1', JSON.stringify(customList));
-
-      // 2. Si es estático (IDs 1 a 9)
-      const staticIds = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-      if (staticIds.includes(id)) {
-        const deletedStatic = getDeletedStaticIds();
-        if (!deletedStatic.includes(id)) {
-          const updatedDeleted = [...deletedStatic, id];
-          localStorage.setItem('colkley_deleted_static_ids:v1', JSON.stringify(updatedDeleted));
-        }
+    if (isSupabaseConfigured) {
+      const { error } = await supabase
+        .from('productos')
+        .delete()
+        .eq('id', id);
+      if (error) {
+        alert("❌ Error al eliminar producto en Supabase: " + error.message);
+        return;
       }
-
+      
       const updatedDeactivated = dataState.deactivatedIds.filter(x => x !== id);
-      localStorage.setItem('colkley_deactivated_ids:v1', JSON.stringify(updatedDeactivated));
-
+      const updatedList = dataState.productosList.filter(p => p.id !== id);
       setDataState(prev => ({
         ...prev,
         deactivatedIds: updatedDeactivated,
-        productosList: getProductos()
+        productosList: updatedList
       }));
-    } catch (e) {
-      console.error(e);
+    } else {
+      try {
+        // 1. Si es personalizado o editado
+        let customList = getCustomProductos();
+        customList = customList.filter(p => p.id !== id);
+        localStorage.setItem('colkley_custom_productos:v1', JSON.stringify(customList));
+
+        // 2. Si es estático (IDs 1 a 9)
+        const staticIds = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+        if (staticIds.includes(id)) {
+          const deletedStatic = getDeletedStaticIds();
+          if (!deletedStatic.includes(id)) {
+            const updatedDeleted = [...deletedStatic, id];
+            localStorage.setItem('colkley_deleted_static_ids:v1', JSON.stringify(updatedDeleted));
+          }
+        }
+
+        const updatedDeactivated = dataState.deactivatedIds.filter(x => x !== id);
+        localStorage.setItem('colkley_deactivated_ids:v1', JSON.stringify(updatedDeactivated));
+
+        setDataState(prev => ({
+          ...prev,
+          deactivatedIds: updatedDeactivated,
+          productosList: getProductos()
+        }));
+      } catch (e) {
+        console.error(e);
+      }
     }
   };
 
@@ -195,31 +310,46 @@ export default function useAdminState() {
   const handleGuardarNuevoProducto = (prodData) => {
     const sizes = prodData.tamanos.split(',').flatMap(s => s.trim() ? [s.trim()] : []);
 
-    compressImage(prodData.imgBase64).then(compressed => {
+    compressImage(prodData.imgBase64).then(async (compressed) => {
       const newProd = {
         id: Date.now(),
         nombre: prodData.nombre,
         tipo: prodData.tipo,
         categoria: prodData.categoria || 'otros',
-        precio: prodData.precio,
-        descuento: prodData.descuento,
+        precio: parseInt(prodData.precio, 10),
+        descuento: parseInt(prodData.descuento || '0', 10),
         desc: prodData.desc,
         tamanos: sizes,
         diseño: prodData.diseño,
         imagenBase64: compressed,
         nuevo: true,
-        isCustom: true
+        is_custom: true,
+        activo: true
       };
 
-      try {
-        const customList = getCustomProductos();
-        customList.push(newProd);
-        localStorage.setItem('colkley_custom_productos:v1', JSON.stringify(customList));
-
+      if (isSupabaseConfigured) {
+        const { error } = await supabase
+          .from('productos')
+          .insert([newProd]);
+        if (error) {
+          alert("❌ Error al guardar producto en Supabase: " + error.message);
+          return;
+        }
         toggleModal('modalAdd', false);
-        setDataState(prev => ({ ...prev, productosList: getProductos() }));
-      } catch (err) {
-        alert("❌ Error al guardar producto. La imagen puede ser demasiado grande.");
+        const { data: prods } = await supabase.from('productos').select('*').order('id', { ascending: true });
+        if (prods) setDataState(prev => ({ ...prev, productosList: prods }));
+      } else {
+        const localProd = { ...newProd, isCustom: true, imagenBase64: compressed };
+        try {
+          const customList = getCustomProductos();
+          customList.push(localProd);
+          localStorage.setItem('colkley_custom_productos:v1', JSON.stringify(customList));
+
+          toggleModal('modalAdd', false);
+          setDataState(prev => ({ ...prev, productosList: getProductos() }));
+        } catch (err) {
+          alert("❌ Error al guardar producto. La imagen puede ser demasiado grande.");
+        }
       }
     });
   };
@@ -234,36 +364,51 @@ export default function useAdminState() {
     const sizes = editData.tamanos.split(',').flatMap(s => s.trim() ? [s.trim()] : []);
     const existing = dataState.productosList.find(x => x.id === editData.id);
 
-    const saveOverride = (base64Img) => {
+    const saveOverride = async (base64Img) => {
       const updatedProd = {
         id: editData.id,
         nombre: editData.nombre,
         tipo: editData.tipo,
         categoria: editData.categoria || 'otros',
-        precio: editData.precio,
-        descuento: editData.descuento,
+        precio: parseInt(editData.precio, 10),
+        descuento: parseInt(editData.descuento || '0', 10),
         desc: editData.desc,
         tamanos: sizes,
         diseño: editData.diseño,
         imagenBase64: base64Img,
         nuevo: existing ? existing.nuevo : true,
-        isCustom: true
+        is_custom: true,
+        activo: existing ? existing.activo : true
       };
 
-      try {
-        let customList = getCustomProductos();
-        const index = customList.findIndex(c => c.id === editData.id);
-        if (index !== -1) {
-          customList[index] = updatedProd;
-        } else {
-          customList.push(updatedProd);
+      if (isSupabaseConfigured) {
+        const { error } = await supabase
+          .from('productos')
+          .upsert([updatedProd]);
+        if (error) {
+          alert("❌ Error al guardar edición en Supabase: " + error.message);
+          return;
         }
-        localStorage.setItem('colkley_custom_productos:v1', JSON.stringify(customList));
-
         toggleModal('modalEdit', false);
-        setDataState(prev => ({ ...prev, productosList: getProductos() }));
-      } catch (err) {
-        alert("❌ Error al guardar. Intenta con una imagen de muestra más liviana.");
+        const { data: prods } = await supabase.from('productos').select('*').order('id', { ascending: true });
+        if (prods) setDataState(prev => ({ ...prev, productosList: prods }));
+      } else {
+        const localProd = { ...updatedProd, isCustom: true, imagenBase64: base64Img };
+        try {
+          let customList = getCustomProductos();
+          const index = customList.findIndex(c => c.id === editData.id);
+          if (index !== -1) {
+            customList[index] = localProd;
+          } else {
+            customList.push(localProd);
+          }
+          localStorage.setItem('colkley_custom_productos:v1', JSON.stringify(customList));
+
+          toggleModal('modalEdit', false);
+          setDataState(prev => ({ ...prev, productosList: getProductos() }));
+        } catch (err) {
+          alert("❌ Error al guardar. Intenta con una imagen de muestra más liviana.");
+        }
       }
     };
 
@@ -277,7 +422,7 @@ export default function useAdminState() {
   };
 
   // Guardar Cupón
-  const handleGuardarNuevoCupon = (couponData) => {
+  const handleGuardarNuevoCupon = async (couponData) => {
     if (dataState.cupones.some(c => c.codigo === couponData.codigo)) {
       alert("⚠️ Ya existe un cupón con este código.");
       return;
@@ -286,63 +431,122 @@ export default function useAdminState() {
     const newCoupon = {
       codigo: couponData.codigo,
       tipo: couponData.tipo,
-      valor: couponData.valor,
-      minCompra: couponData.minCompra,
+      valor: parseFloat(couponData.valor),
+      minCompra: parseFloat(couponData.minCompra || '0'),
       activo: true
     };
 
-    try {
-      const updated = [...dataState.cupones, newCoupon];
-      setDataState(prev => ({ ...prev, cupones: updated }));
-      localStorage.setItem('colkley_cupones:v1', JSON.stringify(updated));
+    if (isSupabaseConfigured) {
+      const { error } = await supabase
+        .from('cupones')
+        .insert([newCoupon]);
+      if (error) {
+        alert("❌ Error al guardar el cupón en Supabase: " + error.message);
+        return;
+      }
       toggleModal('modalCoupon', false);
-    } catch(err) {
-      alert("❌ Error al guardar el cupón");
+      const { data: cups } = await supabase.from('cupones').select('*').order('codigo', { ascending: true });
+      if (cups) setDataState(prev => ({ ...prev, cupones: cups }));
+    } else {
+      try {
+        const updated = [...dataState.cupones, newCoupon];
+        setDataState(prev => ({ ...prev, cupones: updated }));
+        localStorage.setItem('colkley_cupones:v1', JSON.stringify(updated));
+        toggleModal('modalCoupon', false);
+      } catch(err) {
+        alert("❌ Error al guardar el cupón");
+      }
     }
   };
 
   // Guardar o Editar Categoría
-  const handleGuardarCategoria = (catData) => {
+  const handleGuardarCategoria = async (catData) => {
     const existing = dataState.categorias.find(c => c.id === catData.id);
-    let updated;
-    if (existing) {
-      updated = dataState.categorias.map(c => c.id === catData.id ? { ...catData, activo: c.activo !== false } : c);
-    } else {
-      updated = [...dataState.categorias, { ...catData, activo: true }];
-    }
+    const updatedCat = {
+      id: catData.id,
+      nombre: catData.nombre,
+      emoji: catData.emoji,
+      activo: existing ? (existing.activo !== false) : true
+    };
 
-    setDataState(prev => ({ ...prev, categorias: updated }));
-    localStorage.setItem('colkley_categorias:v1', JSON.stringify(updated));
-    setUiState(prev => ({ ...prev, selectedCategory: null, modalCategory: false }));
+    if (isSupabaseConfigured) {
+      const { error } = await supabase
+        .from('categorias')
+        .upsert([updatedCat]);
+      if (error) {
+        alert("❌ Error al guardar la categoría en Supabase: " + error.message);
+        return;
+      }
+      setUiState(prev => ({ ...prev, selectedCategory: null, modalCategory: false }));
+      const { data: cats } = await supabase.from('categorias').select('*').order('id', { ascending: true });
+      if (cats) setDataState(prev => ({ ...prev, categorias: cats }));
+    } else {
+      let updated;
+      if (existing) {
+        updated = dataState.categorias.map(c => c.id === catData.id ? { ...catData, activo: c.activo !== false } : c);
+      } else {
+        updated = [...dataState.categorias, { ...catData, activo: true }];
+      }
+
+      setDataState(prev => ({ ...prev, categorias: updated }));
+      localStorage.setItem('colkley_categorias:v1', JSON.stringify(updated));
+      setUiState(prev => ({ ...prev, selectedCategory: null, modalCategory: false }));
+    }
   };
 
   // Alternar el estado activo/inactivo de una categoría
-  const handleToggleCategoryStatus = (id) => {
+  const handleToggleCategoryStatus = async (id) => {
     if (id === 'todos') {
       alert("⚠️ La categoría 'Todos' es del sistema y no se puede desactivar.");
       return;
     }
+    const cat = dataState.categorias.find(c => c.id === id);
+    if (!cat) return;
+    const newActivo = cat.activo === false ? true : false;
+
     const updated = dataState.categorias.map(c => {
       if (c.id === id) {
-        return { ...c, activo: c.activo === false ? true : false };
+        return { ...c, activo: newActivo };
       }
       return c;
     });
     setDataState(prev => ({ ...prev, categorias: updated }));
-    localStorage.setItem('colkley_categorias:v1', JSON.stringify(updated));
+
+    if (isSupabaseConfigured) {
+      const { error } = await supabase
+        .from('categorias')
+        .update({ activo: newActivo })
+        .eq('id', id);
+      if (error) console.error(error);
+    } else {
+      localStorage.setItem('colkley_categorias:v1', JSON.stringify(updated));
+    }
   };
 
   // Eliminar Categoría
-  const handleEliminarCategoria = (id) => {
+  const handleEliminarCategoria = async (id) => {
     if (id === 'todos') {
       alert("⚠️ La categoría 'Todos' es del sistema y no puede eliminarse.");
       return;
     }
     if (!confirm("⚠️ ¿Estás seguro de que deseas eliminar esta categoría? Esto podría afectar a los productos asociados.")) return;
 
-    const updated = dataState.categorias.filter(c => c.id !== id);
-    setDataState(prev => ({ ...prev, categorias: updated }));
-    localStorage.setItem('colkley_categorias:v1', JSON.stringify(updated));
+    if (isSupabaseConfigured) {
+      const { error } = await supabase
+        .from('categorias')
+        .delete()
+        .eq('id', id);
+      if (error) {
+        alert("❌ Error al eliminar categoría en Supabase: " + error.message);
+        return;
+      }
+      const { data: cats } = await supabase.from('categorias').select('*').order('id', { ascending: true });
+      if (cats) setDataState(prev => ({ ...prev, categorias: cats }));
+    } else {
+      const updated = dataState.categorias.filter(c => c.id !== id);
+      setDataState(prev => ({ ...prev, categorias: updated }));
+      localStorage.setItem('colkley_categorias:v1', JSON.stringify(updated));
+    }
   };
 
   // Abrir Modal de Categoría para editar
@@ -351,9 +555,17 @@ export default function useAdminState() {
   };
 
   // Guardar configuración del servicio de regalo
-  const handleGuardarGiftWrapConfig = (newConfig) => {
+  const handleGuardarGiftWrapConfig = async (newConfig) => {
     setDataState(prev => ({ ...prev, giftWrapConfig: newConfig }));
-    localStorage.setItem('colkley_gift_wrap_config:v1', JSON.stringify(newConfig));
+
+    if (isSupabaseConfigured) {
+      const { error } = await supabase
+        .from('settings')
+        .upsert([{ key: 'gift_wrap', value: newConfig }]);
+      if (error) console.error("Error saving gift wrap config to Supabase:", error);
+    } else {
+      localStorage.setItem('colkley_gift_wrap_config:v1', JSON.stringify(newConfig));
+    }
   };
 
   // Filtrado de productos en frontend
