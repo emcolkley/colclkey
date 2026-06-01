@@ -27,7 +27,7 @@ const CheckoutForm = dynamic(() => import('../components/CheckoutForm'), {
   ),
   ssr: false
 });
-import { getProductos, getCategoriasList } from '../data/productos';
+import { getProductos, getCategoriasList, getGiftWrapConfig } from '../data/productos';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { loadGlobalMaquetas } from './CanvasPreview';
 
@@ -231,6 +231,18 @@ export default function HomeClient() {
     return isSupabaseConfigured ? [] : getCategoriasList();
   });
 
+  const [giftWrapConfig, setGiftWrapConfig] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem('colkley_supabase_cached_gift_wrap:v1');
+        if (cached) return JSON.parse(cached);
+      } catch (e) {
+        console.error("Error reading cached gift wrap", e);
+      }
+    }
+    return getGiftWrapConfig();
+  });
+
   // Lazy initializer del carrito que lee de forma directa y segura en carga (resuelve no-initialize-state)
   const [cartState, setCartState] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -395,6 +407,24 @@ export default function HomeClient() {
             });
             localStorage.setItem('colkley_supabase_cached_categorias:v1', JSON.stringify(cats));
           }
+
+          // 3. Cargar configuración de envoltura de regalo (gift_wrap) de Supabase
+          const { data: giftWrapSetting, error: errGiftWrap } = await supabase
+            .from('settings')
+            .select('*')
+            .eq('key', 'gift_wrap')
+            .maybeSingle();
+          if (!errGiftWrap && giftWrapSetting && giftWrapSetting.value) {
+            setGiftWrapConfig(prev => {
+              const newStr = JSON.stringify(giftWrapSetting.value);
+              const oldStr = JSON.stringify(prev);
+              if (newStr !== oldStr) {
+                return giftWrapSetting.value;
+              }
+              return prev;
+            });
+            localStorage.setItem('colkley_supabase_cached_gift_wrap:v1', JSON.stringify(giftWrapSetting.value));
+          }
         } catch (e) {
           console.error("Error loading data in HomeClient:", e);
         }
@@ -523,6 +553,7 @@ export default function HomeClient() {
               cart={cartState.items}
               onBack={() => setStep(2)}
               onOrderPlaced={handleOrderPlaced}
+              giftWrapConfig={giftWrapConfig}
             />
           </section>
         )}

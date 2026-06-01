@@ -3,16 +3,16 @@
 import React, { useState, useEffect } from 'react';
 import { getGiftWrapConfig } from '../data/productos';
 
-export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumber = "5491100000000" }) {
+export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumber = "5491100000000", giftWrapConfig }) {
   // Cargar configuración de regalo de forma autónoma en useEffect para prevenir hydration mismatches en Next.js
   const [giftConfig, setGiftConfig] = useState(null);
 
   useEffect(() => {
-    const config = getGiftWrapConfig();
+    const config = giftWrapConfig || getGiftWrapConfig();
     setTimeout(() => {
       setGiftConfig(config);
     }, 0);
-  }, []);
+  }, [giftWrapConfig]);
 
   // Estado consolidado para evitar múltiples useState (resuelve prefer-useReducer)
   const [formState, setFormState] = useState({
