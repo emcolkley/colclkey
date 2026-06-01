@@ -175,6 +175,10 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
             placeholder="Tu nombre y apellido" 
             value={formState.nombre}
             onChange={(e) => updateFormState({ nombre: e.target.value })}
+            autoComplete="name"
+            autoCapitalize="words"
+            autoCorrect="off"
+            spellCheck="false"
             required 
           />
         </div>
@@ -184,6 +188,8 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
           <input 
             className="form-input" 
             type="tel" 
+            inputMode="tel"
+            autoComplete="tel"
             id="input-telefono" 
             placeholder="+56 9 ..." 
             value={formState.telefono}
@@ -199,6 +205,7 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
             placeholder="Ej: quiero que la foto quede centrada, tonos cálidos..."
             value={formState.mensaje}
             onChange={(e) => updateFormState({ mensaje: e.target.value })}
+            spellCheck="true"
           />
         </div>
 
@@ -266,6 +273,7 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
                           placeholder={field.placeholder || ''}
                           value={val}
                           onChange={(e) => handleFieldChange(e.target.value)}
+                          spellCheck="true"
                         />
                       ) : (
                         <input
@@ -276,6 +284,9 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
                           placeholder={field.placeholder || ''}
                           value={val}
                           onChange={(e) => handleFieldChange(e.target.value)}
+                          autoComplete="off"
+                          autoCorrect="off"
+                          spellCheck="false"
                         />
                       )}
                     </div>
@@ -297,6 +308,10 @@ export default function CheckoutForm({ cart, onBack, onOrderPlaced, whatsappNumb
               placeholder="Ingresá tu cupón"
               value={formState.couponCode}
               onChange={(e) => updateFormState({ couponCode: e.target.value })}
+              autoCapitalize="characters"
+              autoCorrect="off"
+              autoComplete="off"
+              spellCheck="false"
               style={{ flex: 1 }}
             />
             <button 
