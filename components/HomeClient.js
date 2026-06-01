@@ -2,10 +2,31 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import ProductGrid from '../components/ProductGrid';
-import Customizer from '../components/Customizer';
 import CartDrawer from '../components/CartDrawer';
-import CheckoutForm from '../components/CheckoutForm';
+
+const Customizer = dynamic(() => import('../components/Customizer'), {
+  loading: () => (
+    <div style={{ textAlign: 'center', color: '#888', padding: '100px 0', fontFamily: 'inherit' }}>
+      <span className="upload-icon" style={{ fontSize: '2.5rem', display: 'block', marginBottom: '16px' }}>🎨</span>
+      <h3 style={{ fontFamily: 'Cinzel, serif', color: '#E8C96A', fontSize: '1.2rem', marginBottom: '8px', marginTop: 0 }}>Cargando personalizador...</h3>
+      <p style={{ color: '#666', fontSize: '0.85rem', margin: 0 }}>Preparando tu lienzo de diseño en alta resolución</p>
+    </div>
+  ),
+  ssr: false
+});
+
+const CheckoutForm = dynamic(() => import('../components/CheckoutForm'), {
+  loading: () => (
+    <div style={{ textAlign: 'center', color: '#888', padding: '100px 0', fontFamily: 'inherit' }}>
+      <span className="upload-icon" style={{ fontSize: '2.5rem', display: 'block', marginBottom: '16px' }}>🛒</span>
+      <h3 style={{ fontFamily: 'Cinzel, serif', color: '#E8C96A', fontSize: '1.2rem', marginBottom: '8px', marginTop: 0 }}>Cargando checkout...</h3>
+      <p style={{ color: '#666', fontSize: '0.85rem', margin: 0 }}>Preparando tu resumen y opciones de compra</p>
+    </div>
+  ),
+  ssr: false
+});
 import { getProductos, getCategoriasList } from '../data/productos';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { loadGlobalMaquetas } from './CanvasPreview';
