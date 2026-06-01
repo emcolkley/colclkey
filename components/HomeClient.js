@@ -6,7 +6,7 @@ import ProductGrid from '../components/ProductGrid';
 import Customizer from '../components/Customizer';
 import CartDrawer from '../components/CartDrawer';
 import CheckoutForm from '../components/CheckoutForm';
-import { getProductos } from '../data/productos';
+import { getProductos, getCategoriasList } from '../data/productos';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 // Estilos estáticos constantes (resuelve no-inline-exhaustive-style)
@@ -177,6 +177,7 @@ export default function HomeClient() {
   const [orderConfirmation, setOrderConfirmation] = useState(null);
   const dialogRef = useRef(null);
   const [productosList, setProductosList] = useState(() => getProductos());
+  const [categoriasList, setCategoriasList] = useState(() => getCategoriasList());
 
   // Lazy initializer del carrito que lee de forma directa y segura en carga (resuelve no-initialize-state)
   const [cartState, setCartState] = useState(() => {
@@ -278,24 +279,34 @@ export default function HomeClient() {
     registerVisit();
   }, []);
 
-  // Cargar productos actualizados desde Supabase o fallback local
+  // Cargar productos y categorías actualizados desde Supabase o fallback local
   useEffect(() => {
-    const loadProducts = async () => {
+    const loadData = async () => {
       if (isSupabaseConfigured) {
         try {
-          const { data, error } = await supabase
+          // 1. Cargar productos
+          const { data: prods, error: errProds } = await supabase
             .from('productos')
             .select('*')
             .order('id', { ascending: true });
-          if (!error && data) {
-            setProductosList(data);
+          if (!errProds && prods) {
+            setProductosList(prods);
+          }
+
+          // 2. Cargar categorías
+          const { data: cats, error: errCats } = await supabase
+            .from('categorias')
+            .select('*')
+            .order('orden', { ascending: true });
+          if (!errCats && cats) {
+            setCategoriasList(cats);
           }
         } catch (e) {
-          console.error("Error loading products in HomeClient:", e);
+          console.error("Error loading data in HomeClient:", e);
         }
       }
     };
-    loadProducts();
+    loadData();
   }, []);
 
   // Sincronizar carrito con localStorage (con versión)
@@ -388,7 +399,11 @@ export default function HomeClient() {
             <div className="gold-line"></div>
             <p className="section-sub">Seleccioná el producto que querés personalizar con tu foto</p>
             
-            <ProductGrid onSelectProduct={handleSelectProduct} />
+            <ProductGrid 
+              onSelectProduct={handleSelectProduct} 
+              activeProducts={productosList.filter(p => p.activo)}
+              categories={categoriasList}
+            />
           </section>
         )}
 

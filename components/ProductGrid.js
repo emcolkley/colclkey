@@ -53,18 +53,26 @@ const BUTTON_ACTIVE_STYLE = {
   boxShadow: '0 0 12px rgba(201, 168, 76, 0.15)',
 };
 
-export default function ProductGrid({ onSelectProduct }) {
+export default function ProductGrid({ onSelectProduct, activeProducts, categories }) {
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('todos');
-  const [categorias, setCategorias] = useState(() => getCategoriasList());
+  const [categorias, setCategorias] = useState(() => categories || getCategoriasList());
 
   // Lazy initializer que carga el estado inicial de productos activos (resuelve no-initialize-state)
   const [productosActivos, setProductosActivos] = useState(() => {
+    if (activeProducts) return activeProducts;
     const deactivatedList = getDeactivatedList();
     const allProds = getProductos();
     return allProds.filter(p => !deactivatedList.includes(p.id));
   });
 
   useEffect(() => {
+    // Si ya tenemos los datos pasados por props (optimizados), sincronizamos el estado y evitamos consulta duplicada
+    if (activeProducts && categories) {
+      setProductosActivos(activeProducts);
+      setCategorias(categories);
+      return;
+    }
+
     const fetchActiveProducts = async () => {
       if (isSupabaseConfigured) {
         try {
@@ -156,7 +164,7 @@ export default function ProductGrid({ onSelectProduct }) {
       window.addEventListener('storage', fetchActiveProducts);
       return () => window.removeEventListener('storage', fetchActiveProducts);
     }
-  }, []);
+  }, [activeProducts, categories]);
 
   const productosFiltrados = productosActivos.filter(p => {
     if (categoriaSeleccionada === 'todos') return true;
